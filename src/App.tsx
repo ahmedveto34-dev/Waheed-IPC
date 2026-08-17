@@ -1,0 +1,693 @@
+import React, { useState, useRef, useEffect } from 'react';
+import { 
+  ShieldCheck, 
+  FileText, 
+  Upload, 
+  Sparkles, 
+  BookOpen, 
+  Printer, 
+  Volume2, 
+  VolumeX, 
+  MessageSquare, 
+  ArrowRight, 
+  CheckCircle2, 
+  AlertCircle, 
+  RotateCcw, 
+  FileCheck, 
+  Filter, 
+  Layers, 
+  Download, 
+  Share2, 
+  Copy, 
+  ChevronDown,
+  Activity,
+  HeartPulse,
+  Flame,
+  Award
+} from 'lucide-react';
+
+import { PolicyAnalysisResult, SamplePolicy } from './types';
+import { SAMPLE_POLICIES } from './data/samplePolicies';
+import { PolicyCardSection } from './components/PolicyCardSection';
+import { PurposeScopeSection } from './components/PurposeScopeSection';
+import { RolesSection } from './components/RolesSection';
+import { SopSection } from './components/SopSection';
+import { SafetyWarningsSection } from './components/SafetyWarningsSection';
+import { MermaidViewer } from './components/MermaidViewer';
+import { AuditAndKpisSection } from './components/AuditAndKpisSection';
+import { AskExpertModal } from './components/AskExpertModal';
+import { PrintableReport } from './components/PrintableReport';
+import { LoginPage } from './components/LoginPage';
+import { LogOut } from 'lucide-react';
+
+export default function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
+    return localStorage.getItem('waheed_ipc_auth') === 'authenticated';
+  });
+  const [policyText, setPolicyText] = useState('');
+  const [uploadedFile, setUploadedFile] = useState<{
+    name: string;
+    type: string;
+    size: number;
+    base64?: string;
+  } | null>(null);
+  const [standardFocus, setStandardFocus] = useState('شامل (CBAHI + JCI + OSHA)');
+  const [customInstructions, setCustomInstructions] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [analysisResult, setAnalysisResult] = useState<PolicyAnalysisResult | null>(null);
+  const [activeSection, setActiveSection] = useState<string>('all');
+  const [isExpertModalOpen, setIsExpertModalOpen] = useState(false);
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [copySuccess, setCopySuccess] = useState(false);
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const resultsRef = useRef<HTMLDivElement>(null);
+
+  // Load a default analysis or sample on start for instant discovery
+  useEffect(() => {
+    const saved = localStorage.getItem('last_analyzed_policy');
+    if (saved) {
+      try {
+        setAnalysisResult(JSON.parse(saved));
+      } catch (e) {
+        console.error('Failed to load saved policy', e);
+      }
+    }
+  }, []);
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+
+    if (file.type.startsWith('text/') || file.name.endsWith('.txt') || file.name.endsWith('.md')) {
+      reader.onload = (event) => {
+        const text = event.target?.result as string;
+        setPolicyText(text);
+        setUploadedFile({
+          name: file.name,
+          type: file.type || 'text/plain',
+          size: file.size,
+        });
+      };
+      reader.readAsText(file);
+    } else {
+      // For PDF, images or other binary files, read as Base64 for Gemini multimodal input
+      reader.onload = (event) => {
+        const dataUrl = event.target?.result as string;
+        const base64Data = dataUrl.split(',')[1];
+        setUploadedFile({
+          name: file.name,
+          type: file.type || 'application/pdf',
+          size: file.size,
+          base64: base64Data,
+        });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleSelectSample = (sample: SamplePolicy) => {
+    setPolicyText(sample.content);
+    setUploadedFile(null);
+    setErrorMessage(null);
+  };
+
+  const handleAnalyze = async () => {
+    if (!policyText.trim() && !uploadedFile?.base64) {
+      setErrorMessage('يرجى كتابة أو لصق نص السياسة، أو رفع ملف الوثيقة، أو اختيار نموذج من المكتبة.');
+      return;
+    }
+
+    setIsLoading(true);
+    setErrorMessage(null);
+
+    try {
+      const payload: any = {
+        standardFocus,
+        customInstructions,
+      };
+
+      if (policyText.trim()) {
+        payload.content = policyText.trim();
+      }
+
+      if (uploadedFile?.base64) {
+        payload.fileData = uploadedFile.base64;
+        payload.mimeType = uploadedFile.type;
+      }
+
+      const response = await fetch('/api/analyze-policy', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      const resData = await response.json();
+
+      if (!response.ok || !resData.success) {
+        throw new Error(resData.error || resData.details || 'فشل تحليل السياسة.');
+      }
+
+      const result: PolicyAnalysisResult = {
+        ...resData.data,
+        analyzedAt: new Date().toISOString(),
+      };
+
+      setAnalysisResult(result);
+      localStorage.setItem('last_analyzed_policy', JSON.stringify(result));
+
+      // Smooth scroll to results
+      setTimeout(() => {
+        resultsRef.current?.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
+    } catch (err: any) {
+      console.error('Analysis error:', err);
+      setErrorMessage(err.message || 'حدث خطأ غير متوقع أثناء معالجة السياسة بالذكاء الاصطناعي.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Text-to-Speech playback for executive summary
+  const handleToggleSpeech = () => {
+    if (!analysisResult?.executiveSummarySnippet) return;
+
+    if (isSpeaking) {
+      window.speechSynthesis.cancel();
+      setIsSpeaking(false);
+      return;
+    }
+
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(analysisResult.executiveSummarySnippet);
+    utterance.lang = 'ar-SA';
+    utterance.rate = 0.95;
+
+    utterance.onend = () => setIsSpeaking(false);
+    utterance.onerror = () => setIsSpeaking(false);
+
+    window.speechSynthesis.speak(utterance);
+    setIsSpeaking(true);
+  };
+
+  const handlePrint = () => {
+    window.print();
+  };
+
+  const handleCopySummary = async () => {
+    if (!analysisResult) return;
+    const textToCopy = `
+ملخص السياسة الطبية: ${analysisResult.policyCard.titleArabic}
+كود السياسة: ${analysisResult.policyCard.policyCode}
+المجال: ${analysisResult.policyCard.domain}
+
+${analysisResult.executiveSummarySnippet}
+
+المعايير المرجعية:
+${analysisResult.policyCard.alignedStandards.map((s) => `- ${s.standardBody}: ${s.description}`).join('\n')}
+    `.trim();
+
+    try {
+      await navigator.clipboard.writeText(textToCopy);
+      setCopySuccess(true);
+      setTimeout(() => setCopySuccess(false), 2000);
+    } catch (e) {
+      console.error('Copy failed', e);
+    }
+  };
+
+  const clearForm = () => {
+    setPolicyText('');
+    setUploadedFile(null);
+    setErrorMessage(null);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('waheed_ipc_auth');
+    setIsAuthenticated(false);
+  };
+
+  if (!isAuthenticated) {
+    return <LoginPage onLoginSuccess={() => setIsAuthenticated(true)} />;
+  }
+
+  return (
+    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col antialiased">
+      {/* Top Navbar */}
+      <header className="sticky top-0 z-40 bg-white border-b border-slate-200 shadow-2xs no-print">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-700 to-emerald-700 text-white flex items-center justify-center font-black font-mono shadow-xs">
+              W
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="font-extrabold text-blue-950 text-base sm:text-lg font-mono tracking-tight leading-none">
+                  Waheed IPC
+                </span>
+                <span className="px-2 py-0.5 rounded text-2xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">
+                  لوحة التحكم المعتمدة
+                </span>
+              </div>
+              <p className="text-2xs text-slate-500 font-medium mt-0.5">
+                محلل السياسات الطبية ومكافحة العدوى | GAHAR 2025 • CBAHI • JCI • OSHA
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            {analysisResult && (
+              <>
+                <button
+                  id="nav-ask-expert-btn"
+                  onClick={() => setIsExpertModalOpen(true)}
+                  className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-50 text-blue-800 hover:bg-blue-100 border border-blue-200 text-xs font-bold transition"
+                >
+                  <MessageSquare className="w-3.5 h-3.5" />
+                  <span>استشر الخبير</span>
+                </button>
+
+                <button
+                  id="nav-print-btn"
+                  onClick={handlePrint}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold transition shadow-xs"
+                  title="طباعة أو تحميل التقرير بصيغة A4 PDF"
+                >
+                  <Printer className="w-3.5 h-3.5" />
+                  <span>طباعة / حفظ A4 (PDF)</span>
+                </button>
+              </>
+            )}
+
+            <button
+              onClick={() => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                clearForm();
+              }}
+              className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-blue-800 hover:bg-blue-900 text-white text-xs font-bold transition shadow-2xs"
+            >
+              <RotateCcw className="w-3.5 h-3.5" />
+              <span>تحليل سياسة جديدة</span>
+            </button>
+
+            <button
+              id="logout-btn"
+              onClick={handleLogout}
+              title="تسجيل الخروج من المنظومة"
+              className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-slate-100 hover:bg-rose-50 text-slate-600 hover:text-rose-700 border border-slate-200 hover:border-rose-200 text-xs font-bold transition"
+            >
+              <LogOut className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">خروج</span>
+            </button>
+          </div>
+        </div>
+      </header>
+
+      {/* Main Container */}
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6 no-print">
+        {/* Hero & Accreditation Bar */}
+        <section className="bg-slate-900 rounded-xl p-6 sm:p-7 text-white relative overflow-hidden shadow-sm border border-slate-800">
+          <div className="relative z-10 space-y-3.5 max-w-3xl">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="px-2.5 py-0.5 rounded text-xs font-bold bg-blue-900/80 text-blue-200 border border-blue-700/60 flex items-center gap-1.5">
+                <HeartPulse className="w-3.5 h-3.5 text-blue-300" />
+                تحليل السياسات والإجراءات الطبية الشامل
+              </span>
+              <span className="px-2 py-0.5 rounded text-2xs bg-slate-800 text-slate-300 font-mono border border-slate-700">
+                AI Clinical Engine v3.7
+              </span>
+            </div>
+
+            <h1 className="text-xl sm:text-2xl font-bold text-white leading-snug tracking-tight">
+              تحليل وتلخيص وثائق السياسات الطبية ومكافحة العدوى والسلامة المهنية
+            </h1>
+
+            <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
+              توليد ملخصات تنفيذية دقيقة مقسمة إلى بطاقة السياسة، المسؤوليات، مسار خطوات العمل (SOP)، الإرشادات الحرجة، مخطط انسيابي تفاعلي بصيغة Mermaid.js، وقوائم تدقيق الاعتماد ومؤشرات الأداء KPIs وفق متطلبات CBAHI و JCI و OSHA.
+            </p>
+
+            <div className="pt-1 flex flex-wrap items-center gap-2 text-2xs font-semibold text-slate-300">
+              <span className="bg-slate-800/90 px-2.5 py-1 rounded border border-slate-700 flex items-center gap-1">
+                <Award className="w-3.5 h-3.5 text-emerald-400" /> CBAHI Standards
+              </span>
+              <span className="bg-slate-800/90 px-2.5 py-1 rounded border border-slate-700 flex items-center gap-1">
+                <Award className="w-3.5 h-3.5 text-blue-400" /> JCI Accreditation
+              </span>
+              <span className="bg-slate-800/90 px-2.5 py-1 rounded border border-slate-700 flex items-center gap-1">
+                <Award className="w-3.5 h-3.5 text-amber-400" /> OSHA Safety & Health
+              </span>
+              <span className="bg-slate-800/90 px-2.5 py-1 rounded border border-slate-700 flex items-center gap-1">
+                <Award className="w-3.5 h-3.5 text-purple-400" /> CDC / WHO Guidelines
+              </span>
+            </div>
+          </div>
+        </section>
+
+        {/* Input & Policy Workbench */}
+        <section className="bg-white rounded-xl border border-slate-200 shadow-sm p-5 sm:p-6 space-y-5">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">
+            <div>
+              <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                <FileText className="w-4 h-4 text-blue-800" />
+                <span>إدخال وثيقة السياسة أو رفع الملف</span>
+              </h2>
+              <p className="text-xs text-slate-500">
+                الصق نص السياسة أو ارفع ملف PDF / Word أو اختر سياسة معتمدة جاهزة من المكتبة الطبية
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold transition border border-slate-200"
+              >
+                <Upload className="w-3.5 h-3.5 text-blue-800" />
+                <span>رفع ملف (PDF / DOC / صور)</span>
+              </button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".pdf,.txt,.doc,.docx,.png,.jpg,.jpeg"
+                onChange={handleFileUpload}
+                className="hidden"
+              />
+            </div>
+          </div>
+
+          {/* Quick Pre-loaded Policy Library */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                <BookOpen className="w-3.5 h-3.5 text-blue-800" />
+                <span>مكتبة السياسات الطبية النموذجية المعتمدة (اختر للتجربة الفورية):</span>
+              </span>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
+              {SAMPLE_POLICIES.map((sample) => (
+                <button
+                  key={sample.id}
+                  onClick={() => handleSelectSample(sample)}
+                  className={`text-right p-3 rounded-lg border transition-all text-xs space-y-1 ${
+                    policyText === sample.content
+                      ? 'bg-blue-50/90 border-blue-600 text-blue-950 shadow-2xs'
+                      : 'bg-slate-50/70 border-slate-200 hover:bg-slate-100 hover:border-slate-300 text-slate-800'
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold text-2xs px-2 py-0.5 rounded bg-white border border-slate-200 text-blue-800">
+                      {sample.category}
+                    </span>
+                    {policyText === sample.content && (
+                      <CheckCircle2 className="w-3.5 h-3.5 text-blue-800" />
+                    )}
+                  </div>
+                  <h4 className="font-bold text-xs line-clamp-1">{sample.title}</h4>
+                  <p className="text-2xs text-slate-500 line-clamp-1">{sample.summary}</p>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Uploaded file indicator */}
+          {uploadedFile && (
+            <div className="p-3 rounded-lg bg-blue-50 border border-blue-200 flex items-center justify-between text-xs">
+              <div className="flex items-center gap-2">
+                <FileCheck className="w-4 h-4 text-blue-800" />
+                <span>
+                  الملف المرفوع: <strong className="text-blue-950">{uploadedFile.name}</strong> (
+                  {(uploadedFile.size / 1024).toFixed(1)} KB)
+                </span>
+              </div>
+              <button
+                onClick={() => setUploadedFile(null)}
+                className="text-rose-600 hover:text-rose-800 text-xs font-semibold"
+              >
+                إلغاء الملف
+              </button>
+            </div>
+          )}
+
+          {/* Text Area */}
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between text-xs text-slate-600">
+              <label htmlFor="policy-textarea" className="font-bold">
+                نص السياسة أو مسودة الإجراء الطبي:
+              </label>
+              {policyText && (
+                <button
+                  onClick={clearForm}
+                  className="text-slate-400 hover:text-slate-600 text-2xs"
+                >
+                  مسح النص
+                </button>
+              )}
+            </div>
+            <textarea
+              id="policy-textarea"
+              rows={7}
+              value={policyText}
+              onChange={(e) => setPolicyText(e.target.value)}
+              placeholder="اكتب أو الصق نص وثيقة السياسة، خطوات العمل، أو الإجراءات الطبية هنا..."
+              className="w-full p-3.5 rounded-xl border border-slate-200 focus:outline-none focus:border-blue-800 focus:ring-2 focus:ring-blue-100 text-xs sm:text-sm text-slate-800 leading-relaxed font-sans bg-slate-50/50"
+            />
+          </div>
+
+          {/* Config Controls (Standard Focus & Custom instructions) */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                <Filter className="w-3.5 h-3.5 text-blue-800" />
+                <span>التركيز المرجعي ومعايير الاعتماد:</span>
+              </label>
+              <select
+                value={standardFocus}
+                onChange={(e) => setStandardFocus(e.target.value)}
+                className="w-full p-2.5 rounded-lg border border-slate-200 bg-white text-xs text-slate-800 focus:outline-none focus:border-blue-800"
+              >
+                <option value="شامل (CBAHI + JCI + OSHA)">شامل (CBAHI + JCI + OSHA + WHO)</option>
+                <option value="معايير المركز السعودي لاعتماد المنشآت الصحية (CBAHI Focused)">معايير المركز السعودي لاعتماد المنشآت الصحية (CBAHI)</option>
+                <option value="معايير الهيئة الدولية المشتركة (JCI Focused)">معايير الهيئة الدولية المشتركة (JCI)</option>
+                <option value="السلامة والصحة المهنية الأمريكية (OSHA Focused)">السلامة والصحة المهنية (OSHA / FMS)</option>
+                <option value="مكافحة العدوى والوقاية (Infection Control IPC Focus)">مكافحة العدوى والوقاية (IPC CDC/WHO)</option>
+              </select>
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-slate-700">
+                توجيهات إضافية للمحلل (اختياري):
+              </label>
+              <input
+                type="text"
+                value={customInstructions}
+                onChange={(e) => setCustomInstructions(e.target.value)}
+                placeholder="مثال: ركز على دور التمريض، أو أضف نقاط تفتيش غرف العناية المركزة..."
+                className="w-full p-2.5 rounded-lg border border-slate-200 bg-white text-xs text-slate-800 focus:outline-none focus:border-blue-800"
+              />
+            </div>
+          </div>
+
+          {/* Error Banner */}
+          {errorMessage && (
+            <div className="p-3.5 bg-rose-50 border border-rose-200 rounded-lg text-rose-800 text-xs flex items-start gap-2.5">
+              <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+              <span>{errorMessage}</span>
+            </div>
+          )}
+
+          {/* Submit CTA Button */}
+          <div className="pt-1">
+            <button
+              id="analyze-policy-cta-btn"
+              onClick={handleAnalyze}
+              disabled={isLoading}
+              className="w-full py-3.5 px-6 rounded-xl bg-blue-800 hover:bg-blue-900 disabled:opacity-50 text-white font-bold text-sm sm:text-base flex items-center justify-center gap-2.5 transition shadow-sm hover:shadow-md active:scale-[0.99]"
+            >
+              {isLoading ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  <span>جاري تحليل الوثيقة واستخراج الهيكل الإلزامي ومخطط Mermaid...</span>
+                </>
+              ) : (
+                <>
+                  <Sparkles className="w-4 h-4" />
+                  <span>تحليل وتوليد الملخص التنفيذي ومخطط التدفق (SOP & Mermaid)</span>
+                </>
+              )}
+            </button>
+          </div>
+        </section>
+
+        {/* Results Section */}
+        {analysisResult && (
+          <div ref={resultsRef} className="space-y-6 pt-2">
+            {/* Executive Summary Callout Box */}
+            <section className="bg-slate-900 rounded-xl p-5 sm:p-6 text-white shadow-sm border border-slate-800 relative overflow-hidden">
+              <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 pb-4 border-b border-slate-800">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <span className="px-2.5 py-0.5 rounded text-2xs font-bold bg-blue-900/80 text-blue-200 border border-blue-700/60">
+                      ملخص تنفيذي معتمد
+                    </span>
+                    <span className="text-2xs text-slate-300 font-mono">
+                      {analysisResult.policyCard.policyCode}
+                    </span>
+                  </div>
+                  <h2 className="text-base sm:text-xl font-bold text-white leading-snug">
+                    {analysisResult.policyCard.titleArabic}
+                  </h2>
+                </div>
+
+                <div className="flex items-center gap-2 self-end sm:self-auto">
+                  <button
+                    onClick={handleToggleSpeech}
+                    title={isSpeaking ? 'إيقاف القراءة الصوتية' : 'قراءة صوتية للملخص'}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition ${
+                      isSpeaking
+                        ? 'bg-rose-600 text-white animate-pulse'
+                        : 'bg-slate-800 hover:bg-slate-700 text-blue-200 border border-slate-700'
+                    }`}
+                  >
+                    {isSpeaking ? <VolumeX className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5" />}
+                    <span>{isSpeaking ? 'إيقاف الصوت' : 'استمع للملخص'}</span>
+                  </button>
+
+                  <button
+                    onClick={handlePrint}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition shadow-xs"
+                    title="تصدير وثيقة السياسة A4 أو الطباعة المباشرة"
+                  >
+                    <Printer className="w-3.5 h-3.5" />
+                    <span>طباعة / تصدير A4</span>
+                  </button>
+
+                  <button
+                    onClick={handleCopySummary}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-bold transition"
+                  >
+                    {copySuccess ? <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                    <span>{copySuccess ? 'تم النسخ' : 'نسخ الملخص'}</span>
+                  </button>
+
+                  <button
+                    onClick={() => setIsExpertModalOpen(true)}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs transition shadow-2xs"
+                  >
+                    <MessageSquare className="w-3.5 h-3.5" />
+                    <span>استشر الخبير</span>
+                  </button>
+                </div>
+              </div>
+
+              <div className="pt-3.5">
+                <p className="text-xs sm:text-sm text-slate-200 leading-relaxed font-normal whitespace-pre-line">
+                  {analysisResult.executiveSummarySnippet}
+                </p>
+              </div>
+            </section>
+
+            {/* Quick Section Anchor Tabs */}
+            <div className="sticky top-16 z-30 bg-white/95 backdrop-blur-md p-1.5 rounded-xl border border-slate-200 shadow-2xs flex items-center gap-1 overflow-x-auto">
+              {[
+                { id: 'all', label: 'كافة الأقسام' },
+                { id: 'card', label: '1. بطاقة السياسة' },
+                { id: 'scope', label: '2. الهدف والنطاق' },
+                { id: 'roles', label: '3. الأدوار والمسؤوليات' },
+                { id: 'sop', label: '4. خطوات العمل (SOP)' },
+                { id: 'warnings', label: '5. التحذيرات الحرجة' },
+                { id: 'flowchart', label: '6. المخطط الانسيابي' },
+                { id: 'kpis', label: '7. معايير التدقيق و KPIs' },
+              ].map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveSection(tab.id)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition whitespace-nowrap ${
+                    activeSection === tab.id
+                      ? 'bg-blue-800 text-white shadow-xs'
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Structured Sections Output */}
+            <div className="space-y-5">
+              {/* Section 1: Policy Card */}
+              {(activeSection === 'all' || activeSection === 'card') && (
+                <PolicyCardSection card={analysisResult.policyCard} />
+              )}
+
+              {/* Section 2: Purpose & Scope */}
+              {(activeSection === 'all' || activeSection === 'scope') && (
+                <PurposeScopeSection data={analysisResult.purposeAndScope} />
+              )}
+
+              {/* Section 3: Roles & Responsibilities */}
+              {(activeSection === 'all' || activeSection === 'roles') && (
+                <RolesSection roles={analysisResult.rolesAndResponsibilities} />
+              )}
+
+              {/* Section 4: SOP Steps */}
+              {(activeSection === 'all' || activeSection === 'sop') && (
+                <SopSection sop={analysisResult.sopPhases} />
+              )}
+
+              {/* Section 5: Safety Warnings & Critical Steps */}
+              {(activeSection === 'all' || activeSection === 'warnings') && (
+                <SafetyWarningsSection warnings={analysisResult.safetyWarningsAndCriticalSteps} />
+              )}
+
+              {/* Section 6: Mermaid Flowchart */}
+              {(activeSection === 'all' || activeSection === 'flowchart') && (
+                <MermaidViewer
+                  code={analysisResult.mermaidFlowchart.code}
+                  description={analysisResult.mermaidFlowchart.description}
+                  title="6. مخطط تدفق الإجراءات الانسيابي (Mermaid.js Flowchart Code)"
+                />
+              )}
+
+              {/* Section 7: Audit Checklist & KPIs */}
+              {(activeSection === 'all' || activeSection === 'kpis') && (
+                <AuditAndKpisSection
+                  data={analysisResult.complianceAndKPIs}
+                  policyTitle={analysisResult.policyCard.titleArabic}
+                />
+              )}
+            </div>
+          </div>
+        )}
+      </main>
+
+      {/* Footer */}
+      <footer className="bg-white border-t border-slate-200 py-5 mt-10 no-print">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
+          <div className="flex items-center gap-2">
+            <ShieldCheck className="w-4 h-4 text-blue-800" />
+            <span>
+              نظام تحليل السياسات الطبية ومكافحة العدوى والسلامة المهنية | CBAHI • JCI • OSHA Standards
+            </span>
+          </div>
+          <div>
+            <span>منصة متوافقة مع معايير جودة الرعاية الصحية وإدارة المخاطر السريرية</span>
+          </div>
+        </div>
+      </footer>
+
+      {/* Ask Expert Consultation Modal */}
+      {analysisResult && (
+        <AskExpertModal
+          isOpen={isExpertModalOpen}
+          onClose={() => setIsExpertModalOpen(false)}
+          analysisData={analysisResult}
+        />
+      )}
+
+      {/* Hidden Official Printable Document */}
+      {analysisResult && <PrintableReport data={analysisResult} />}
+    </div>
+  );
+}
