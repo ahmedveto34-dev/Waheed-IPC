@@ -141,11 +141,29 @@ export default function App() {
 
       const response = await fetch('/api/analyze-policy', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Accept': 'application/json' 
+        },
         body: JSON.stringify(payload),
       });
 
-      const resData = await response.json();
+      const responseText = await response.text();
+      let resData: any;
+
+      try {
+        resData = JSON.parse(responseText);
+      } catch (parseError) {
+        console.error('Non-JSON response received from server:', responseText);
+        // If server returned an HTML error (e.g. 413 Payload Too Large or 504 Gateway Timeout or static fallback)
+        if (responseText.includes('413') || responseText.toLowerCase().includes('payload too large') || responseText.toLowerCase().includes('entity too large')) {
+          throw new Error('حجم الملف المرفوع كبير جداً. يرجى اختيار ملف أصغر حجماً (أقل من 5 ميجابايت) أو نسخ نص السياسة ولصقه في الحقل المخصص.');
+        } else if (response.status === 504 || responseText.toLowerCase().includes('timeout') || responseText.toLowerCase().includes('the page')) {
+          throw new Error('استغرقت معالجة الوثيقة وقتاً أطول من المعتاد. يرجى محاولة نسخ ولصق النص مباشرة أو تقليل حجم الملف والمحاولة مرة أخرى.');
+        } else {
+          throw new Error('تعذر معالجة استجابة الخادم. يرجى نسخ نص السياسة ولصقه في المربع أو إعادة المحاولة.');
+        }
+      }
 
       if (!response.ok || !resData.success) {
         throw new Error(resData.error || resData.details || 'فشل تحليل السياسة.');
