@@ -51,7 +51,7 @@ export default function App() {
     size: number;
     base64?: string;
   } | null>(null);
-  const [standardFocus, setStandardFocus] = useState('شامل (CBAHI + JCI + OSHA)');
+  const [standardFocus, setStandardFocus] = useState('معايير جهار 2025 والدليل القومي لمكافحة العدوى 2020 (GAHAR & National IPC Guidelines)');
   const [customInstructions, setCustomInstructions] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -483,13 +483,26 @@ ${analysisResult.policyCard.alignedStandards.map((s) => `- ${s.standardBody}: ${
               <select
                 value={standardFocus}
                 onChange={(e) => setStandardFocus(e.target.value)}
-                className="w-full p-2.5 rounded-lg border border-slate-200 bg-white text-xs text-slate-800 focus:outline-none focus:border-blue-800"
+                className="w-full p-2.5 rounded-lg border border-slate-200 bg-white text-xs text-slate-800 font-semibold focus:outline-none focus:border-blue-800"
               >
-                <option value="شامل (CBAHI + JCI + OSHA)">شامل (CBAHI + JCI + OSHA + WHO)</option>
-                <option value="معايير المركز السعودي لاعتماد المنشآت الصحية (CBAHI Focused)">معايير المركز السعودي لاعتماد المنشآت الصحية (CBAHI)</option>
-                <option value="معايير الهيئة الدولية المشتركة (JCI Focused)">معايير الهيئة الدولية المشتركة (JCI)</option>
-                <option value="السلامة والصحة المهنية الأمريكية (OSHA Focused)">السلامة والصحة المهنية (OSHA / FMS)</option>
-                <option value="مكافحة العدوى والوقاية (Infection Control IPC Focus)">مكافحة العدوى والوقاية (IPC CDC/WHO)</option>
+                <option value="معايير جهار 2025 والدليل القومي لمكافحة العدوى 2020 (GAHAR & National IPC Guidelines)">
+                  ⭐ معايير جهار 2025 والدليل القومي المصري لمكافحة العدوى 2020 (GAHAR & National Guidelines)
+                </option>
+                <option value="شامل معتمد (GAHAR 2025 + الدليل القومي + CBAHI + JCI + OSHA)">
+                  معايير شاملة موحدة (GAHAR 2025 + الدليل القومي + CBAHI + JCI + OSHA)
+                </option>
+                <option value="معايير المركز السعودي لاعتماد المنشآت الصحية (CBAHI Focused)">
+                  معايير المركز السعودي لاعتماد المنشآت الصحية (CBAHI)
+                </option>
+                <option value="معايير الهيئة الدولية المشتركة (JCI Focused)">
+                  معايير الهيئة الدولية المشتركة لاعتماد المستشفيات (JCI)
+                </option>
+                <option value="السلامة والصحة المهنية وإدارة المرافق (OSHA & FMS Focused)">
+                  معايير السلامة والصحة المهنية وإدارة المرافق (OSHA & FMS)
+                </option>
+                <option value="مكافحة العدوى والترصد الوبائي (CDC / WHO IPC Guidelines)">
+                  إرشادات مكافحة العدوى والترصد الوبائي (CDC / WHO IPC)
+                </option>
               </select>
             </div>
 
