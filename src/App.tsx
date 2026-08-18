@@ -166,7 +166,17 @@ export default function App() {
       }
 
       if (!response.ok || !resData.success) {
-        throw new Error(resData.error || resData.details || 'فشل تحليل السياسة.');
+        let errText = 'فشل تحليل السياسة.';
+        if (typeof resData?.error === 'string') {
+          errText = resData.error;
+        } else if (typeof resData?.details === 'string') {
+          errText = resData.details;
+        } else if (resData?.error?.message) {
+          errText = resData.error.message;
+        } else if (typeof resData?.error === 'object') {
+          errText = JSON.stringify(resData.error);
+        }
+        throw new Error(errText);
       }
 
       const result: PolicyAnalysisResult = {
@@ -183,7 +193,15 @@ export default function App() {
       }, 100);
     } catch (err: any) {
       console.error('Analysis error:', err);
-      setErrorMessage(err.message || 'حدث خطأ غير متوقع أثناء معالجة السياسة بالذكاء الاصطناعي.');
+      let displayMessage = 'حدث خطأ غير متوقع أثناء معالجة السياسة بالذكاء الاصطناعي.';
+      if (typeof err === 'string') {
+        displayMessage = err;
+      } else if (err?.message && typeof err.message === 'string') {
+        displayMessage = err.message;
+      } else if (err && typeof err === 'object') {
+        displayMessage = err.toString() !== '[object Object]' ? err.toString() : JSON.stringify(err);
+      }
+      setErrorMessage(displayMessage);
     } finally {
       setIsLoading(false);
     }
