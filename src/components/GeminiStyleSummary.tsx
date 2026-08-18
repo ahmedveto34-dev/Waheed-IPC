@@ -210,12 +210,9 @@ export function GeminiStyleSummary({ data, onSwitchToA4, onSwitchToDashboard }: 
       }
     }
 
-    // 11. Audit and KPIs
+    // 11. Measurable KPIs
     if (data.complianceAndKPIs) {
-      sections.push(`\n## 📊 11. معايير التدقيق ومؤشرات الأداء المقاسة (Audit & KPIs)`);
-      if (data.complianceAndKPIs.auditChecklist?.length) {
-        sections.push(`### بنود التفتيش الميداني:\n${data.complianceAndKPIs.auditChecklist.map(item => `- [${item.id}] **${item.checkpoint}** (المرجع: ${item.standardReference} | الدليل: ${item.evidenceRequired})`).join('\n')}`);
-      }
+      sections.push(`\n## 📊 11. مؤشرات الأداء المقاسة ونسب الامتثال (Measurable KPIs)`);
       if (data.complianceAndKPIs.kpis?.length) {
         sections.push(`### مؤشرات الأداء (KPIs):\n${data.complianceAndKPIs.kpis.map(kpi => `- **${kpi.name}**: المعادلة: \`${kpi.formula}\` | المستهدف: **${kpi.target}** (${kpi.frequency})`).join('\n')}`);
       }
@@ -517,57 +514,11 @@ export function GeminiStyleSummary({ data, onSwitchToA4, onSwitchToDashboard }: 
               </div>
             </div>
 
-            {/* 2. INSTITUTIONAL SIGN-OFF & APPROVAL MATRIX */}
-            <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs space-y-4">
-              <div className="flex items-center gap-2 text-slate-900 font-bold text-base border-b border-slate-100 pb-3">
-                <FileCheck2 className="w-5 h-5 text-blue-800" />
-                <h3>1. مصفوفة الإعداد والمراجعة الفنية والاعتماد المؤسسي</h3>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
-                {/* Prepared by */}
-                <div className="p-3.5 rounded-xl bg-blue-50/60 border border-blue-200 space-y-2">
-                  <span className="font-bold text-blue-950 block border-b border-blue-200/70 pb-1 text-2xs uppercase tracking-wider">
-                    ✍️ إعداد ومراجعة فنية:
-                  </span>
-                  <ul className="space-y-1.5 text-slate-800 text-2xs">
-                    <li className="font-semibold">• أ/ محمود محمد شحاته <span className="text-slate-500">(مشرف مكافحة العدوى)</span></li>
-                    <li className="font-semibold">• أ/ أحمد وحيد شعبان <span className="text-slate-500">(مشرف مكافحة العدوى)</span></li>
-                    <li className="font-semibold">• د/ محمود رمضان عبد السميع <span className="text-slate-500">(مدير فريق مكافحة العدوى)</span></li>
-                  </ul>
-                </div>
-
-                {/* Reviewed by */}
-                <div className="p-3.5 rounded-xl bg-purple-50/60 border border-purple-200 space-y-2">
-                  <span className="font-bold text-purple-950 block border-b border-purple-200/70 pb-1 text-2xs uppercase tracking-wider">
-                    🔍 مراجعة واعتماد الجودة:
-                  </span>
-                  <ul className="space-y-1.5 text-slate-800 text-2xs">
-                    <li className="font-semibold">• أ/ محمد ناجي عبدالمجيد <span className="text-slate-500">(عضو الإدارة المركزية لمكافحة العدوى)</span></li>
-                    <li className="font-semibold">• ص/ باسم ناصف فؤاد <span className="text-slate-500">(منسق اللجنة المركزية للجودة)</span></li>
-                    <li className="font-semibold">• د/ أسماء فؤاد أحمد <span className="text-slate-500">(مدير وحدة الجودة)</span></li>
-                  </ul>
-                </div>
-
-                {/* Approved by */}
-                <div className="p-3.5 rounded-xl bg-emerald-50/60 border border-emerald-200 space-y-2">
-                  <span className="font-bold text-emerald-950 block border-b border-emerald-200/70 pb-1 text-2xs uppercase tracking-wider">
-                    🏛️ الاعتماد النهائي:
-                  </span>
-                  <ul className="space-y-1.5 text-slate-800 text-2xs">
-                    <li className="font-semibold">• د/ مصطفى سيد محمد <span className="text-slate-500">(مدير إدارة مكافحة العدوى المركزية)</span></li>
-                    <li className="font-semibold">• د/ سلمان حمدي محمد <span className="text-slate-500">(مدير وحدات الجودة المركزية)</span></li>
-                    <li className="font-semibold">• ا.د/ أحمد عبد الحميد أحمد <span className="text-slate-500">(مدير عام المستشفى)</span></li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-
-            {/* 3. POLICY STATEMENT & OPERATIONAL OBJECTIVES */}
+            {/* 1. POLICY STATEMENT & OPERATIONAL OBJECTIVES */}
             <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs space-y-4">
               <div className="flex items-center gap-2 text-slate-900 font-bold text-base border-b border-slate-100 pb-3">
                 <BookOpen className="w-5 h-5 text-blue-800" />
-                <h3>2. نص السياسة والأهداف الإكلينيكية والتشغيلية (Policy Statement & Objectives)</h3>
+                <h3>1. نص السياسة والأهداف الإكلينيكية والتشغيلية (Policy Statement & Objectives)</h3>
               </div>
 
               <div className="bg-blue-50/70 p-4 rounded-xl border border-blue-200 text-slate-900 space-y-2">
@@ -604,12 +555,12 @@ export function GeminiStyleSummary({ data, onSwitchToA4, onSwitchToDashboard }: 
               </div>
             </div>
 
-            {/* 4. SCIENTIFIC DEFINITIONS */}
+            {/* 2. SCIENTIFIC DEFINITIONS */}
             {definitions.length > 0 && (
               <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs space-y-4">
                 <div className="flex items-center gap-2 text-slate-900 font-bold text-base border-b border-slate-100 pb-3">
                   <FlaskConical className="w-5 h-5 text-indigo-700" />
-                  <h3>3. المفاهيم والمصطلحات العلمية الحاكمة (Scientific Terminology)</h3>
+                  <h3>2. المفاهيم والمصطلحات العلمية الحاكمة (Scientific Terminology)</h3>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -635,12 +586,12 @@ export function GeminiStyleSummary({ data, onSwitchToA4, onSwitchToDashboard }: 
               </div>
             )}
 
-            {/* 5. COMPARATIVE MATRIX OF TECHNIQUES & DISINFECTANTS */}
+            {/* 3. COMPARATIVE MATRIX OF TECHNIQUES & DISINFECTANTS */}
             {techSpecs.length > 0 && (
               <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs space-y-4">
                 <div className="flex items-center gap-2 text-slate-900 font-bold text-base border-b border-slate-100 pb-3">
                   <Layers className="w-5 h-5 text-blue-800" />
-                  <h3>4. جدول تقنيات نظافة الأيدي والمواصفات الفنية والمطهرات</h3>
+                  <h3>3. جدول تقنيات نظافة الأيدي والمواصفات الفنية والمطهرات</h3>
                 </div>
 
                 <div className="overflow-x-auto">
@@ -697,12 +648,12 @@ export function GeminiStyleSummary({ data, onSwitchToA4, onSwitchToDashboard }: 
               </div>
             )}
 
-            {/* 6. WHO 5 MOMENTS DETAIL */}
+            {/* 4. WHO 5 MOMENTS DETAIL */}
             {fiveMoments.length > 0 && (
               <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs space-y-4">
                 <div className="flex items-center gap-2 text-slate-900 font-bold text-base border-b border-slate-100 pb-3">
                   <Bookmark className="w-5 h-5 text-amber-600" />
-                  <h3>5. اللحظات الخمس (WHO 5 Moments) لتطهير الأيدي بالمنشآت الصحية</h3>
+                  <h3>4. اللحظات الخمس (WHO 5 Moments) لتطهير الأيدي بالمنشآت الصحية</h3>
                 </div>
 
                 <div className="space-y-3">
@@ -729,11 +680,11 @@ export function GeminiStyleSummary({ data, onSwitchToA4, onSwitchToDashboard }: 
               </div>
             )}
 
-            {/* 7. DETAILED SOPS: ROUTINE, ALCOHOL, SURGICAL */}
+            {/* 5. DETAILED SOPS: ROUTINE, ALCOHOL, SURGICAL */}
             <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs space-y-5">
               <div className="flex items-center gap-2 text-slate-900 font-bold text-base border-b border-slate-100 pb-3">
                 <CheckCheck className="w-5 h-5 text-emerald-600" />
-                <h3>6. خطوات العمل القياسية (SOPs) المتسلسلة لتقنيات نظافة الأيدي</h3>
+                <h3>5. خطوات العمل القياسية (SOPs) المتسلسلة لتقنيات نظافة الأيدي</h3>
               </div>
 
               {/* Tabbed or Subdivided SOPs */}
@@ -803,11 +754,11 @@ export function GeminiStyleSummary({ data, onSwitchToA4, onSwitchToDashboard }: 
               </div>
             </div>
 
-            {/* 8. STRICT PROHIBITIONS & GENERAL PRECAUTIONS */}
+            {/* 6. STRICT PROHIBITIONS & GENERAL PRECAUTIONS */}
             <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs space-y-4">
               <div className="flex items-center gap-2 text-slate-900 font-bold text-base border-b border-slate-100 pb-3">
                 <ShieldAlert className="w-5 h-5 text-rose-600" />
-                <h3>7. الإجراءات العامة والمحظورات الصارمة (Strict Prohibitions)</h3>
+                <h3>6. الإجراءات العامة والمحظورات الصارمة (Strict Prohibitions)</h3>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
@@ -841,11 +792,11 @@ export function GeminiStyleSummary({ data, onSwitchToA4, onSwitchToDashboard }: 
               </div>
             </div>
 
-            {/* 9. PPE & GLOVE PROTOCOLS */}
+            {/* 7. PPE & GLOVE PROTOCOLS */}
             <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs space-y-4">
               <div className="flex items-center gap-2 text-slate-900 font-bold text-base border-b border-slate-100 pb-3">
                 <HeartPulse className="w-5 h-5 text-purple-700" />
-                <h3>8. معدات الوقاية الشخصية وضوابط القفازات</h3>
+                <h3>7. معدات الوقاية الشخصية وضوابط القفازات</h3>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
@@ -869,12 +820,12 @@ export function GeminiStyleSummary({ data, onSwitchToA4, onSwitchToDashboard }: 
               </div>
             </div>
 
-            {/* 10. ROLES & RESPONSIBILITIES */}
+            {/* 8. ROLES & RESPONSIBILITIES */}
             {roles.length > 0 && (
               <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs space-y-4">
                 <div className="flex items-center gap-2 text-slate-900 font-bold text-base border-b border-slate-100 pb-3">
                   <Users className="w-5 h-5 text-blue-800" />
-                  <h3>9. مصفوفة المسؤوليات وتوزيع الأدوار التنفيذية</h3>
+                  <h3>8. مصفوفة المسؤوليات وتوزيع الأدوار التنفيذية</h3>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -897,49 +848,17 @@ export function GeminiStyleSummary({ data, onSwitchToA4, onSwitchToDashboard }: 
               </div>
             )}
 
-            {/* 11. AUDIT CHECKLIST & MEASURABLE KPIS */}
+            {/* 9. MEASURABLE KPIS */}
             {kpisData && (
               <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs space-y-4">
                 <div className="flex items-center gap-2 text-slate-900 font-bold text-base border-b border-slate-100 pb-3">
                   <Building2 className="w-5 h-5 text-emerald-700" />
-                  <h3>10. معايير التدقيق التفتيشي ومؤشرات الأداء المقاسة (Audit & KPIs)</h3>
+                  <h3>9. مؤشرات الأداء المقاسة ونسب الامتثال (Measurable KPIs)</h3>
                 </div>
-
-                {/* Audit Checklist Table */}
-                {kpisData.auditChecklist?.length > 0 && (
-                  <div className="space-y-2">
-                    <h4 className="text-xs font-bold text-slate-800">قائمة فحص التدقيق الميداني (Audit Checklist):</h4>
-                    <div className="overflow-x-auto">
-                      <table className="w-full text-2xs text-right border-collapse border border-slate-200 rounded-lg">
-                        <thead>
-                          <tr className="bg-slate-100 text-slate-900 font-bold">
-                            <th className="p-2 border border-slate-300 w-16">كود البند</th>
-                            <th className="p-2 border border-slate-300">نقطة التفتيش والمطابقة</th>
-                            <th className="p-2 border border-slate-300 w-28">المرجع القياسي</th>
-                            <th className="p-2 border border-slate-300 w-36">دليل الإثبات المطلوب</th>
-                            <th className="p-2 border border-slate-300 w-16 text-center">التكرار</th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-slate-200">
-                          {kpisData.auditChecklist.map((item: any, idx: number) => (
-                            <tr key={idx} className="hover:bg-slate-50">
-                              <td className="p-2 font-mono font-bold text-blue-900 border border-slate-200">{item.id}</td>
-                              <td className="p-2 text-slate-800 border border-slate-200">{item.checkpoint}</td>
-                              <td className="p-2 text-slate-600 border border-slate-200">{item.standardReference}</td>
-                              <td className="p-2 text-emerald-900 font-medium border border-slate-200">{item.evidenceRequired}</td>
-                              <td className="p-2 text-center text-slate-600 border border-slate-200">{item.frequency}</td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                )}
 
                 {/* KPIs Cards */}
                 {kpisData.kpis?.length > 0 && (
-                  <div className="space-y-2 pt-2">
-                    <h4 className="text-xs font-bold text-slate-800">مؤشرات الأداء المقاسة (KPIs):</h4>
+                  <div className="space-y-2">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       {kpisData.kpis.map((kpi: any, idx: number) => (
                         <div key={idx} className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-1 text-2xs">
@@ -958,28 +877,6 @@ export function GeminiStyleSummary({ data, onSwitchToA4, onSwitchToDashboard }: 
                 )}
               </div>
             )}
-
-            {/* 12. ATTACHMENTS & FORMS */}
-            <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs space-y-3">
-              <div className="flex items-center gap-2 text-slate-900 font-bold text-base border-b border-slate-100 pb-3">
-                <FileText className="w-5 h-5 text-blue-800" />
-                <h3>11. المرفقات والنماذج والمراجع المعتمدة</h3>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-2xs text-slate-700">
-                <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-1">
-                  <strong className="text-slate-900 block font-bold">المرفقات الإلزامية:</strong>
-                  <p>1. استمارة تقييم الاستجابة لغسل الأيدي حسب منظمة الصحة العالمية (شهرياً).</p>
-                  <p>2. كشف حصر وأسماء المتدربين من جميع أقسام المستشفى ونسب التدريب.</p>
-                </div>
-                <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-1">
-                  <strong className="text-slate-900 block font-bold">المراجع العلمية المعتمدة:</strong>
-                  <p>• الدليل القومي المصري لمكافحة العدوى (الإصدار الرابع).</p>
-                  <p>• إرشادات منظمة الصحة العالمية (WHO Guidelines on Hand Hygiene in Healthcare).</p>
-                  <p>• أدلة مراكز مكافحة الأمراض CDC، وجمعيات APIC و SHEA الدولية.</p>
-                </div>
-              </div>
-            </div>
 
           </div>
 

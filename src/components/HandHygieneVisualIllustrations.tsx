@@ -22,73 +22,173 @@ interface HandHygieneVisualIllustrationsProps {
 }
 
 export const HandHygieneVisualIllustrations: React.FC<HandHygieneVisualIllustrationsProps> = ({ isCompact = false }) => {
-  const [activeStepTab, setActiveStepTab] = useState<'soap' | 'alcohol' | 'surgical' | 'five_moments' | 'bare_below_elbows'>('five_moments');
+  const [activeStepTab, setActiveStepTab] = useState<'soap' | 'alcohol' | 'surgical' | 'five_moments' | 'bare_below_elbows' | 'full_policy'>('five_moments');
   const [selectedMoment, setSelectedMoment] = useState<number | null>(null);
 
-  // Core 6 Hand Motions Data with SVG visual icons
-  const handMotions = [
+  // Complete 13 Standard Steps of Routine Hand Washing with Soap & Water
+  const soap13Steps = [
     {
       step: 1,
-      title: 'فرك باطن بالباطن',
-      titleEn: 'Palm to Palm',
+      title: 'خلع جميع المجوهرات والحلي والمعاصم',
+      titleEn: 'Remove all jewelry and wristwatches',
+      time: '3 ثوانٍ',
+      details: 'خلع الخواتم والأساور والساعات باليدين والمعصمين لضمان وصول الماء والمطهر لكافة مناطق الجلد ومنع تمزق القفازات.',
+      iconType: 'wrists'
+    },
+    {
+      step: 2,
+      title: 'فتح الصنبور وترطيب اليدين بالماء الجاري',
+      titleEn: 'Wet hands with running water',
+      time: '3 ثوانٍ',
+      details: 'فتح الصنبور بالكوع أو باليد وترطيب كامل أسطح اليدين والرسغين بالماء الجاري النظيف (تجنب غمر اليدين في ماء راكد).',
+      iconType: 'rinse_dry'
+    },
+    {
+      step: 3,
+      title: 'وضع كمية كافية من الصابون السائل',
+      titleEn: 'Apply sufficient soap to cover all surfaces',
+      time: '3 ثوانٍ',
+      details: 'الضغط على موزع الصابون بالكوع أو اليد لوضع كمية كافية (3-5 مل) تغطي كامل مساحة الراحتين والظاهرين.',
+      iconType: 'palm_to_palm'
+    },
+    {
+      step: 4,
+      title: 'فرك باطن اليد بباطن اليد الأخرى',
+      titleEn: 'Rub hands palm to palm',
       time: '5 ثوانٍ',
-      details: 'فرك باطن اليدين مواجهين بحركات دائرية مستمرة لتوزيع الصابون أو الكحول بالتساوي.',
+      details: 'فرك باطن اليدين مواجهين بحركات دائرية مستمرة لتكوين رغوة صابونية كثيفة وتوزيعها على الراحتين.',
+      iconType: 'palm_to_palm'
+    },
+    {
+      step: 5,
+      title: 'فرك باطن اليد اليمنى فوق ظهر اليسرى والعكس',
+      titleEn: 'Right palm over left dorsum with interlaced fingers',
+      time: '5 ثوانٍ',
+      details: 'فرك باطن اليد اليمنى على ظهر اليد اليسرى مع تداخل الأصابع، ثم عكس الوضع لليد المعاكسة.',
+      iconType: 'dorsum_interlaced'
+    },
+    {
+      step: 6,
+      title: 'دلك باطن اليدين مواجهين مع تداخل الأصابع',
+      titleEn: 'Palm to palm with fingers interlaced',
+      time: '5 ثوانٍ',
+      details: 'مواجهة باطن اليدين مع تشابك وتداخل الأصابع والفرك للأعلى والأسفل لتطهير الفراغات بين الأصابع.',
+      iconType: 'interlaced'
+    },
+    {
+      step: 7,
+      title: 'دلك قبضة اليد بباطن اليد المعاكسة',
+      titleEn: 'Backs of fingers to opposing palms with fingers interlocked',
+      time: '5 ثوانٍ',
+      details: 'ضم الأصابع في شكل قبضة ودلك ظهر الأصابع في راحة اليد المعاكسة مع تحريك الأصابع يمنة ويسرة.',
+      iconType: 'clasped_fingers'
+    },
+    {
+      step: 8,
+      title: 'الدلك الدائري لإبهام اليد اليسرى باليمنى ثم العكس',
+      titleEn: 'Rotational rubbing of left thumb clasped in right palm',
+      time: '5 ثوانٍ',
+      details: 'الإمساك بالإبهام الأيسر بقبضة اليد اليمنى والدلك الدائري الشامل، ثم تكرار الخطوة للإبهام الأيمن.',
+      iconType: 'thumb_rotation'
+    },
+    {
+      step: 9,
+      title: 'فرك أطراف الأصابع والأظافر دائرياً بباطن اليد',
+      titleEn: 'Rotational rubbing of fingertips in opposite palm',
+      time: '5 ثوانٍ',
+      details: 'ضم أطراف أصابع اليد اليمنى وفركها بحركة دائرية في باطن اليد اليسرى لإزالة الأوساخ الميكروبية تحت الأظافر، ثم العكس.',
+      iconType: 'fingertips_nails'
+    },
+    {
+      step: 10,
+      title: 'فرك الرسغين بطريقة دائرية لليدين',
+      titleEn: 'Rotational rubbing of both wrists',
+      time: '5 ثوانٍ',
+      details: 'الدلك الدائري لرسغ اليد اليسرى باليد اليمنى ثم رسغ اليد اليمنى باليسرى لتطهير منطقة المعصم.',
+      iconType: 'wrists'
+    },
+    {
+      step: 11,
+      title: 'شطف اليدين بماء جارٍ مع رفع اليدين لأعلى',
+      titleEn: 'Rinse hands thoroughly with running water',
+      time: '8 ثوانٍ',
+      details: 'شطف اليدين بماء جارٍ بدءاً من أطراف الأصابع نحو الرسغين مع إبقاء اليدين مرفوعتين حتى إزالة الصابون بالكامل.',
+      iconType: 'rinse_dry'
+    },
+    {
+      step: 12,
+      title: 'تجفيف اليدين بمنشفة ورقية وحيدة الاستخدام',
+      titleEn: 'Dry hands thoroughly with a single-use towel',
+      time: '5 ثوانٍ',
+      details: 'تجفيف اليدين بالتربيت اللطيف باستخدام منشفة ورقية نظيفة ذات استخدام واحد دون فرك الجلد بعنف.',
+      iconType: 'rinse_dry'
+    },
+    {
+      step: 13,
+      title: 'إغلاق الصنبور بنفس المنشفة والتخلص منها',
+      titleEn: 'Use towel to turn off faucet and discard safely',
+      time: '3 ثوانٍ',
+      details: 'استخدام نفس المنشفة الورقية لإغلاق مقبض الصنبور لمنع إعادة تلوث الأيدي، ثم إلقاؤها في حاوية النفايات.',
+      iconType: 'rinse_dry'
+    }
+  ];
+
+  // Complete Steps of Alcohol Hand Rub (7 Core Steps)
+  const alcoholSteps = [
+    {
+      step: 1,
+      title: 'خلع المجوهرات ووضع الكحول (3-5 مل)',
+      titleEn: 'Apply 3-5ml alcohol in palm',
+      time: '3 ثوانٍ',
+      details: 'وضع كمية كافية من المطهر الكحولي 70% في راحة اليد المقعرة لتغطية كافة أسطح اليدين حتى الرسغين.',
       iconType: 'palm_to_palm'
     },
     {
       step: 2,
-      title: 'فرك ظهر اليد مع تداخل الأصابع',
-      titleEn: 'Right palm over left dorsum',
-      time: '5 ثوانٍ',
-      details: 'فرك باطن اليد اليمنى فوق ظهر اليد اليسرى مع تداخل الأصابع، ثم عكس الوضع لليد الأخرى.',
-      iconType: 'dorsum_interlaced'
+      title: 'فرك باطن بالباطن',
+      titleEn: 'Palm to palm rubbing',
+      time: '4 ثوانٍ',
+      details: 'فرك الراحتين مواجهتين لتوزيع الجل أو السائل الكحولي.',
+      iconType: 'palm_to_palm'
     },
     {
       step: 3,
-      title: 'فرك باطن اليدين مع تشابك الأصابع',
-      titleEn: 'Palm to palm with fingers interlaced',
-      time: '5 ثوانٍ',
-      details: 'دلك باطن اليدين مواجهين مع تداخل وتشابك الأصابع لتطهير الفراغات بين الأصابع.',
-      iconType: 'interlaced'
+      title: 'فرك ظهر اليد مع تداخل الأصابع',
+      titleEn: 'Right palm over left dorsum',
+      time: '4 ثوانٍ',
+      details: 'فرك باطن اليد اليمنى على ظهر اليد اليسرى مع تداخل الأصابع والعكس.',
+      iconType: 'dorsum_interlaced'
     },
     {
       step: 4,
-      title: 'دلك ظهر الأصابع بقبضة اليد المعاكسة',
-      titleEn: 'Back of fingers to opposing palms',
-      time: '5 ثوانٍ',
-      details: 'ضم الأصابع في قبضة ودلك ظهر الأصابع مع باطن اليد المعاكسة بحركة متداخلة.',
-      iconType: 'clasped_fingers'
+      title: 'فرك الراحتين مع تشابك الأصابع',
+      titleEn: 'Palm to palm with fingers interlaced',
+      time: '4 ثوانٍ',
+      details: 'دلك باطن اليدين مواجهين مع تداخل الأصابع لتغطية الفراغات بين الأصابع.',
+      iconType: 'interlaced'
     },
     {
       step: 5,
-      title: 'الدلك الدائري للإبهامين',
-      titleEn: 'Rotational rubbing of thumb',
-      time: '5 ثوانٍ',
-      details: 'الإمساك بإبهام اليد اليسرى بقبضة اليد اليمنى والدلك الدائري الشامل، ثم عكس اليد.',
-      iconType: 'thumb_rotation'
+      title: 'دلك ظهر الأصابع بقبضة اليد',
+      titleEn: 'Backs of fingers to opposing palms',
+      time: '4 ثوانٍ',
+      details: 'ضم الأصابع ودلك ظهر الأصابع في راحة اليد المعاكسة.',
+      iconType: 'clasped_fingers'
     },
     {
       step: 6,
-      title: 'فرك أطراف الأصابع والأظافر',
-      titleEn: 'Rotational rubbing of fingertips',
+      title: 'الدلك الدائري للإبهامين وأطراف الأصابع',
+      titleEn: 'Rotational rubbing of thumbs and fingertips',
       time: '5 ثوانٍ',
-      details: 'ضم أطراف أصابع اليد اليمنى وفركها بحركة دائرية في باطن اليد اليسرى للقضاء على الجراثيم تحت الأظافر.',
-      iconType: 'fingertips_nails'
+      details: 'الدلك الدائري للإبهامين وفرك أطراف الأصابع في راحة اليد لتطهير ما تحت الأظافر.',
+      iconType: 'thumb_rotation'
     },
     {
       step: 7,
-      title: 'فرك الرسغين بحركة دائرية',
-      titleEn: 'Wrists rotational rubbing',
+      title: 'الاستمرار بالدلك حتى الجفاف التام في الهواء',
+      titleEn: 'Rub until completely dry (20-30s)',
       time: '5 ثوانٍ',
-      details: 'الدلك الدائري لرسغ اليد اليمنى باليد اليسرى ثم العكس لضمان شمول التطهير لمحيط المعصم.',
-      iconType: 'wrists'
-    },
-    {
-      step: 8,
-      title: 'الشطف والتجفيف وإغلاق الصنبور بالمنديل',
-      titleEn: 'Rinse, Dry & Turn off faucet with towel',
-      time: '10 ثوانٍ',
-      details: 'شطف اليدين بالماء الجاري، التجفيف بمنشفة ورقية وحيدة الاستخدام، وإغلاق الصنبور بالمنديل قبل التخلص منه.',
+      details: 'الاستمرار في فرك اليدين حتى يتبخر الكحول تماماً وتجف الأيدي (يحظر مسح الكحول بأي منديل).',
       iconType: 'rinse_dry'
     }
   ];
@@ -290,7 +390,7 @@ export const HandHygieneVisualIllustrations: React.FC<HandHygieneVisualIllustrat
                 activeStepTab === 'soap' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-300 hover:text-white'
               }`}
             >
-              <span>🧼 خطوات الغسيل (40-60 ث)</span>
+              <span>🧼 غسيل بالماء والصابون (13 خطوة)</span>
             </button>
 
             <button
@@ -299,7 +399,7 @@ export const HandHygieneVisualIllustrations: React.FC<HandHygieneVisualIllustrat
                 activeStepTab === 'alcohol' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-300 hover:text-white'
               }`}
             >
-              <span>🧴 الدلك بالكحول (20-30 ث)</span>
+              <span>🧴 الدلك بالكحول (7 خطوات)</span>
             </button>
 
             <button
@@ -318,6 +418,15 @@ export const HandHygieneVisualIllustrations: React.FC<HandHygieneVisualIllustrat
               }`}
             >
               <span>🚫 خلو الساعدين والمحظورات</span>
+            </button>
+
+            <button
+              onClick={() => setActiveStepTab('full_policy')}
+              className={`px-3 py-1.5 rounded-lg font-bold transition flex items-center gap-1 ${
+                activeStepTab === 'full_policy' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-300 hover:text-white'
+              }`}
+            >
+              <span>📋 نص السياسة والاعتماد</span>
             </button>
           </div>
         </div>
@@ -526,43 +635,37 @@ export const HandHygieneVisualIllustrations: React.FC<HandHygieneVisualIllustrat
         )}
 
         {/* ========================================================================= */}
-        {/* VIEW 2: 8-STEP ILLUSTRATED HANDWASHING & RUBBING MOTIONS                  */}
+        {/* VIEW 2: 13-STEP ILLUSTRATED ROUTINE HANDWASHING WITH SOAP & WATER          */}
         {/* ========================================================================= */}
-        {(activeStepTab === 'soap' || activeStepTab === 'alcohol') && (
+        {activeStepTab === 'soap' && (
           <div className="space-y-6">
             {/* Mode Banner */}
-            <div className={`p-4 rounded-xl border flex flex-wrap items-center justify-between gap-3 ${
-              activeStepTab === 'soap' ? 'bg-blue-50 border-blue-200 text-blue-950' : 'bg-indigo-50 border-indigo-200 text-indigo-950'
-            }`}>
+            <div className="p-4 rounded-xl border bg-blue-50 border-blue-200 text-blue-950 flex flex-wrap items-center justify-between gap-3">
               <div className="flex items-center gap-3">
-                <div className={`w-9 h-9 rounded-lg flex items-center justify-center font-bold text-white shadow-xs ${
-                  activeStepTab === 'soap' ? 'bg-blue-700' : 'bg-indigo-700'
-                }`}>
-                  {activeStepTab === 'soap' ? '🧼' : '🧴'}
+                <div className="w-10 h-10 rounded-xl bg-blue-700 text-white flex items-center justify-center font-bold text-lg shadow-xs">
+                  🧼
                 </div>
                 <div>
                   <h4 className="font-bold text-xs sm:text-sm">
-                    {activeStepTab === 'soap' ? 'خطوات غسيل اليدين بالماء والصابون (40 - 60 ثانية)' : 'خطوات تدليك اليدين بالكحول 70% (20 - 30 ثانية)'}
+                    خطوات غسيل اليدين القياسية بالماء والصابون (13 خطوة متسلسلة - 40 إلى 60 ثانية)
                   </h4>
                   <p className="text-2xs text-slate-600">
-                    {activeStepTab === 'soap' 
-                      ? 'إلزامي عند الاتساخ الظاهري أو التلوث بالدم وسوائل الجسم وبعد دورة المياه' 
-                      : 'الخيار الأول والأسرع في كافة اللحظات الخمس طالما الأيدي غير متسخة ظاهرياً'}
+                    إلزامي عند الاتساخ الظاهري للأيدي، أو التلوث بالدم وسوائل الجسم، وبعد استخدام دورات المياه
                   </p>
                 </div>
               </div>
-              <div className="text-2xs font-mono font-bold bg-white px-3 py-1 rounded-lg border border-slate-300 shadow-2xs">
-                {activeStepTab === 'soap' ? 'الزمن المطلوب: 40-60 ثانية' : 'الحجم: 3-5 مل | الزمن: 20-30 ثانية'}
+              <div className="text-2xs font-mono font-bold bg-white px-3 py-1 rounded-lg border border-slate-300 shadow-2xs text-blue-900">
+                الزمن الإلزامي: 40 - 60 ثانية | 13 خطوة تفصيلية
               </div>
             </div>
 
-            {/* 8 Core Hand Motions Visual Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3.5">
-              {handMotions.map((motion) => (
+            {/* 13 Steps Visual Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3.5">
+              {soap13Steps.map((motion) => (
                 <div key={motion.step} className="bg-slate-50 hover:bg-white p-3.5 rounded-xl border border-slate-200 shadow-2xs transition flex flex-col justify-between space-y-2 group">
                   <div>
                     <div className="flex items-center justify-between mb-2">
-                      <span className="w-5 h-5 rounded-full bg-blue-700 text-white font-bold text-2xs flex items-center justify-center shadow-2xs">
+                      <span className="w-6 h-6 rounded-full bg-blue-700 text-white font-bold text-2xs flex items-center justify-center shadow-2xs">
                         {motion.step}
                       </span>
                       <span className="text-3xs text-slate-500 font-mono bg-white px-1.5 py-0.5 rounded border border-slate-200">
@@ -586,13 +689,66 @@ export const HandHygieneVisualIllustrations: React.FC<HandHygieneVisualIllustrat
         )}
 
         {/* ========================================================================= */}
-        {/* VIEW 3: SURGICAL HAND SCRUB & ANTISEPSIS ILLUSTRATED PROTOCOL             */}
+        {/* VIEW 3: 7-STEP ALCOHOL HAND RUB PROTOCOL (20 - 30 SECONDS)                */}
+        {/* ========================================================================= */}
+        {activeStepTab === 'alcohol' && (
+          <div className="space-y-6">
+            <div className="p-4 rounded-xl border bg-indigo-50 border-indigo-200 text-indigo-950 flex flex-wrap items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-indigo-700 text-white flex items-center justify-center font-bold text-lg shadow-xs">
+                  🧴
+                </div>
+                <div>
+                  <h4 className="font-bold text-xs sm:text-sm">
+                    خطوات تدليك الأيدي بالمطهر الكحولي 70% (20 إلى 30 ثانية حتى الجفاف التام)
+                  </h4>
+                  <p className="text-2xs text-slate-600">
+                    الخيار الأول والأنسب والأسرع في كافة اللحظات الخمس طالما الأيدي غير متسخة ظاهرياً
+                  </p>
+                </div>
+              </div>
+              <div className="text-2xs font-mono font-bold bg-white px-3 py-1 rounded-lg border border-slate-300 shadow-2xs text-indigo-900">
+                الحجم: 3-5 مل | الزمن: 20-30 ثانية حتى الجفاف
+              </div>
+            </div>
+
+            {/* Alcohol Steps Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3.5">
+              {alcoholSteps.map((motion) => (
+                <div key={motion.step} className="bg-slate-50 hover:bg-white p-3.5 rounded-xl border border-slate-200 shadow-2xs transition flex flex-col justify-between space-y-2 group">
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="w-6 h-6 rounded-full bg-indigo-700 text-white font-bold text-2xs flex items-center justify-center shadow-2xs">
+                        {motion.step}
+                      </span>
+                      <span className="text-3xs text-slate-500 font-mono bg-white px-1.5 py-0.5 rounded border border-slate-200">
+                        {motion.time}
+                      </span>
+                    </div>
+
+                    {/* Vector Graphic */}
+                    <div className="py-2 bg-white rounded-lg border border-slate-100 mb-2 group-hover:border-indigo-200 transition">
+                      {renderMotionSvg(motion.iconType)}
+                    </div>
+
+                    <h5 className="font-bold text-slate-900 text-2xs leading-snug">{motion.title}</h5>
+                    <p className="text-3xs text-slate-500 font-mono mb-1">{motion.titleEn}</p>
+                    <p className="text-3xs text-slate-600 leading-relaxed">{motion.details}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* ========================================================================= */}
+        {/* VIEW 4: SURGICAL HAND SCRUB & ANTISEPSIS ILLUSTRATED PROTOCOL             */}
         {/* ========================================================================= */}
         {activeStepTab === 'surgical' && (
           <div className="space-y-6">
             <div className="bg-purple-50 border border-purple-200 p-4 rounded-xl flex flex-wrap items-center justify-between gap-3 text-purple-950">
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-lg bg-purple-700 text-white flex items-center justify-center font-bold text-sm shadow-xs">
+                <div className="w-10 h-10 rounded-xl bg-purple-700 text-white flex items-center justify-center font-bold text-lg shadow-xs">
                   🏥
                 </div>
                 <div>
@@ -605,7 +761,7 @@ export const HandHygieneVisualIllustrations: React.FC<HandHygieneVisualIllustrat
                 </div>
               </div>
               <span className="text-2xs font-mono font-bold bg-white px-3 py-1 rounded-lg border border-purple-200 text-purple-900">
-                العمق: حتى 5 سم فوق المرفقين
+                العمق التشريحي: حتى 5 سم فوق المرفقين
               </span>
             </div>
 
@@ -615,12 +771,13 @@ export const HandHygieneVisualIllustrations: React.FC<HandHygieneVisualIllustrat
                 <div className="w-8 h-8 rounded-lg bg-purple-700 text-white flex items-center justify-center font-bold text-xs">
                   1
                 </div>
-                <h5 className="font-bold text-slate-900 text-xs">الغسل بالبيتادين 7.5% الرغوي</h5>
+                <h5 className="font-bold text-slate-900 text-xs">الغسل بالبيتادين 7.5% الرغوي (3-5 دقائق)</h5>
                 <p className="text-2xs text-slate-600 leading-relaxed">
+                  • خلع كافة الحلي والمعاصم تماماً.<br/>
                   • بلل اليدين والساعدين حتى 5 سم فوق المرفق.<br/>
-                  • تنظيف ما تحت الأظافر بمبرد أو فرشاة معقمة.<br/>
-                  • فرك دائري مستمر لمدة <strong>3 إلى 5 دقائق</strong>.<br/>
-                  • الشطف بدءاً من أطراف الأصابع مع رفع الأيدي أعلى من مستوى المرفق.
+                  • تنظيف ما تحت كل ظفر بمبرد أو فرشاة معقمة.<br/>
+                  • وضع رغوة البيتادين والدعك الدائري المستمر لليدين والأصابع والذراعين لمدة <strong>3 إلى 5 دقائق</strong>.<br/>
+                  • الشطف بدءاً من أطراف الأصابع نحو المرفقين مع رفع الأيدي أعلى من مستوى المرفق.
                 </p>
               </div>
 
@@ -630,9 +787,10 @@ export const HandHygieneVisualIllustrations: React.FC<HandHygieneVisualIllustrat
                 </div>
                 <h5 className="font-bold text-slate-900 text-xs">الدلك بالكلورهيكسيدين 2%-4% الكحولي</h5>
                 <p className="text-2xs text-slate-600 leading-relaxed">
-                  • غسل وتجفيف اليدين روتينياً أولاً.<br/>
-                  • وضع 5 مل مطهر في راحة اليد وغمر أطراف الأصابع لمدة 5 ثوانٍ.<br/>
-                  • تدليك كل ذراع حتى 5 سم فوق المرفق لمدة <strong>15 ثانية لكل ذراع</strong>.<br/>
+                  • غسل وتجفيف اليدين روتينياً أولاً والتأكد من جفافهما.<br/>
+                  • وضع 5 مل مطهر كحولي في راحة اليد المقعرة.<br/>
+                  • غمر أطراف الأصابع لمدة <strong>5 ثوانٍ</strong>.<br/>
+                  • تدليك الذراع حتى 5 سم فوق المرفق لمدة <strong>15 ثانية لكل ذراع</strong>.<br/>
                   • الفرك حتى الجفاف التام في الهواء دون ملامسة أي سطح.
                 </p>
               </div>
@@ -643,8 +801,8 @@ export const HandHygieneVisualIllustrations: React.FC<HandHygieneVisualIllustrat
                 </div>
                 <h5 className="font-bold text-slate-900 text-xs">التجفيف وارتداء الرداء والقفازات</h5>
                 <p className="text-2xs text-slate-600 leading-relaxed">
-                  • التجفيف بمنشفة معقمة (جانب لكل يد/ذراع).<br/>
-                  • إبقاء الأيدي مرفوعة فوق مستوى الخصر دائماً.<br/>
+                  • التجفيف بمنشفة معقمة (استخدام جانب لكل يد/ذراع دون العودة للمناطق المطهرة).<br/>
+                  • إبقاء الأيدي مرفوعة فوق مستوى الخصر دائماً وأعلى من المرفقين.<br/>
                   • ارتداء الرداء المعقم (Surgical Gown) والقفازات المعقمة بالطريقة المغلقة (Closed Gloving).
                 </p>
               </div>
@@ -653,7 +811,7 @@ export const HandHygieneVisualIllustrations: React.FC<HandHygieneVisualIllustrat
         )}
 
         {/* ========================================================================= */}
-        {/* VIEW 4: BARE BELOW ELBOWS & STRICT PROHIBITIONS ILLUSTRATED MATRIX        */}
+        {/* VIEW 5: BARE BELOW ELBOWS & STRICT PROHIBITIONS ILLUSTRATED MATRIX        */}
         {/* ========================================================================= */}
         {activeStepTab === 'bare_below_elbows' && (
           <div className="space-y-6">
@@ -669,7 +827,7 @@ export const HandHygieneVisualIllustrations: React.FC<HandHygieneVisualIllustrat
                     <span className="text-base">💍</span>
                     <div>
                       <strong className="text-rose-900 block">حظر الخواتم والمجوهرات والساعات:</strong>
-                      <span>تمنع وصول الماء والمطهر لمناطق التلامس وتسبب تمزق القفازات.</span>
+                      <span>تمنع وصول الماء والمطهر لمناطق التلامس وتأوي الجراثيم وتسبب تمزق القفازات.</span>
                     </div>
                   </div>
 
@@ -685,7 +843,7 @@ export const HandHygieneVisualIllustrations: React.FC<HandHygieneVisualIllustrat
                     <span className="text-base">💨</span>
                     <div>
                       <strong className="text-rose-900 block">حظر مجففات الهواء الساخن:</strong>
-                      <span>تنشر الرذاذ الملوث في الهواء ولا تضمن التجفيف الكامل مقارنة بالمناديل الورقية.</span>
+                      <span>تنشر الرذاذ الملوث في الهواء وتسبب الإزعاج ولا تضمن التجفيف الكامل مقارنة بالمناديل الورقية.</span>
                     </div>
                   </div>
 
@@ -694,6 +852,14 @@ export const HandHygieneVisualIllustrations: React.FC<HandHygieneVisualIllustrat
                     <div>
                       <strong className="text-rose-900 block">حظر إعادة ملء العبوات (Zero Top-up Ban):</strong>
                       <span>يحظر خلط أو تزويد الصابون والكحول في عبوات قديمة دون تفريغها وتطهيرها وتجفيفها وتدوين التاريخ.</span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-2 bg-white p-2 rounded-lg border border-rose-100">
+                    <span className="text-base">🚫</span>
+                    <div>
+                      <strong className="text-rose-900 block">حظر سكب السوائل في أحواض الأيدي:</strong>
+                      <span>الأحواض مخصصة لغسيل الأيدي فقط (حظر سكب المحاليل أو غسيل المتعلقات والآلات فيها).</span>
                     </div>
                   </div>
                 </div>
@@ -718,7 +884,7 @@ export const HandHygieneVisualIllustrations: React.FC<HandHygieneVisualIllustrat
                     <span className="text-base">🚰</span>
                     <div>
                       <strong className="text-emerald-900 block">حوض لكل 4 أسرة:</strong>
-                      <span>مخصص لغسيل الأيدي فقط (حظر سكب السوائل والمحاليل فيه) مع ماء وصابون ومناشف ورقية.</span>
+                      <span>مخصص لغسيل الأيدي فقط مع ماء وصابون ومناشف ورقية وسلة مهملات تعمل بالقدم.</span>
                     </div>
                   </div>
 
@@ -737,6 +903,64 @@ export const HandHygieneVisualIllustrations: React.FC<HandHygieneVisualIllustrat
                       <span>ارتداء القفاز لا يغني بأي حال من الأحوال عن غسيل الأيدي والعكس.</span>
                     </div>
                   </div>
+
+                  <div className="flex items-start gap-2 bg-white p-2 rounded-lg border border-emerald-100">
+                    <span className="text-base">📅</span>
+                    <div>
+                      <strong className="text-emerald-900 block">تدوين تاريخ الفتح والاستخدام:</strong>
+                      <span>تدوين تاريخ الصلاحية والفتح على كافة عبوات الصابون السائل والمطهرات.</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ========================================================================= */}
+        {/* VIEW 6: FULL LITERAL POLICY TEXT & INSTITUTIONAL CONTROL MATRIX          */}
+        {/* ========================================================================= */}
+        {activeStepTab === 'full_policy' && (
+          <div className="space-y-6">
+            {/* Header Document Control */}
+            <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 text-xs space-y-3">
+              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 pb-2">
+                <div>
+                  <h4 className="font-bold text-sm text-slate-900">
+                    جامعة المنيا - مستشفيات جامعة المنيا - مستشفى المنيا الجامعي للعيون
+                  </h4>
+                  <p className="text-2xs text-slate-500">
+                    كود السياسة: MUEH.IPC.04 | رقم المعيار: I.P.C 04 | الإصدار الثاني (2025/5/1)
+                  </p>
+                </div>
+                <div className="text-left text-2xs space-y-0.5">
+                  <p><span className="text-slate-500">تاريخ التفعيل:</span> <strong>2025/5/15</strong></p>
+                  <p><span className="text-slate-500">تاريخ المراجعة:</span> <strong>2028/4/1</strong></p>
+                  <p><span className="text-slate-500">عدد الصفحات:</span> <strong>11 صفحة</strong></p>
+                </div>
+              </div>
+
+              {/* Literal Policy Statement */}
+              <div className="bg-blue-50/80 p-4 rounded-xl border border-blue-200 space-y-1.5">
+                <strong className="text-xs font-bold text-blue-950 block">نص السياسة الإلزامي الكامل:</strong>
+                <p className="text-2xs text-slate-800 leading-relaxed text-justify">
+                  «التزام جميع العاملين (أطباء - تمريض - عمال - إداريين) وكذلك الزائرين بغسيل الأيدي بطريقة صحيحة تبعاً لنوع الإجراء المتخذ مع المريض، حيث تُعد نظافة اليدين حجر الزاوية في الحد من انتقال العدوى في جميع مرافق الرعاية الصحية، وتُعتبر الاستراتيجية الأكثر فعالية وكفاءة للوقاية من العدوى ومكافحتها.»
+                </p>
+              </div>
+
+              {/* 3 Operational Objectives */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-2 pt-1 text-2xs">
+                <div className="p-2.5 rounded-lg bg-white border border-slate-200">
+                  <strong className="text-slate-900 block font-bold mb-0.5">1. سلامة التدخلات الطبية:</strong>
+                  <p className="text-slate-600">القيام بالإجراءات الطبية دون أي ملوثات تنتقل من الأيدي أثناء التعامل مع المريض.</p>
+                </div>
+                <div className="p-2.5 rounded-lg bg-white border border-slate-200">
+                  <strong className="text-slate-900 block font-bold mb-0.5">2. التدريب بنسبة 100%:</strong>
+                  <p className="text-slate-600">تدريب جميع العاملين بالمستشفى بالخطوات والدواعي الصحيحة لنظافة وتطهير الأيدي.</p>
+                </div>
+                <div className="p-2.5 rounded-lg bg-white border border-slate-200">
+                  <strong className="text-slate-900 block font-bold mb-0.5">3. سلامة المرضى والعاملين:</strong>
+                  <p className="text-slate-600">التأكيد على أهمية نظافة الأيدي لضمان سلامة المرضى والعاملين على حد سواء.</p>
                 </div>
               </div>
             </div>
