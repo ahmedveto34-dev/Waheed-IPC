@@ -25,11 +25,13 @@ import {
   Eye,
   SlidersHorizontal,
   ChevronRight,
-  Image as ImageIcon
+  Image as ImageIcon,
+  Stethoscope
 } from 'lucide-react';
 import Markdown from 'react-markdown';
 import { PolicyAnalysisResult } from '../types';
 import { HandHygieneVisualIllustrations } from './HandHygieneVisualIllustrations';
+import { ClinicalTeamPolicyGuide } from './ClinicalTeamPolicyGuide';
 
 interface GeminiStyleSummaryProps {
   data: PolicyAnalysisResult;
@@ -45,7 +47,7 @@ interface ChatMessage {
 }
 
 export function GeminiStyleSummary({ data, onSwitchToA4, onSwitchToDashboard }: GeminiStyleSummaryProps) {
-  const [activeTab, setActiveTab] = useState<'structured' | 'visual_infographics' | 'markdown' | 'interactive_chat'>('structured');
+  const [activeTab, setActiveTab] = useState<'structured' | 'clinical_guide' | 'visual_infographics' | 'markdown' | 'interactive_chat'>('structured');
   const [copied, setCopied] = useState(false);
   const [fontSize, setFontSize] = useState<'normal' | 'large' | 'xlarge'>('normal');
   
@@ -418,7 +420,19 @@ export function GeminiStyleSummary({ data, onSwitchToA4, onSwitchToDashboard }: 
             }`}
           >
             <Layers className="w-4 h-4" />
-            <span>العرض المنهجي المنظم (جميع عناصر السياسة)</span>
+            <span>العرض المنهجي للسياسة (كامل العناصر)</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('clinical_guide')}
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition shrink-0 ${
+              activeTab === 'clinical_guide'
+                ? 'bg-emerald-600 text-white shadow-xs'
+                : 'bg-slate-800/60 text-slate-300 hover:bg-slate-800 hover:text-white'
+            }`}
+          >
+            <Stethoscope className="w-4 h-4 text-emerald-300" />
+            <span>🩺 دليل ومراجعة الفريق الطبي والتمريض السريع</span>
           </button>
 
           <button
@@ -970,7 +984,16 @@ export function GeminiStyleSummary({ data, onSwitchToA4, onSwitchToDashboard }: 
       )}
 
       {/* ========================================================================= */}
-      {/* TAB 2: CLINICAL INFOGRAPHICS & VISUAL ILLUSTRATIONS (بالصور والرسوم)     */}
+      {/* TAB 2: CLINICAL TEAM FAST REFERENCE & DECISION PATHWAY GUIDE              */}
+      {/* ========================================================================= */}
+      {activeTab === 'clinical_guide' && (
+        <div className="space-y-6">
+          <ClinicalTeamPolicyGuide data={data} />
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* TAB 3: CLINICAL INFOGRAPHICS & VISUAL ILLUSTRATIONS (بالصور والرسوم)     */}
       {/* ========================================================================= */}
       {activeTab === 'visual_infographics' && (
         <div className="space-y-6">
