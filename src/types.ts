@@ -1,5 +1,5 @@
 export interface AlignedStandard {
-  standardBody: string; // CBAHI, JCI, OSHA, CDC, WHO, MOH
+  standardBody: string; // GAHAR 2025, CBAHI, JCI, OSHA, CDC, WHO, National IPC 2020
   clauseNumber?: string;
   description: string;
 }
@@ -22,6 +22,40 @@ export interface PurposeAndScope {
   exclusions?: string[];
 }
 
+export interface ScientificDefinition {
+  term: string;
+  definition: string;
+  clinicalSignificance?: string;
+}
+
+export interface TechnicalSpecification {
+  techniqueName: string;
+  agentAndConcentration: string;
+  requiredVolume?: string;
+  contactTime: string;
+  indications: string[];
+  contraindicationsOrLimitations?: string[];
+}
+
+export interface FiveMomentsDetail {
+  momentNumber: number;
+  momentName: string;
+  timing: string;
+  clinicalExamples: string[];
+}
+
+export interface SkinAndGloveCare {
+  gloveProtocols: string[];
+  skinProtectionAndDermatitis: string[];
+  jewelryAndNailRegulations: string[];
+}
+
+export interface InfrastructureRequirements {
+  sinkSpecifications: string[];
+  dispenserAndConsumables: string[];
+  maintenanceAndRefillRules: string[];
+}
+
 export interface RoleResponsibility {
   role: string;
   responsibilities: string[];
@@ -32,6 +66,7 @@ export interface SopStep {
   title: string;
   details: string;
   assignedTo?: string;
+  keySafetyPoint?: string;
 }
 
 export interface SopPhases {
@@ -79,6 +114,11 @@ export interface ComplianceAndKPIs {
 export interface PolicyAnalysisResult {
   policyCard: PolicyCard;
   purposeAndScope: PurposeAndScope;
+  scientificDefinitions?: ScientificDefinition[];
+  technicalSpecifications?: TechnicalSpecification[];
+  fiveMomentsDetails?: FiveMomentsDetail[];
+  skinAndGloveCare?: SkinAndGloveCare;
+  infrastructureRequirements?: InfrastructureRequirements;
   rolesAndResponsibilities: RoleResponsibility[];
   sopPhases: SopPhases;
   safetyWarningsAndCriticalSteps: SafetyWarnings;
@@ -96,3 +136,4 @@ export interface SamplePolicy {
   summary: string;
   content: string;
 }
+

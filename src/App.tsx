@@ -160,6 +160,11 @@ export default function App() {
           scope: Array.isArray(raw.purposeAndScope?.scope) ? raw.purposeAndScope.scope : ['جميع الكوادر الطبية والتمريضية والخدمات المساندة'],
           exclusions: Array.isArray(raw.purposeAndScope?.exclusions) ? raw.purposeAndScope.exclusions : []
         },
+        scientificDefinitions: Array.isArray(raw.scientificDefinitions) ? raw.scientificDefinitions : [],
+        technicalSpecifications: Array.isArray(raw.technicalSpecifications) ? raw.technicalSpecifications : [],
+        fiveMomentsDetails: Array.isArray(raw.fiveMomentsDetail) ? raw.fiveMomentsDetail : Array.isArray(raw.fiveMomentsDetails) ? raw.fiveMomentsDetails : [],
+        skinAndGloveCare: raw.skinAndGloveCare || undefined,
+        infrastructureRequirements: raw.infrastructureRequirements || undefined,
         rolesAndResponsibilities: Array.isArray(raw.rolesAndResponsibilities) ? raw.rolesAndResponsibilities : [],
         sopPhases: {
           preProcedure: Array.isArray(raw.sopPhases?.preProcedure) ? raw.sopPhases.preProcedure : [],

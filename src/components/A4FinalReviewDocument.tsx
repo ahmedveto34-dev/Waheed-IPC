@@ -6,14 +6,15 @@ import {
   AlertTriangle, 
   XCircle, 
   FileText, 
-  CheckSquare, 
-  Award, 
-  Building2, 
-  Calendar, 
-  Clock, 
-  Flame, 
   Sparkles,
-  Printer
+  BookOpen,
+  FlaskConical,
+  Clock,
+  Droplets,
+  Layers,
+  HeartPulse,
+  Activity,
+  CheckSquare
 } from 'lucide-react';
 
 interface A4FinalReviewDocumentProps {
@@ -24,12 +25,21 @@ interface A4FinalReviewDocumentProps {
 export const A4FinalReviewDocument: React.FC<A4FinalReviewDocumentProps> = ({ data, isPrintOnly = false }) => {
   const card = data.policyCard || ({} as any);
   const purpose = data.purposeAndScope || ({} as any);
+  const definitions = Array.isArray(data.scientificDefinitions) ? data.scientificDefinitions : [];
+  const techSpecs = Array.isArray(data.technicalSpecifications) ? data.technicalSpecifications : [];
+  const fiveMoments = Array.isArray((data as any).fiveMomentsDetail) 
+    ? (data as any).fiveMomentsDetail 
+    : Array.isArray(data.fiveMomentsDetails) 
+    ? data.fiveMomentsDetails 
+    : [];
+  const skinCare = data.skinAndGloveCare || ({} as any);
+  const infra = data.infrastructureRequirements || ({} as any);
   const roles = Array.isArray(data.rolesAndResponsibilities) ? data.rolesAndResponsibilities : [];
   const sop = data.sopPhases || ({} as any);
   const safety = data.safetyWarningsAndCriticalSteps || ({} as any);
   const kpisData = data.complianceAndKPIs || ({} as any);
 
-  // Extract safe arrays
+  // Extract safe arrays for safety
   const criticalPoints: string[] = Array.isArray(safety?.criticalControlPoints)
     ? safety.criticalControlPoints.map((item: any) => typeof item === 'string' ? item : item?.text || JSON.stringify(item))
     : [];
@@ -56,10 +66,11 @@ export const A4FinalReviewDocument: React.FC<A4FinalReviewDocumentProps> = ({ da
     ? safety.emergencyIncidentProtocol
     : typeof safety?.exposureProtocol === 'string'
     ? safety.exposureProtocol
-    : 'في حال حدوث وخز إبرة أو تعرض مهني: غسل الموضع فوراً بالماء والصابون دون عصر، إبلاغ مشرف السلامة ومكافحة العدوى فوراً وبدء الإجراءات الوقائية.';
+    : 'في حال حدوث وخز إبرة أو تعرض مهني: غسل الموضع فوراً بالماء والصابون دون عصر، إبلاغ مشرف السلامة ومكافحة العدوى فوراً وبدء التقييم والوقاية بعد التعرض (PEP).';
 
   const auditItems = Array.isArray(kpisData?.auditChecklist) ? kpisData.auditChecklist : [];
   const kpiItems = Array.isArray(kpisData?.kpis) ? kpisData.kpis : [];
+  const recommendations = Array.isArray(kpisData?.gapAnalysisAndRecommendations) ? kpisData.gapAnalysisAndRecommendations : [];
 
   return (
     <div 
@@ -76,62 +87,62 @@ export const A4FinalReviewDocument: React.FC<A4FinalReviewDocumentProps> = ({ da
             <div>
               <div className="flex items-center gap-2">
                 <h1 className="text-sm md:text-base font-black text-slate-950 tracking-tight leading-tight">
-                  وثيقة المراجعة النهائية والملخص التنفيذي للسياسة (Final Review Brief)
+                  وثيقة المراجعة والتلخيص التنفيذي العلمي للسياسة والإجراءات الإكلينيكية
                 </h1>
                 <span className="px-2 py-0.5 rounded bg-blue-900 text-white text-[7pt] font-bold font-mono">
-                  ISO / GAHAR / CBAHI
+                  GAHAR 2025 • CBAHI • JCI
                 </span>
               </div>
               <p className="text-[7.5pt] text-slate-600 font-semibold">
-                منظومة الرعاية الصحية ومكافحة العدوى والسلامة الإكلينيكية وضمان الجودة والاعتماد
+                اللجنة العليا للجودة ومكافحة العدوى والسلامة الإكلينيكية والمهنية
               </p>
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-1.5 text-[7pt] font-semibold text-emerald-900 bg-emerald-50/80 px-2 py-1 rounded border border-emerald-200">
+          <div className="flex flex-wrap items-center gap-1.5 text-[7pt] font-semibold text-emerald-900 bg-emerald-50/90 px-2.5 py-1 rounded border border-emerald-200">
             <ShieldCheck className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
-            <span>مطابقة للمعايير الإلزامية:</span>
+            <span>معايير الاعتماد والامتثال المرجعي:</span>
             <span className="font-bold">معايير جهار (GAHAR 2025)</span>
             <span>•</span>
             <span className="font-bold">الدليل القومي لمكافحة العدوى 2020</span>
             <span>•</span>
             <span className="font-bold">CBAHI</span>
             <span>•</span>
-            <span className="font-bold">JCI</span>
+            <span className="font-bold">JCI IPSG.5</span>
             <span>•</span>
-            <span className="font-bold">CDC Guidelines</span>
+            <span className="font-bold">CDC & WHO Hand Hygiene</span>
           </div>
         </div>
 
         {/* Policy Quick Meta Box */}
-        <div className="text-left font-mono text-[7.5pt] border border-slate-300 p-2 rounded bg-slate-50 space-y-0.5 min-w-[175px] shrink-0">
-          <div>كود الوثيقة: <strong className="text-blue-950 font-bold">{card.policyCode || 'IPC-POL-01'}</strong></div>
-          <div>تاريخ التفعيل: <strong>{card.effectiveDate || '2025/05/15'}</strong></div>
+        <div className="text-left font-mono text-[7.5pt] border border-slate-300 p-2 rounded bg-slate-50 space-y-0.5 min-w-[185px] shrink-0">
+          <div>كود الوثيقة: <strong className="text-blue-950 font-bold">{card.policyCode || 'GAHAR-IPC-01'}</strong></div>
+          <div>تاريخ الإصدار: <strong>{card.effectiveDate || '2026/01/01'}</strong></div>
           <div>دورة المراجعة: <strong>{card.reviewCycle || 'سنوياً'}</strong></div>
-          <div className="text-emerald-700 font-bold">الحالة: معتمدة للتطبيق الإلزامي</div>
+          <div className="text-emerald-700 font-bold">الحالة: وثيقة إلزامية معتمدة للتطبيق</div>
         </div>
       </header>
 
-      {/* ================= 1. EXECUTIVE SUMMARY & GOLDEN RULES ================= */}
+      {/* ================= 1. EXECUTIVE SUMMARY & CLINICAL OBJECTIVES ================= */}
       <section className="avoid-break mb-3.5 border border-slate-300 rounded-lg overflow-hidden bg-white shadow-2xs">
         <div className="bg-slate-900 text-white px-3 py-1.5 font-bold text-[8.5pt] flex items-center justify-between">
           <div className="flex items-center gap-1.5">
             <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-            <span>1. الملخص التنفيذي المركز والنقاط الذهبية للمراجعة السريعة (Executive Review)</span>
+            <span>1. الملخص التنفيذي العلمي والاستراتيجي المركز (Executive & Clinical Review)</span>
           </div>
-          <span className="text-[7pt] text-slate-300 font-normal">جاهز للتفتيش الميداني والتقييم</span>
+          <span className="text-[7pt] text-slate-300 font-normal">ملخص شامل وموثوق للسياسة</span>
         </div>
         
         <div className="p-3 space-y-2 text-[8pt]">
-          <p className="leading-relaxed text-slate-800 text-justify bg-slate-50 p-2.5 rounded border border-slate-200">
-            {data.executiveSummarySnippet || 'تم تلخيص وتدقيق محاور هذه السياسة لتتوافق مع معايير جهار 2025 والدليل القومي المصري لمكافحة العدوى، مع التركيز على السلامة الإكلينيكية وحماية متلقي الخدمة ومقدميها.'}
-          </p>
+          <div className="leading-relaxed text-slate-800 text-justify bg-slate-50 p-2.5 rounded border border-slate-200 whitespace-pre-line">
+            {data.executiveSummarySnippet || 'تم إعداد وتلخيص وثيقة السياسة بدقة علمية ومنهجية تامة لتتوافق مع معايير جهار 2025 والدليل القومي المصري لمكافحة العدوى والمعايير الدولية.'}
+          </div>
 
-          {/* Golden Rules Callout */}
+          {/* Core Objectives Triad */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-2 pt-1 text-[7.5pt]">
             <div className="bg-blue-50/70 p-2 rounded border border-blue-200 space-y-0.5">
               <strong className="text-blue-950 font-bold block flex items-center gap-1">
-                <CheckCircle2 className="w-3 h-3 text-blue-700" />
+                <CheckCircle2 className="w-3 h-3 text-blue-700 shrink-0" />
                 الهدف الاستراتيجي الأساسي:
               </strong>
               <p className="text-blue-900 leading-snug">{purpose.mainObjective || 'الحد من انتقال العدوى المكتسبة داخل المنشأة وضمان بيئة علاجية آمنة.'}</p>
@@ -139,23 +150,23 @@ export const A4FinalReviewDocument: React.FC<A4FinalReviewDocumentProps> = ({ da
 
             <div className="bg-amber-50/70 p-2 rounded border border-amber-200 space-y-0.5">
               <strong className="text-amber-950 font-bold block flex items-center gap-1">
-                <AlertTriangle className="w-3 h-3 text-amber-700" />
+                <AlertTriangle className="w-3 h-3 text-amber-700 shrink-0" />
                 المبرر الإكلينيكي الحرج:
               </strong>
-              <p className="text-amber-900 leading-snug">{purpose.clinicalRationale || 'خفض معدلات العدوى المرتبطة بالقساطر والتداخلات الجراحية والميكروبات المقاومة.'}</p>
+              <p className="text-amber-900 leading-snug">{purpose.clinicalRationale || 'خفض معدلات العدوى بالمستشفيات والميكروبات المقاومة للأدوية المتعددة (MDROs).'}</p>
             </div>
 
             <div className="bg-emerald-50/70 p-2 rounded border border-emerald-200 space-y-0.5">
               <strong className="text-emerald-950 font-bold block flex items-center gap-1">
-                <ShieldCheck className="w-3 h-3 text-emerald-700" />
+                <ShieldCheck className="w-3 h-3 text-emerald-700 shrink-0" />
                 النطاق والفئات الملزمة:
               </strong>
               <p className="text-emerald-900 leading-snug">
-                {Array.isArray(purpose.scope) && purpose.scope.length > 0 ? purpose.scope.join('، ') : 'كافة الكوادر الطبية والتمريضية'}
+                {Array.isArray(purpose.scope) && purpose.scope.length > 0 ? purpose.scope.join('، ') : 'كافة الكوادر الطبية والتمريضية والمساندة'}
               </p>
               {Array.isArray(purpose.exclusions) && purpose.exclusions.length > 0 && (
                 <div className="text-[6.5pt] text-rose-800 pt-0.5 border-t border-emerald-200/60 mt-1">
-                  <strong>الاستثناءات: </strong> {purpose.exclusions.join('، ')}
+                  <strong>الاستثناءات والمحددات: </strong> {purpose.exclusions.join('، ')}
                 </div>
               )}
             </div>
@@ -163,49 +174,194 @@ export const A4FinalReviewDocument: React.FC<A4FinalReviewDocumentProps> = ({ da
         </div>
       </section>
 
-      {/* ================= 2. POLICY FACTS & STANDARDS TABLE ================= */}
-      <section className="avoid-break mb-3.5 border border-slate-300 rounded-lg overflow-hidden">
-        <div className="bg-slate-800 text-white px-3 py-1 font-bold text-[8pt] flex items-center justify-between">
-          <span>2. بطاقة تعريف السياسة والاعتماد المرجعي (Policy Card & Standards)</span>
-          <span className="text-[7pt] text-slate-300 font-mono">Domain: {card.domain || 'Infection Prevention'}</span>
-        </div>
-        <table className="w-full border-collapse text-[7.5pt]">
-          <tbody>
-            <tr className="border-b border-slate-200">
-              <td className="p-1.5 font-bold bg-slate-100 w-1/4 border-l border-slate-200">اسم السياسة المعتمد:</td>
-              <td className="p-1.5 font-bold text-slate-950">
-                {card.titleArabic} {card.titleEnglish ? `— (${card.titleEnglish})` : ''}
-              </td>
-            </tr>
-            <tr className="border-b border-slate-200">
-              <td className="p-1.5 font-bold bg-slate-100 border-l border-slate-200">الأقسام المعنية بالتطبيق:</td>
-              <td className="p-1.5">{Array.isArray(card.departments) ? card.departments.join('، ') : 'جميع الأقسام الإكلينيكية والتمريض'}</td>
-            </tr>
-            <tr>
-              <td className="p-1.5 font-bold bg-slate-100 border-l border-slate-200">المعايير المرجعية ذات الصلة:</td>
-              <td className="p-1.5">
-                <div className="flex flex-wrap gap-1">
-                  {Array.isArray(card.alignedStandards) && card.alignedStandards.length > 0 ? (
-                    card.alignedStandards.map((s: any, idx: number) => (
-                      <span key={idx} className="bg-slate-100 border border-slate-300 px-1.5 py-0.5 rounded text-[7pt]">
-                        <strong className="text-slate-900">{s.standardBody}</strong> {s.clauseNumber ? `[${s.clauseNumber}]` : ''}: {s.description}
-                      </span>
-                    ))
-                  ) : (
-                    <span>معايير جهار 2025 والدليل القومي لمكافحة العدوى 2020</span>
-                  )}
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </section>
+      {/* ================= 2. SCIENTIFIC DEFINITIONS (If available) ================= */}
+      {definitions.length > 0 && (
+        <section className="avoid-break mb-3.5 border border-slate-300 rounded-lg overflow-hidden">
+          <div className="bg-slate-800 text-white px-3 py-1 font-bold text-[8pt] flex items-center justify-between">
+            <div className="flex items-center gap-1.5">
+              <BookOpen className="w-3.5 h-3.5 text-blue-300" />
+              <span>2. المفاهيم والمصطلحات العلمية والأسس الميكروبيولوجية (Scientific Terminology)</span>
+            </div>
+            <span className="text-[7pt] text-slate-300">المرجع العلمي</span>
+          </div>
+          <div className="p-2 grid grid-cols-1 md:grid-cols-2 gap-2 text-[7.5pt] bg-slate-50/50">
+            {definitions.map((def: any, idx: number) => (
+              <div key={idx} className="bg-white border border-slate-200 p-2 rounded shadow-2xs space-y-1">
+                <strong className="text-blue-950 font-bold block text-[8pt] border-b border-slate-100 pb-0.5">
+                  {def.term}
+                </strong>
+                <p className="text-slate-700 leading-snug">{def.definition}</p>
+                {def.clinicalSignificance && (
+                  <div className="text-[6.5pt] text-emerald-800 bg-emerald-50/60 px-1.5 py-0.5 rounded border border-emerald-100">
+                    <strong>الأهمية السريرية: </strong> {def.clinicalSignificance}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
-      {/* ================= 2.5 ROLES & RESPONSIBILITIES ================= */}
+      {/* ================= 3. TECHNICAL SPECIFICATIONS & FORMULATIONS ================= */}
+      {techSpecs.length > 0 && (
+        <section className="avoid-break mb-3.5 border border-slate-300 rounded-lg overflow-hidden">
+          <div className="bg-slate-800 text-white px-3 py-1 font-bold text-[8pt] flex items-center justify-between">
+            <div className="flex items-center gap-1.5">
+              <FlaskConical className="w-3.5 h-3.5 text-amber-300" />
+              <span>3. جدول المقارنة والمواصفات الفنية للتقنيات والمطهرات (Technical Specifications)</span>
+            </div>
+            <span className="text-[7pt] text-slate-300">التركيزات وأزمنة التلامس والكميات</span>
+          </div>
+          <div className="p-2 text-[7pt]">
+            <table className="w-full border-collapse border border-slate-300">
+              <thead>
+                <tr className="bg-slate-100 text-slate-900 font-bold">
+                  <th className="border border-slate-300 p-1.5 text-right w-1/4">التقنية ونوع الإجراء</th>
+                  <th className="border border-slate-300 p-1.5 text-right">المادة والمستحضر الفعال</th>
+                  <th className="border border-slate-300 p-1.5 text-center w-20">الحجم المطلوب</th>
+                  <th className="border border-slate-300 p-1.5 text-center w-20">زمن التلامس</th>
+                  <th className="border border-slate-300 p-1.5 text-right">دواعي الاستخدام الرئيسية والموانع</th>
+                </tr>
+              </thead>
+              <tbody>
+                {techSpecs.map((spec: any, idx: number) => (
+                  <tr key={idx} className="hover:bg-slate-50/80">
+                    <td className="border border-slate-300 p-1.5 font-bold text-slate-950 align-top">
+                      {spec.techniqueName}
+                    </td>
+                    <td className="border border-slate-300 p-1.5 text-slate-800 align-top">
+                      {spec.agentAndConcentration}
+                    </td>
+                    <td className="border border-slate-300 p-1.5 text-center font-mono font-bold text-blue-900 align-top">
+                      {spec.requiredVolume || '—'}
+                    </td>
+                    <td className="border border-slate-300 p-1.5 text-center font-mono font-bold text-emerald-800 align-top">
+                      {spec.contactTime}
+                    </td>
+                    <td className="border border-slate-300 p-1.5 text-slate-700 align-top space-y-1">
+                      <div>
+                        <strong className="text-emerald-900">الدواعي: </strong>
+                        {Array.isArray(spec.indications) ? spec.indications.join(' • ') : spec.indications}
+                      </div>
+                      {Array.isArray(spec.contraindicationsOrLimitations) && spec.contraindicationsOrLimitations.length > 0 && (
+                        <div className="text-rose-900 bg-rose-50/70 p-1 rounded border border-rose-100">
+                          <strong>الموانع / المحاذير: </strong>
+                          {spec.contraindicationsOrLimitations.join(' • ')}
+                        </div>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      )}
+
+      {/* ================= 4. WHO 5 MOMENTS & CLINICAL SCENARIOS ================= */}
+      {fiveMoments.length > 0 && (
+        <section className="avoid-break mb-3.5 border border-slate-300 rounded-lg overflow-hidden">
+          <div className="bg-slate-800 text-white px-3 py-1 font-bold text-[8pt] flex items-center justify-between">
+            <div className="flex items-center gap-1.5">
+              <Clock className="w-3.5 h-3.5 text-emerald-300" />
+              <span>4. اللحظات الخمس لنظافة الأيدي والسيناريوهات الإكلينيكية (WHO 5 Moments)</span>
+            </div>
+            <span className="text-[7pt] text-slate-300">أداة الملاحظة والتقييم السريري</span>
+          </div>
+          <div className="p-2 grid grid-cols-1 md:grid-cols-5 gap-1.5 text-[7pt]">
+            {fiveMoments.map((m: any, idx: number) => (
+              <div key={idx} className="bg-blue-50/50 border border-blue-200 p-2 rounded space-y-1">
+                <div className="flex items-center gap-1 border-b border-blue-200 pb-1">
+                  <span className="w-4 h-4 rounded-full bg-blue-800 text-white font-mono font-bold text-[6.5pt] flex items-center justify-center shrink-0">
+                    {m.momentNumber || idx + 1}
+                  </span>
+                  <strong className="text-blue-950 font-bold leading-tight text-[7pt]">
+                    {m.momentName}
+                  </strong>
+                </div>
+                <p className="text-slate-700 text-[6.5pt] leading-tight">
+                  <strong>التوقيت: </strong>{m.timing}
+                </p>
+                {Array.isArray(m.clinicalExamples) && m.clinicalExamples.length > 0 && (
+                  <div className="text-[6.5pt] text-slate-600 bg-white p-1 rounded border border-blue-100">
+                    <strong>أمثلة: </strong>{m.clinicalExamples.join('، ')}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* ================= 5. SKIN, GLOVE INTEGRITY & INFRASTRUCTURE ================= */}
+      {(skinCare.gloveProtocols || infra.sinkSpecifications) && (
+        <section className="avoid-break mb-3.5 border border-slate-300 rounded-lg overflow-hidden">
+          <div className="bg-slate-800 text-white px-3 py-1 font-bold text-[8pt] flex items-center justify-between">
+            <div className="flex items-center gap-1.5">
+              <Layers className="w-3.5 h-3.5 text-purple-300" />
+              <span>5. اشتراطات حماية الجلد، القفازات، والبنية التحتية ونقاط تقديم الرعاية</span>
+            </div>
+            <span className="text-[7pt] text-slate-300">Bare Below the Elbows & Point of Care</span>
+          </div>
+          <div className="p-2.5 grid grid-cols-1 md:grid-cols-2 gap-2 text-[7.5pt]">
+            {/* Skin & Glove Protocols */}
+            <div className="bg-slate-50 border border-slate-200 p-2 rounded space-y-1.5">
+              <strong className="text-slate-950 font-bold block text-[8pt] border-b border-slate-200 pb-0.5 flex items-center gap-1">
+                <HeartPulse className="w-3 h-3 text-rose-600" />
+                ضوابط القفازات وخلو الساعدين (Bare Below the Elbows):
+              </strong>
+              <ul className="space-y-1 text-slate-700 text-[7pt]">
+                {Array.isArray(skinCare.gloveProtocols) && skinCare.gloveProtocols.map((g: string, i: number) => (
+                  <li key={i} className="flex items-start gap-1">
+                    <span className="text-blue-700 font-bold">•</span>
+                    <span className="leading-snug">{g}</span>
+                  </li>
+                ))}
+                {Array.isArray(skinCare.jewelryAndNailRegulations) && skinCare.jewelryAndNailRegulations.map((j: string, i: number) => (
+                  <li key={i} className="flex items-start gap-1 text-amber-900 font-semibold">
+                    <span className="text-amber-700 font-bold">•</span>
+                    <span className="leading-snug">{j}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Infrastructure & Sinks */}
+            <div className="bg-slate-50 border border-slate-200 p-2 rounded space-y-1.5">
+              <strong className="text-slate-950 font-bold block text-[8pt] border-b border-slate-200 pb-0.5 flex items-center gap-1">
+                <Droplets className="w-3 h-3 text-blue-600" />
+                اشتراطات الأحواض، الموزعات، وحظر خلط العبوات (Zero Top-Up):
+              </strong>
+              <ul className="space-y-1 text-slate-700 text-[7pt]">
+                {Array.isArray(infra.sinkSpecifications) && infra.sinkSpecifications.map((s: string, i: number) => (
+                  <li key={i} className="flex items-start gap-1">
+                    <span className="text-emerald-700 font-bold">•</span>
+                    <span className="leading-snug">{s}</span>
+                  </li>
+                ))}
+                {Array.isArray(infra.dispenserAndConsumables) && infra.dispenserAndConsumables.map((d: string, i: number) => (
+                  <li key={i} className="flex items-start gap-1">
+                    <span className="text-emerald-700 font-bold">•</span>
+                    <span className="leading-snug">{d}</span>
+                  </li>
+                ))}
+                {Array.isArray(infra.maintenanceAndRefillRules) && infra.maintenanceAndRefillRules.map((m: string, i: number) => (
+                  <li key={i} className="flex items-start gap-1 text-rose-900 font-semibold">
+                    <span className="text-rose-700 font-bold">✕</span>
+                    <span className="leading-snug">{m}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ================= 6. ROLES & RESPONSIBILITIES ================= */}
       {roles.length > 0 && (
         <section className="avoid-break mb-3.5 border border-slate-300 rounded-lg overflow-hidden">
           <div className="bg-slate-800 text-white px-3 py-1 font-bold text-[8pt] flex items-center justify-between">
-            <span>مصفوفة الأدوار والمسؤوليات الإكلينيكية والتنفيذية (Roles & Responsibilities)</span>
+            <span>6. مصفوفة الأدوار والمسؤوليات الإكلينيكية والإدارية (Roles & Responsibilities)</span>
             <span className="text-[7pt] text-slate-300">المساءلة وتوزيع المهام</span>
           </div>
           <div className="p-2 grid grid-cols-1 md:grid-cols-3 gap-2 text-[7.5pt]">
@@ -228,11 +384,11 @@ export const A4FinalReviewDocument: React.FC<A4FinalReviewDocumentProps> = ({ da
         </section>
       )}
 
-      {/* ================= 3. STEP-BY-STEP SOP TABLE ================= */}
+      {/* ================= 7. STEP-BY-STEP SOP PROTOCOL ================= */}
       <section className="avoid-break mb-3.5 border border-slate-300 rounded-lg overflow-hidden">
         <div className="bg-slate-800 text-white px-3 py-1 font-bold text-[8pt] flex items-center justify-between">
-          <span>3. خطوات وإجراءات العمل القياسية والتنفيذية (SOP Protocol)</span>
-          <span className="text-[7pt] text-slate-300">مراحل التنفيذ الثلاثية الإلزامية</span>
+          <span>7. خطوات وإجراءات العمل القياسية والتنفيذية (SOP Protocol)</span>
+          <span className="text-[7pt] text-slate-300">مراحل التنفيذ الثلاثية الإلزامية ونقاط الأمان</span>
         </div>
 
         <div className="p-2 space-y-2 text-[7.5pt]">
@@ -251,7 +407,11 @@ export const A4FinalReviewDocument: React.FC<A4FinalReviewDocumentProps> = ({ da
                     <div className="leading-tight">
                       <strong className="text-slate-900">{s.title}: </strong>
                       <span className="text-slate-700">{s.details}</span>
-                      {s.assignedTo && <span className="text-[6.5pt] text-slate-500 font-mono mr-1">[{s.assignedTo}]</span>}
+                      {s.keySafetyPoint && (
+                        <span className="text-[6.5pt] text-amber-900 font-semibold mr-1 bg-amber-100/70 px-1 py-0.2 rounded">
+                          [نقطة أمان: {s.keySafetyPoint}]
+                        </span>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -263,7 +423,7 @@ export const A4FinalReviewDocument: React.FC<A4FinalReviewDocumentProps> = ({ da
           {Array.isArray(sop?.execution) && sop.execution.length > 0 && (
             <div className="border-r-3 border-emerald-600 pr-2 bg-emerald-50/30 p-1.5 rounded-l">
               <strong className="font-bold text-[8pt] text-emerald-950 block mb-1">
-                المرحلة الثانية: التنفيذ الفعلي والأسلوب المانع للتلوث (Direct Clinical Execution):
+                المرحلة الثانية: خطوات التنفيذ السريري والفرك الميكانيكي الست (Clinical Execution & Steps):
               </strong>
               <div className="space-y-1">
                 {sop.execution.map((s: any, i: number) => (
@@ -274,7 +434,11 @@ export const A4FinalReviewDocument: React.FC<A4FinalReviewDocumentProps> = ({ da
                     <div className="leading-tight">
                       <strong className="text-slate-900">{s.title}: </strong>
                       <span className="text-slate-700">{s.details}</span>
-                      {s.assignedTo && <span className="text-[6.5pt] text-slate-500 font-mono mr-1">[{s.assignedTo}]</span>}
+                      {s.keySafetyPoint && (
+                        <span className="text-[6.5pt] text-emerald-900 font-semibold mr-1 bg-emerald-100/70 px-1 py-0.2 rounded">
+                          [نقطة أمان: {s.keySafetyPoint}]
+                        </span>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -286,7 +450,7 @@ export const A4FinalReviewDocument: React.FC<A4FinalReviewDocumentProps> = ({ da
           {Array.isArray(sop?.postProcedure) && sop.postProcedure.length > 0 && (
             <div className="border-r-3 border-blue-600 pr-2 bg-blue-50/30 p-1.5 rounded-l">
               <strong className="font-bold text-[8pt] text-blue-950 block mb-1">
-                المرحلة الثالثة: ما بعد الإجراء والتطهير والتخلص الآمن والتوثيق (Post-Procedure & Disposal):
+                المرحلة الثالثة: ما بعد الإجراء والجفاف والتخلص الآمن والتوثيق (Post-Procedure & Safety):
               </strong>
               <div className="space-y-1">
                 {sop.postProcedure.map((s: any, i: number) => (
@@ -297,7 +461,11 @@ export const A4FinalReviewDocument: React.FC<A4FinalReviewDocumentProps> = ({ da
                     <div className="leading-tight">
                       <strong className="text-slate-900">{s.title}: </strong>
                       <span className="text-slate-700">{s.details}</span>
-                      {s.assignedTo && <span className="text-[6.5pt] text-slate-500 font-mono mr-1">[{s.assignedTo}]</span>}
+                      {s.keySafetyPoint && (
+                        <span className="text-[6.5pt] text-blue-900 font-semibold mr-1 bg-blue-100/70 px-1 py-0.2 rounded">
+                          [نقطة أمان: {s.keySafetyPoint}]
+                        </span>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -307,10 +475,13 @@ export const A4FinalReviewDocument: React.FC<A4FinalReviewDocumentProps> = ({ da
         </div>
       </section>
 
-      {/* ================= 4. CRITICAL DO's & DONT's MATRIX ================= */}
+      {/* Page break marker for multipage printed reports */}
+      <div className="page-break" />
+
+      {/* ================= 8. CRITICAL DO's & DONT's MATRIX ================= */}
       <section className="avoid-break mb-3.5 border border-slate-300 rounded-lg overflow-hidden">
         <div className="bg-slate-800 text-white px-3 py-1 font-bold text-[8pt] flex items-center justify-between">
-          <span>4. مصفوفة الممارسات الإلزامية والمحظورات الصارمة (DOs & DON'Ts Matrix)</span>
+          <span>8. مصفوفة الممارسات الإلزامية والمحظورات الصارمة (DOs & DON'Ts Matrix)</span>
           <span className="text-[7pt] text-slate-300">نقاط التقييم والملاحظة المباشرة</span>
         </div>
 
@@ -357,7 +528,7 @@ export const A4FinalReviewDocument: React.FC<A4FinalReviewDocumentProps> = ({ da
             </div>
           </div>
 
-          {/* Critical Control Points & Emergency Response */}
+          {/* Critical Control Points */}
           {criticalPoints.length > 0 && (
             <div className="bg-amber-50/80 p-2 rounded border border-amber-300 text-[7pt]">
               <strong className="text-amber-950 font-bold block mb-0.5 flex items-center gap-1">
@@ -385,25 +556,22 @@ export const A4FinalReviewDocument: React.FC<A4FinalReviewDocumentProps> = ({ da
         </div>
       </section>
 
-      {/* Page break marker for multipage printed reports */}
-      <div className="page-break" />
-
-      {/* ================= 5. AUDIT CHECKLIST FOR INSPECTIONS ================= */}
+      {/* ================= 9. AUDIT CHECKLIST FOR INSPECTIONS ================= */}
       <section className="avoid-break mb-3.5 border border-slate-300 rounded-lg overflow-hidden">
         <div className="bg-slate-800 text-white px-3 py-1 font-bold text-[8pt] flex items-center justify-between">
-          <span>5. قائمة المراجعة والتدقيق الميداني للاعتماد (Audit Checklist & GAHAR Survey)</span>
+          <span>9. قائمة المراجعة والتدقيق الميداني للاعتماد (Audit Checklist & GAHAR Survey)</span>
           <span className="text-[7pt] text-slate-300">أداة المقيّم والمفتش الصحي</span>
         </div>
 
         <div className="p-2.5 text-[7.5pt]">
           <table className="w-full border-collapse border border-slate-300 text-[7pt]">
             <thead>
-              <tr className="bg-slate-100 text-slate-900">
+              <tr className="bg-slate-100 text-slate-900 font-bold">
                 <th className="border border-slate-300 p-1 text-center w-6">م</th>
                 <th className="border border-slate-300 p-1 text-right">عنصر التدقيق والملاحظة</th>
-                <th className="border border-slate-300 p-1 text-right w-24">المعيار المرجعي</th>
+                <th className="border border-slate-300 p-1 text-right w-28">المعيار المرجعي</th>
                 <th className="border border-slate-300 p-1 text-right">دليل الإثبات والتوثيق المطلوب</th>
-                <th className="border border-slate-300 p-1 text-center w-12">الدورية</th>
+                <th className="border border-slate-300 p-1 text-center w-14">الدورية</th>
                 <th className="border border-slate-300 p-1 text-center w-14">الامتثال</th>
               </tr>
             </thead>
@@ -433,22 +601,22 @@ export const A4FinalReviewDocument: React.FC<A4FinalReviewDocumentProps> = ({ da
         </div>
       </section>
 
-      {/* ================= 6. KEY PERFORMANCE INDICATORS (KPIs) ================= */}
+      {/* ================= 10. KEY PERFORMANCE INDICATORS (KPIs) ================= */}
       <section className="avoid-break mb-3.5 border border-slate-300 rounded-lg overflow-hidden">
         <div className="bg-slate-800 text-white px-3 py-1 font-bold text-[8pt] flex items-center justify-between">
-          <span>6. مؤشرات الأداء الرئيسية المقاسة (Key Performance Indicators - KPIs)</span>
-          <span className="text-[7pt] text-slate-300">معدلات الجودة والامتثال</span>
+          <span>10. مؤشرات الأداء الرئيسية المقاسة (Key Performance Indicators - KPIs)</span>
+          <span className="text-[7pt] text-slate-300">معدلات الجودة ومستهدفات GAHAR</span>
         </div>
 
         <div className="p-2.5 text-[7.5pt]">
           <table className="w-full border-collapse border border-slate-300 text-[7pt]">
             <thead>
-              <tr className="bg-slate-100 text-slate-900">
+              <tr className="bg-slate-100 text-slate-900 font-bold">
                 <th className="border border-slate-300 p-1 text-right">المؤشر المقاس</th>
                 <th className="border border-slate-300 p-1 text-right">طريقة الحساب / المعادلة الإحصائية</th>
-                <th className="border border-slate-300 p-1 text-center w-16">المستهدف</th>
-                <th className="border border-slate-300 p-1 text-center w-12">الدورية</th>
-                <th className="border border-slate-300 p-1 text-right w-20">المسؤول</th>
+                <th className="border border-slate-300 p-1 text-center w-20">المستهدف</th>
+                <th className="border border-slate-300 p-1 text-center w-14">الدورية</th>
+                <th className="border border-slate-300 p-1 text-right w-24">المسؤول</th>
               </tr>
             </thead>
             <tbody>
@@ -471,10 +639,24 @@ export const A4FinalReviewDocument: React.FC<A4FinalReviewDocumentProps> = ({ da
               )}
             </tbody>
           </table>
+
+          {recommendations.length > 0 && (
+            <div className="mt-2 pt-2 border-t border-slate-200 text-[7pt]">
+              <strong className="text-blue-950 font-bold block mb-1">توصيات التحسين وتجاوز الفجوات (Gap Analysis & Recommendations):</strong>
+              <ul className="grid grid-cols-1 md:grid-cols-2 gap-1 text-slate-700">
+                {recommendations.map((rec: string, i: number) => (
+                  <li key={i} className="flex items-start gap-1">
+                    <span className="text-blue-700 font-bold">•</span>
+                    <span>{rec}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
       </section>
 
-      {/* ================= 7. OFFICIAL SIGN-OFF AND APPROVALS ================= */}
+      {/* ================= 11. OFFICIAL SIGN-OFF AND APPROVALS ================= */}
       <footer className="avoid-break pt-3 border-t-2 border-slate-900 grid grid-cols-3 gap-3 text-[7pt] text-center">
         <div className="space-y-2 border border-slate-200 p-2 rounded bg-slate-50/50">
           <p className="font-bold text-slate-900">إعداد: منسق مكافحة العدوى والسلامة</p>
