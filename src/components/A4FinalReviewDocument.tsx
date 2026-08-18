@@ -472,6 +472,46 @@ export const A4FinalReviewDocument: React.FC<A4FinalReviewDocumentProps> = ({ da
               </div>
             </div>
           )}
+
+          {/* Visual Illustrated 6 Steps Quick Matrix */}
+          <div className="bg-slate-50 border border-slate-200 p-2 rounded mt-2">
+            <strong className="text-[7.5pt] font-bold text-slate-900 block mb-1.5 flex items-center gap-1">
+              <Sparkles className="w-3 h-3 text-blue-600" />
+              <span>المخطط التوضيحي المصور للحركات الست لفرك وتطهير الأيدي (Illustrated 6 Core Motions):</span>
+            </strong>
+            <div className="grid grid-cols-3 sm:grid-cols-6 gap-1.5 text-center text-[6.5pt]">
+              <div className="bg-white p-1.5 rounded border border-slate-200 space-y-0.5">
+                <span className="w-3.5 h-3.5 rounded-full bg-blue-700 text-white font-bold mx-auto flex items-center justify-center text-[6pt]">1</span>
+                <strong className="block text-slate-900">باطن بالباطن</strong>
+                <span className="text-slate-500 text-[5.5pt]">Palm to Palm</span>
+              </div>
+              <div className="bg-white p-1.5 rounded border border-slate-200 space-y-0.5">
+                <span className="w-3.5 h-3.5 rounded-full bg-blue-700 text-white font-bold mx-auto flex items-center justify-center text-[6pt]">2</span>
+                <strong className="block text-slate-900">ظهر اليد متداخلاً</strong>
+                <span className="text-slate-500 text-[5.5pt]">Dorsum Interlaced</span>
+              </div>
+              <div className="bg-white p-1.5 rounded border border-slate-200 space-y-0.5">
+                <span className="w-3.5 h-3.5 rounded-full bg-blue-700 text-white font-bold mx-auto flex items-center justify-center text-[6pt]">3</span>
+                <strong className="block text-slate-900">تشابك الأصابع</strong>
+                <span className="text-slate-500 text-[5.5pt]">Fingers Interlaced</span>
+              </div>
+              <div className="bg-white p-1.5 rounded border border-slate-200 space-y-0.5">
+                <span className="w-3.5 h-3.5 rounded-full bg-blue-700 text-white font-bold mx-auto flex items-center justify-center text-[6pt]">4</span>
+                <strong className="block text-slate-900">ظهر الأصابع بالقبضة</strong>
+                <span className="text-slate-500 text-[5.5pt]">Back of Fingers</span>
+              </div>
+              <div className="bg-white p-1.5 rounded border border-slate-200 space-y-0.5">
+                <span className="w-3.5 h-3.5 rounded-full bg-blue-700 text-white font-bold mx-auto flex items-center justify-center text-[6pt]">5</span>
+                <strong className="block text-slate-900">دلك الإبهامين دائرياً</strong>
+                <span className="text-slate-500 text-[5.5pt]">Rotational Thumbs</span>
+              </div>
+              <div className="bg-white p-1.5 rounded border border-slate-200 space-y-0.5">
+                <span className="w-3.5 h-3.5 rounded-full bg-blue-700 text-white font-bold mx-auto flex items-center justify-center text-[6pt]">6</span>
+                <strong className="block text-slate-900">فرك أطراف الأصابع</strong>
+                <span className="text-slate-500 text-[5.5pt]">Fingertips & Nails</span>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 

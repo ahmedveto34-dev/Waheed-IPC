@@ -4,7 +4,6 @@ import {
   Copy, 
   CheckCircle2, 
   Download, 
-  MessageSquare, 
   Send, 
   FileText, 
   ShieldAlert, 
@@ -12,18 +11,25 @@ import {
   AlertTriangle, 
   Clock, 
   Flame,
-  HelpCircle,
-  ChevronDown,
-  ChevronUp,
   Bookmark,
-  Share2,
-  ZoomIn,
-  ZoomOut,
   Layers,
-  BookOpen
+  BookOpen,
+  FlaskConical,
+  HeartPulse,
+  Droplets,
+  Users,
+  Printer,
+  FileCheck2,
+  Building2,
+  ArrowRightLeft,
+  Eye,
+  SlidersHorizontal,
+  ChevronRight,
+  Image as ImageIcon
 } from 'lucide-react';
 import Markdown from 'react-markdown';
 import { PolicyAnalysisResult } from '../types';
+import { HandHygieneVisualIllustrations } from './HandHygieneVisualIllustrations';
 
 interface GeminiStyleSummaryProps {
   data: PolicyAnalysisResult;
@@ -39,16 +45,16 @@ interface ChatMessage {
 }
 
 export function GeminiStyleSummary({ data, onSwitchToA4, onSwitchToDashboard }: GeminiStyleSummaryProps) {
+  const [activeTab, setActiveTab] = useState<'structured' | 'visual_infographics' | 'markdown' | 'interactive_chat'>('structured');
   const [copied, setCopied] = useState(false);
   const [fontSize, setFontSize] = useState<'normal' | 'large' | 'xlarge'>('normal');
-  const [activeSection, setActiveSection] = useState<string>('all');
   
   // Interactive Chat State
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([
     {
       id: 'welcome',
       sender: 'gemini',
-      text: `مرحباً بك! أنا مساعد الذكاء الاصطناعي الإكلينيكي (Gemini Policy AI). لقد قمت بتحليل وتلخيص وثيقة **${data.policyCard.titleArabic}** بدقة متناهية وفق معايير جهار 2025 والدليل القومي.\n\nيمكنك قراءة التلخيص الشامل أدناه، أو طرح أي سؤال مخصص حول بنود السياسة، سيناريوهات العمل، أو أسئلة المقيمين وسأجيبك فوراً!`,
+      text: `مرحباً بك! أنا مستشارك الإكلينيكي الذكي (Gemini Policy AI). لقد قمت بتلخيص شامل وافٍ يغطي **100% من بنود وعناصر وثيقة: ${data.policyCard?.titleArabic || 'السياسة الطبية'}**.\n\nيمكنك استعراض العناصر بالكامل في التبويب المنظم، أو قراءة السرد في تبويب Markdown، أو سؤالي عن أي معيار أو سيناريو تفتيش من معايير جهار (GAHAR 2025).`,
       timestamp: new Date().toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' })
     }
   ]);
@@ -72,10 +78,10 @@ export function GeminiStyleSummary({ data, onSwitchToA4, onSwitchToDashboard }: 
     const sections: string[] = [];
 
     // Title
-    sections.push(`# 📋 ملخص شامل ودقيق للسياسة الطبية: ${data.policyCard.titleArabic}`);
-    sections.push(`**العنوان بالإنجليزية:** ${data.policyCard.titleEnglish} | **كود السياسة:** \`${data.policyCard.policyCode || 'IPC-POL-01'}\` | **تاريخ التفعيل:** ${data.policyCard.effectiveDate || '2025/2026'}`);
-    sections.push(`**المجال الإكلينيكي:** ${data.policyCard.domain} | **الأقسام المستهدفة:** ${data.policyCard.departments.join('، ')}`);
-    sections.push(`**معايير الاعتماد المتوافقة:** ${data.policyCard.alignedStandards.map(s => `${s.standardBody} (${s.clauseNumber || ''} - ${s.description})`).join(' | ')}`);
+    sections.push(`# 📋 ملخص شامل ودقيق للسياسة الطبية: ${data.policyCard?.titleArabic}`);
+    sections.push(`**العنوان بالإنجليزية:** ${data.policyCard?.titleEnglish} | **كود السياسة:** \`${data.policyCard?.policyCode || 'MUEH.IPC.04'}\` | **تاريخ التفعيل:** ${data.policyCard?.effectiveDate || '2025/5/15'}`);
+    sections.push(`**المجال الإكلينيكي:** ${data.policyCard?.domain} | **الأقسام المستهدفة:** ${data.policyCard?.departments?.join('، ')}`);
+    sections.push(`**معايير الاعتماد المتوافقة:** ${data.policyCard?.alignedStandards?.map(s => `${s.standardBody} (${s.clauseNumber || ''} - ${s.description})`).join(' | ')}`);
     sections.push(`\n---\n`);
 
     // 1. Executive Summary
@@ -83,10 +89,10 @@ export function GeminiStyleSummary({ data, onSwitchToA4, onSwitchToDashboard }: 
 
     // 2. Purpose and Scope
     sections.push(`\n## 🎯 2. الهدف الإكلينيكي ونطاق التطبيق (Purpose & Scope)`);
-    sections.push(`- **الهدف الرئيسي:** ${data.purposeAndScope.mainObjective}`);
-    sections.push(`- **المبرر الإكلينيكي والجودة:** ${data.purposeAndScope.clinicalRationale}`);
-    sections.push(`- **نطاق التطبيق والفئات:** ${data.purposeAndScope.scope.join('، ')}`);
-    if (data.purposeAndScope.exclusions && data.purposeAndScope.exclusions.length > 0) {
+    sections.push(`- **الهدف الرئيسي:** ${data.purposeAndScope?.mainObjective}`);
+    sections.push(`- **المبرر الإكلينيكي والجودة:** ${data.purposeAndScope?.clinicalRationale}`);
+    sections.push(`- **نطاق التطبيق والفئات:** ${data.purposeAndScope?.scope?.join('، ')}`);
+    if (data.purposeAndScope?.exclusions && data.purposeAndScope.exclusions.length > 0) {
       sections.push(`- **الاستثناءات:** ${data.purposeAndScope.exclusions.join('، ')}`);
     }
 
@@ -110,7 +116,7 @@ export function GeminiStyleSummary({ data, onSwitchToA4, onSwitchToDashboard }: 
         sections.push(`- **المادة الفعالة والتركيز:** ${spec.agentAndConcentration}`);
         if (spec.requiredVolume) sections.push(`- **الكمية / الحجم المطلوب:** ${spec.requiredVolume}`);
         sections.push(`- **زمن التلامس الفعال (Contact Time):** \`${spec.contactTime}\``);
-        sections.push(`- **دواعي الاستخدام:**\n${spec.indications.map(ind => `  * ${ind}`).join('\n')}`);
+        sections.push(`- **دواعي الاستخدام:**\n${spec.indications?.map(ind => `  * ${ind}`).join('\n')}`);
         if (spec.contraindicationsOrLimitations && spec.contraindicationsOrLimitations.length > 0) {
           sections.push(`- **الموانع والمحددات:**\n${spec.contraindicationsOrLimitations.map(con => `  * ⚠️ ${con}`).join('\n')}`);
         }
@@ -118,12 +124,13 @@ export function GeminiStyleSummary({ data, onSwitchToA4, onSwitchToDashboard }: 
     }
 
     // 5. Five Moments
-    if (data.fiveMomentsDetails && data.fiveMomentsDetails.length > 0) {
+    const moments = data.fiveMomentsDetails || (data as any).fiveMomentsDetail;
+    if (moments && moments.length > 0) {
       sections.push(`\n## 🖐️ 5. اللحظات الخمس لنظافة الأيدي (WHO 5 Moments of Hand Hygiene)`);
-      data.fiveMomentsDetails.forEach(m => {
+      moments.forEach((m: any) => {
         sections.push(`### اللحظة رقم ${m.momentNumber}: ${m.momentName}`);
         sections.push(`- **التوقيت السريري:** ${m.timing}`);
-        sections.push(`- **أمثلة تطبيقية واقعية:** ${m.clinicalExamples.join('، ')}`);
+        sections.push(`- **أمثلة تطبيقية واقعية:** ${m.clinicalExamples?.join('، ')}`);
       });
     }
 
@@ -156,24 +163,26 @@ export function GeminiStyleSummary({ data, onSwitchToA4, onSwitchToDashboard }: 
     }
 
     // 8. SOPs
-    sections.push(`\n## 📝 8. خطوات التشغيل القياسية المتسلسلة (Standard Operating Procedures)`);
-    if (data.sopPhases.preProcedure?.length) {
-      sections.push(`### أولاً: مرحلة ما قبل الإجراء (Pre-Procedure)`);
-      data.sopPhases.preProcedure.forEach(s => {
-        sections.push(`**${s.stepNumber}. ${s.title}** (${s.assignedTo || 'الممارس الصحي'})\n- التفاصيل: ${s.details}${s.keySafetyPoint ? `\n- 🛡️ نقطة أمان حرجة: **${s.keySafetyPoint}**` : ''}`);
-      });
-    }
-    if (data.sopPhases.execution?.length) {
-      sections.push(`\n### ثانياً: مرحلة التنفيذ الإكلينيكي (Execution Phase)`);
-      data.sopPhases.execution.forEach(s => {
-        sections.push(`**${s.stepNumber}. ${s.title}** (${s.assignedTo || 'الممارس الصحي'})\n- التفاصيل: ${s.details}${s.keySafetyPoint ? `\n- 🛡️ نقطة أمان حرجة: **${s.keySafetyPoint}**` : ''}`);
-      });
-    }
-    if (data.sopPhases.postProcedure?.length) {
-      sections.push(`\n### ثالثاً: مرحلة ما بعد الإجراء والتطهير (Post-Procedure)`);
-      data.sopPhases.postProcedure.forEach(s => {
-        sections.push(`**${s.stepNumber}. ${s.title}** (${s.assignedTo || 'الممارس الصحي'})\n- التفاصيل: ${s.details}${s.keySafetyPoint ? `\n- 🛡️ نقطة أمان حرجة: **${s.keySafetyPoint}**` : ''}`);
-      });
+    if (data.sopPhases) {
+      sections.push(`\n## 📝 8. خطوات التشغيل القياسية المتسلسلة (Standard Operating Procedures)`);
+      if (data.sopPhases.preProcedure?.length) {
+        sections.push(`### أولاً: مرحلة ما قبل الإجراء (Pre-Procedure)`);
+        data.sopPhases.preProcedure.forEach(s => {
+          sections.push(`**${s.stepNumber}. ${s.title}** (${s.assignedTo || 'الممارس الصحي'})\n- التفاصيل: ${s.details}${s.keySafetyPoint ? `\n- 🛡️ نقطة أمان حرجة: **${s.keySafetyPoint}**` : ''}`);
+        });
+      }
+      if (data.sopPhases.execution?.length) {
+        sections.push(`\n### ثانياً: مرحلة التنفيذ الإكلينيكي (Execution Phase)`);
+        data.sopPhases.execution.forEach(s => {
+          sections.push(`**${s.stepNumber}. ${s.title}** (${s.assignedTo || 'الممارس الصحي'})\n- التفاصيل: ${s.details}${s.keySafetyPoint ? `\n- 🛡️ نقطة أمان حرجة: **${s.keySafetyPoint}**` : ''}`);
+        });
+      }
+      if (data.sopPhases.postProcedure?.length) {
+        sections.push(`\n### ثالثاً: مرحلة ما بعد الإجراء والتطهير (Post-Procedure)`);
+        data.sopPhases.postProcedure.forEach(s => {
+          sections.push(`**${s.stepNumber}. ${s.title}** (${s.assignedTo || 'الممارس الصحي'})\n- التفاصيل: ${s.details}${s.keySafetyPoint ? `\n- 🛡️ نقطة أمان حرجة: **${s.keySafetyPoint}**` : ''}`);
+        });
+      }
     }
 
     // 9. Roles and Responsibilities
@@ -185,17 +194,21 @@ export function GeminiStyleSummary({ data, onSwitchToA4, onSwitchToDashboard }: 
     }
 
     // 10. Safety Warnings & DOs / DON'Ts
-    sections.push(`\n## ⚠️ 10. مصفوفة المحظورات والإلزاميات ونقاط التحكم الحرجة`);
-    if (data.safetyWarningsAndCriticalSteps.criticalControlPoints?.length) {
-      sections.push(`### نقاط التحكم الحرجة (Critical Control Points):\n${data.safetyWarningsAndCriticalSteps.criticalControlPoints.map(c => `- 🔴 ${c}`).join('\n')}`);
+    if (data.safetyWarningsAndCriticalSteps) {
+      sections.push(`\n## ⚠️ 10. مصفوفة المحظورات والإلزاميات ونقاط التحكم الحرجة`);
+      if (data.safetyWarningsAndCriticalSteps.criticalControlPoints?.length) {
+        sections.push(`### نقاط التحكم الحرجة (Critical Control Points):\n${data.safetyWarningsAndCriticalSteps.criticalControlPoints.map(c => `- 🔴 ${c}`).join('\n')}`);
+      }
+      if (data.safetyWarningsAndCriticalSteps.dos?.length) {
+        sections.push(`### الممارسات الإلزامية (DOs):\n${data.safetyWarningsAndCriticalSteps.dos.map(d => `- ✅ ${d}`).join('\n')}`);
+      }
+      if (data.safetyWarningsAndCriticalSteps.donts?.length) {
+        sections.push(`### المحظورات الصارمة (DON'Ts):\n${data.safetyWarningsAndCriticalSteps.donts.map(d => `- ❌ ${d}`).join('\n')}`);
+      }
+      if (data.safetyWarningsAndCriticalSteps.emergencyIncidentProtocol) {
+        sections.push(`### بروتوكول الاستجابة الفورية والحوادث:\n${data.safetyWarningsAndCriticalSteps.emergencyIncidentProtocol}`);
+      }
     }
-    if (data.safetyWarningsAndCriticalSteps.dos?.length) {
-      sections.push(`### الممارسات الإلزامية (DOs):\n${data.safetyWarningsAndCriticalSteps.dos.map(d => `- ✅ ${d}`).join('\n')}`);
-    }
-    if (data.safetyWarningsAndCriticalSteps.donts?.length) {
-      sections.push(`### المحظورات الصارمة (DON'Ts):\n${data.safetyWarningsAndCriticalSteps.donts.map(d => `- ❌ ${d}`).join('\n')}`);
-    }
-    sections.push(`### بروتوكول الاستجابة الفورية والحوادث:\n${data.safetyWarningsAndCriticalSteps.emergencyIncidentProtocol}`);
 
     // 11. Audit and KPIs
     if (data.complianceAndKPIs) {
@@ -230,7 +243,7 @@ export function GeminiStyleSummary({ data, onSwitchToA4, onSwitchToDashboard }: 
     const element = document.createElement('a');
     const file = new Blob([fullMarkdownSummary], { type: 'text/markdown;charset=utf-8' });
     element.href = URL.createObjectURL(file);
-    element.download = `تلخيص_${data.policyCard.titleArabic.replace(/\s+/g, '_')}_Gemini.md`;
+    element.download = `تلخيص_شامل_${(data.policyCard?.titleArabic || 'السياسة').replace(/\s+/g, '_')}.md`;
     document.body.appendChild(element);
     element.click();
     document.body.removeChild(element);
@@ -252,7 +265,6 @@ export function GeminiStyleSummary({ data, onSwitchToA4, onSwitchToDashboard }: 
     if (!customText) setChatInput('');
     setIsChatLoading(true);
 
-    // Scroll to bottom
     setTimeout(() => {
       chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, 100);
@@ -300,577 +312,920 @@ export function GeminiStyleSummary({ data, onSwitchToA4, onSwitchToDashboard }: 
     xlarge: 'text-lg leading-loose'
   }[fontSize];
 
+  const card = data.policyCard || ({} as any);
+  const purpose = data.purposeAndScope || ({} as any);
+  const definitions = Array.isArray(data.scientificDefinitions) ? data.scientificDefinitions : [];
+  const techSpecs = Array.isArray(data.technicalSpecifications) ? data.technicalSpecifications : [];
+  const fiveMoments = Array.isArray(data.fiveMomentsDetails) 
+    ? data.fiveMomentsDetails 
+    : Array.isArray((data as any).fiveMomentsDetail) 
+    ? (data as any).fiveMomentsDetail 
+    : [];
+  const skinCare = data.skinAndGloveCare || ({} as any);
+  const infra = data.infrastructureRequirements || ({} as any);
+  const roles = Array.isArray(data.rolesAndResponsibilities) ? data.rolesAndResponsibilities : [];
+  const sop = data.sopPhases || ({} as any);
+  const safety = data.safetyWarningsAndCriticalSteps || ({} as any);
+  const kpisData = data.complianceAndKPIs || ({} as any);
+
   return (
-    <div className="space-y-6">
-      {/* Top Gemini/ChatGPT Header Bar */}
-      <div className="bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 text-white rounded-2xl p-5 sm:p-6 border border-slate-800 shadow-md flex flex-wrap items-center justify-between gap-4">
-        <div className="flex items-center gap-3.5">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white shadow-inner ring-2 ring-blue-400/30">
-            <Sparkles className="w-6 h-6 text-amber-300 animate-pulse" />
-          </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <h2 className="text-base sm:text-lg font-bold text-white tracking-tight">
-                ملخص الذكاء الاصطناعي الشامل (ChatGPT & Gemini Pro)
-              </h2>
-              <span className="bg-blue-500/20 text-blue-300 border border-blue-400/30 text-2xs px-2.5 py-0.5 rounded-full font-mono font-bold">
-                Gemini 3.7 Flash Engine
-              </span>
+    <div className="space-y-6" dir="rtl">
+      {/* Top Luxury Header Bar */}
+      <div className="bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 text-white rounded-2xl p-5 sm:p-6 border border-slate-800 shadow-md">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div className="flex items-center gap-3.5">
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white shadow-inner ring-2 ring-blue-400/30">
+              <Sparkles className="w-6 h-6 text-amber-300 animate-pulse" />
             </div>
-            <p className="text-2xs sm:text-xs text-slate-300 mt-0.5">
-              تحليل وتلخيص إكلينيكي مفصل وشامل 100% يغطي جميع بنود السياسة مع إمكانية المحادثة التفاعلية
-            </p>
-          </div>
-        </div>
-
-        {/* Quick Toolbar */}
-        <div className="flex flex-wrap items-center gap-2">
-          {/* Font Controls */}
-          <div className="bg-slate-800/80 rounded-xl p-1 border border-slate-700 flex items-center gap-1 text-xs">
-            <button
-              onClick={() => setFontSize('normal')}
-              className={`px-2 py-1 rounded-lg text-2xs font-bold transition ${fontSize === 'normal' ? 'bg-blue-600 text-white' : 'text-slate-300 hover:text-white'}`}
-              title="خط عادي"
-            >
-              A
-            </button>
-            <button
-              onClick={() => setFontSize('large')}
-              className={`px-2 py-1 rounded-lg text-xs font-bold transition ${fontSize === 'large' ? 'bg-blue-600 text-white' : 'text-slate-300 hover:text-white'}`}
-              title="خط متوسط"
-            >
-              A+
-            </button>
-            <button
-              onClick={() => setFontSize('xlarge')}
-              className={`px-2 py-1 rounded-lg text-sm font-bold transition ${fontSize === 'xlarge' ? 'bg-blue-600 text-white' : 'text-slate-300 hover:text-white'}`}
-              title="خط كبير"
-            >
-              A++
-            </button>
-          </div>
-
-          <button
-            onClick={handleCopy}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold transition border border-slate-700 shadow-xs"
-            title="نسخ النص الكامل للملخص"
-          >
-            {copied ? <CheckCircle2 className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
-            <span>{copied ? 'تم النسخ بنجاح' : 'نسخ التلخيص'}</span>
-          </button>
-
-          <button
-            onClick={handleDownload}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold transition border border-slate-700 shadow-xs"
-            title="تنزيل كملف Markdown"
-          >
-            <Download className="w-4 h-4 text-blue-400" />
-            <span>تنزيل (Markdown)</span>
-          </button>
-
-          {onSwitchToA4 && (
-            <button
-              onClick={onSwitchToA4}
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition shadow-xs"
-              title="الانتقال إلى ورقة المراجعة النهائية المعتمدة A4"
-            >
-              <FileText className="w-4 h-4" />
-              <span>وثيقة A4 المعتمدة</span>
-            </button>
-          )}
-        </div>
-      </div>
-
-      {/* Main Content Layout: Rich Summary Document + Interactive AI Chat */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        
-        {/* Left/Main Column: Rich Gemini Markdown Summary (8 cols on lg) */}
-        <div className="lg:col-span-8 space-y-6">
-
-          {/* Quick Key Takeaways Card */}
-          <div className="bg-amber-50/70 border border-amber-200/90 rounded-2xl p-5 shadow-xs">
-            <div className="flex items-center gap-2 text-amber-900 font-bold text-sm mb-3">
-              <Flame className="w-4 h-4 text-amber-600" />
-              <span>أبرز الركائز الذهبية للسياسة (Key Takeaways):</span>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-amber-950">
-              <div className="bg-white/80 p-3 rounded-xl border border-amber-200/60 flex items-start gap-2">
-                <span className="w-5 h-5 rounded-full bg-amber-200 text-amber-900 font-bold flex items-center justify-center shrink-0 text-2xs">1</span>
-                <div>
-                  <strong className="block font-bold text-amber-900">المطهر الذهبي الأول:</strong>
-                  <span>الدلك الكحولي (ABHR 70-80%) لمدة 20-30 ثانية لكافة اللحظات الخمس طالما اليد غير متسخة.</span>
-                </div>
-              </div>
-              <div className="bg-white/80 p-3 rounded-xl border border-amber-200/60 flex items-start gap-2">
-                <span className="w-5 h-5 rounded-full bg-amber-200 text-amber-900 font-bold flex items-center justify-center shrink-0 text-2xs">2</span>
-                <div>
-                  <strong className="block font-bold text-amber-900">الغسيل بالماء والصابون:</strong>
-                  <span>إلزامي لمدة 40-60 ثانية عند الاتساخ الظاهري وحالات C. difficile والنوروفيروس.</span>
-                </div>
-              </div>
-              <div className="bg-white/80 p-3 rounded-xl border border-amber-200/60 flex items-start gap-2">
-                <span className="w-5 h-5 rounded-full bg-amber-200 text-amber-900 font-bold flex items-center justify-center shrink-0 text-2xs">3</span>
-                <div>
-                  <strong className="block font-bold text-amber-900">قاعدة خلو الساعدين:</strong>
-                  <span>حظر كامل للمجوهرات، الساعات، والأظافر الاصطناعية (Bare Below the Elbows).</span>
-                </div>
-              </div>
-              <div className="bg-white/80 p-3 rounded-xl border border-amber-200/60 flex items-start gap-2">
-                <span className="w-5 h-5 rounded-full bg-amber-200 text-amber-900 font-bold flex items-center justify-center shrink-0 text-2xs">4</span>
-                <div>
-                  <strong className="block font-bold text-amber-900">حظر خلط وإعادة الملء:</strong>
-                  <span>حظر إعادة ملء عبوات الصابون أو الكحول القديمة (Zero Soap Top-Up Ban).</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Policy Overview & Metadata Box */}
-          <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs space-y-4">
-            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-4">
-              <div>
-                <span className="text-2xs font-bold text-blue-700 bg-blue-50 px-2.5 py-1 rounded-md border border-blue-200 font-mono">
-                  {data.policyCard.policyCode || 'IPC-POL-01'}
+            <div>
+              <div className="flex items-center gap-2">
+                <h2 className="text-base sm:text-lg font-bold text-white tracking-tight">
+                  الملخص التنفيذي والإكلينيكي الشامل (جميع عناصر السياسة)
+                </h2>
+                <span className="bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 text-2xs px-2.5 py-0.5 rounded-full font-mono font-bold">
+                  تنسيق معتمد 100%
                 </span>
-                <h1 className="text-xl sm:text-2xl font-black text-slate-900 mt-2">
-                  {data.policyCard.titleArabic}
-                </h1>
-                <p className="text-xs text-slate-500 font-medium mt-0.5">
-                  {data.policyCard.titleEnglish}
-                </p>
               </div>
-              <div className="text-left bg-slate-50 p-3 rounded-xl border border-slate-200/70 text-2xs space-y-1">
-                <p><span className="text-slate-400">تاريخ التفعيل:</span> <strong className="text-slate-800">{data.policyCard.effectiveDate || '2025/2026'}</strong></p>
-                <p><span className="text-slate-400">المجال:</span> <strong className="text-slate-800">{data.policyCard.domain}</strong></p>
-                <p><span className="text-slate-400">دورة المراجعة:</span> <strong className="text-slate-800">{data.policyCard.reviewCycle || 'سنوياً'}</strong></p>
-              </div>
-            </div>
-
-            {/* Aligned Standards Chips */}
-            <div className="flex flex-wrap items-center gap-2 pt-1">
-              <span className="text-2xs font-bold text-slate-500">معايير الاعتماد المتوافقة:</span>
-              {data.policyCard.alignedStandards.map((std, idx) => (
-                <span key={idx} className="text-2xs bg-emerald-50 text-emerald-800 border border-emerald-200 px-2.5 py-1 rounded-lg font-medium">
-                  ✓ {std.standardBody} {std.clauseNumber ? `(${std.clauseNumber})` : ''} - {std.description}
-                </span>
-              ))}
-            </div>
-          </div>
-
-          {/* Section 1: Executive Summary & Rationale */}
-          <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs space-y-4">
-            <div className="flex items-center gap-2 text-slate-900 font-bold text-base border-b border-slate-100 pb-3">
-              <BookOpen className="w-5 h-5 text-blue-700" />
-              <h3>1. الملخص الإكلينيكي والاستراتيجي الشامل</h3>
-            </div>
-            <div className={`text-slate-800 ${fontSizeClass} whitespace-pre-line text-justify`}>
-              {data.executiveSummarySnippet}
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-3">
-              <div className="bg-blue-50/60 p-4 rounded-xl border border-blue-200/70 text-xs">
-                <strong className="block text-blue-950 font-bold mb-1">🎯 الهدف الرئيسي:</strong>
-                <p className="text-blue-900">{data.purposeAndScope.mainObjective}</p>
-              </div>
-              <div className="bg-indigo-50/60 p-4 rounded-xl border border-indigo-200/70 text-xs">
-                <strong className="block text-indigo-950 font-bold mb-1">🔬 المبرر الإكلينيكي وجودة الرعاية:</strong>
-                <p className="text-indigo-900">{data.purposeAndScope.clinicalRationale}</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Section 2: Scientific Definitions & Concepts */}
-          {data.scientificDefinitions && data.scientificDefinitions.length > 0 && (
-            <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs space-y-4">
-              <div className="flex items-center gap-2 text-slate-900 font-bold text-base border-b border-slate-100 pb-3">
-                <Sparkles className="w-5 h-5 text-indigo-600" />
-                <h3>2. المفاهيم والمصطلحات العلمية الحاكمة</h3>
-              </div>
-              <div className="space-y-3">
-                {data.scientificDefinitions.map((def, idx) => (
-                  <div key={idx} className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-1.5">
-                    <div className="flex items-center justify-between">
-                      <h4 className="font-bold text-sm text-slate-900 flex items-center gap-2">
-                        <span className="w-6 h-6 rounded-full bg-blue-100 text-blue-800 flex items-center justify-center text-xs font-bold">
-                          {idx + 1}
-                        </span>
-                        {def.term}
-                      </h4>
-                    </div>
-                    <p className={`text-slate-700 ${fontSizeClass}`}>
-                      {def.definition}
-                    </p>
-                    {def.clinicalSignificance && (
-                      <div className="text-2xs bg-emerald-50 text-emerald-900 p-2.5 rounded-lg border border-emerald-200 font-medium">
-                        <strong>الأهمية السريرية والميكروبيولوجية:</strong> {def.clinicalSignificance}
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Section 3: Technical Specs & Disinfectant Matrix */}
-          {data.technicalSpecifications && data.technicalSpecifications.length > 0 && (
-            <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs space-y-4">
-              <div className="flex items-center gap-2 text-slate-900 font-bold text-base border-b border-slate-100 pb-3">
-                <Layers className="w-5 h-5 text-blue-700" />
-                <h3>3. المواصفات الفنية للتقنيات والمطهرات وأزمنة التلامس</h3>
-              </div>
-              <div className="space-y-4">
-                {data.technicalSpecifications.map((spec, idx) => (
-                  <div key={idx} className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
-                    <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 pb-2">
-                      <h4 className="font-bold text-sm text-blue-950">
-                        {spec.techniqueName}
-                      </h4>
-                      <span className="bg-blue-100 text-blue-900 text-xs font-mono font-bold px-2.5 py-1 rounded-lg">
-                        ⏱️ زمن التلامس: {spec.contactTime}
-                      </span>
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-                      <div>
-                        <span className="text-slate-500 block">المادة والتركيز:</span>
-                        <strong className="text-slate-800">{spec.agentAndConcentration}</strong>
-                      </div>
-                      {spec.requiredVolume && (
-                        <div>
-                          <span className="text-slate-500 block">الحجم / الجرعة المطلوبة:</span>
-                          <strong className="text-slate-800">{spec.requiredVolume}</strong>
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="space-y-1">
-                      <span className="text-2xs font-bold text-emerald-800 block">دواعي الاستخدام:</span>
-                      <ul className="list-disc list-inside text-xs text-slate-700 space-y-1">
-                        {spec.indications.map((ind, i) => (
-                          <li key={i}>{ind}</li>
-                        ))}
-                      </ul>
-                    </div>
-
-                    {spec.contraindicationsOrLimitations && spec.contraindicationsOrLimitations.length > 0 && (
-                      <div className="p-2.5 bg-rose-50 rounded-lg border border-rose-200 text-xs text-rose-900">
-                        <span className="font-bold block mb-1">⚠️ الموانع والمحددات الهامة:</span>
-                        <ul className="list-disc list-inside space-y-0.5 text-2xs">
-                          {spec.contraindicationsOrLimitations.map((con, i) => (
-                            <li key={i}>{con}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Section 4: WHO 5 Moments */}
-          {data.fiveMomentsDetails && data.fiveMomentsDetails.length > 0 && (
-            <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs space-y-4">
-              <div className="flex items-center gap-2 text-slate-900 font-bold text-base border-b border-slate-100 pb-3">
-                <Bookmark className="w-5 h-5 text-amber-600" />
-                <h3>4. اللحظات الخمس لنظافة الأيدي (WHO 5 Moments)</h3>
-              </div>
-              <div className="grid grid-cols-1 gap-3">
-                {data.fiveMomentsDetails.map((m) => (
-                  <div key={m.momentNumber} className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 flex items-start gap-3">
-                    <div className="w-8 h-8 rounded-full bg-blue-700 text-white font-black flex items-center justify-center shrink-0 text-sm shadow-xs">
-                      {m.momentNumber}
-                    </div>
-                    <div className="space-y-1 flex-1 text-xs">
-                      <h4 className="font-bold text-slate-900 text-sm">{m.momentName}</h4>
-                      <p className="text-slate-700"><strong>التوقيت:</strong> {m.timing}</p>
-                      <p className="text-slate-600 text-2xs"><strong>أمثلة إكلينيكية:</strong> {m.clinicalExamples.join('، ')}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Section 5: Standard Operating Procedures (SOPs) */}
-          <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs space-y-5">
-            <div className="flex items-center gap-2 text-slate-900 font-bold text-base border-b border-slate-100 pb-3">
-              <CheckCheck className="w-5 h-5 text-emerald-600" />
-              <h3>5. خطوات التشغيل القياسية المتسلسلة (SOPs) ونقاط الأمان</h3>
-            </div>
-
-            {/* Pre-procedure */}
-            {data.sopPhases.preProcedure?.length > 0 && (
-              <div className="space-y-2">
-                <h4 className="text-xs font-bold text-blue-900 bg-blue-50 px-3 py-1.5 rounded-lg border border-blue-200 inline-block">
-                  المرحلة الأولى: ما قبل الإجراء (Pre-Procedure)
-                </h4>
-                <div className="space-y-2">
-                  {data.sopPhases.preProcedure.map((s, i) => (
-                    <div key={i} className="p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs space-y-1">
-                      <div className="flex items-center justify-between font-bold text-slate-900">
-                        <span>{s.stepNumber}. {s.title}</span>
-                        <span className="text-2xs text-slate-500">المسؤول: {s.assignedTo || 'الممارس الصحي'}</span>
-                      </div>
-                      <p className="text-slate-700">{s.details}</p>
-                      {s.keySafetyPoint && (
-                        <p className="text-2xs text-emerald-800 bg-emerald-50 px-2 py-1 rounded border border-emerald-200 font-semibold">
-                          🛡️ نقطة أمان: {s.keySafetyPoint}
-                        </p>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Execution */}
-            {data.sopPhases.execution?.length > 0 && (
-              <div className="space-y-2">
-                <h4 className="text-xs font-bold text-indigo-900 bg-indigo-50 px-3 py-1.5 rounded-lg border border-indigo-200 inline-block">
-                  المرحلة الثانية: مرحلة التنفيذ (Execution Phase)
-                </h4>
-                <div className="space-y-2">
-                  {data.sopPhases.execution.map((s, i) => (
-                    <div key={i} className="p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs space-y-1">
-                      <div className="flex items-center justify-between font-bold text-slate-900">
-                        <span>{s.stepNumber}. {s.title}</span>
-                        <span className="text-2xs text-slate-500">المسؤول: {s.assignedTo || 'الممارس الصحي'}</span>
-                      </div>
-                      <p className="text-slate-700">{s.details}</p>
-                      {s.keySafetyPoint && (
-                        <p className="text-2xs text-indigo-800 bg-indigo-50 px-2 py-1 rounded border border-indigo-200 font-semibold">
-                          🛡️ نقطة أمان: {s.keySafetyPoint}
-                        </p>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Post-procedure */}
-            {data.sopPhases.postProcedure?.length > 0 && (
-              <div className="space-y-2">
-                <h4 className="text-xs font-bold text-amber-900 bg-amber-50 px-3 py-1.5 rounded-lg border border-amber-200 inline-block">
-                  المرحلة الثالثة: ما بعد الإجراء والتطهير (Post-Procedure)
-                </h4>
-                <div className="space-y-2">
-                  {data.sopPhases.postProcedure.map((s, i) => (
-                    <div key={i} className="p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs space-y-1">
-                      <div className="flex items-center justify-between font-bold text-slate-900">
-                        <span>{s.stepNumber}. {s.title}</span>
-                        <span className="text-2xs text-slate-500">المسؤول: {s.assignedTo || 'الممارس الصحي'}</span>
-                      </div>
-                      <p className="text-slate-700">{s.details}</p>
-                      {s.keySafetyPoint && (
-                        <p className="text-2xs text-amber-800 bg-amber-50 px-2 py-1 rounded border border-amber-200 font-semibold">
-                          🛡️ نقطة أمان: {s.keySafetyPoint}
-                        </p>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Section 6: DOs & DON'Ts + Emergency Incident Protocol */}
-          <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs space-y-4">
-            <div className="flex items-center gap-2 text-slate-900 font-bold text-base border-b border-slate-100 pb-3">
-              <ShieldAlert className="w-5 h-5 text-rose-600" />
-              <h3>6. مصفوفة المحظورات الصارمة والممارسات الإلزامية</h3>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {/* DOs */}
-              <div className="p-4 rounded-xl bg-emerald-50/70 border border-emerald-200 space-y-2">
-                <h4 className="font-bold text-emerald-950 text-xs flex items-center gap-1.5">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                  <span>الممارسات الإلزامية (DOs):</span>
-                </h4>
-                <ul className="space-y-1.5 text-xs text-emerald-900">
-                  {data.safetyWarningsAndCriticalSteps.dos.map((item, idx) => (
-                    <li key={idx} className="flex items-start gap-1.5">
-                      <span className="text-emerald-700 font-bold">✓</span>
-                      <span>{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              {/* DON'Ts */}
-              <div className="p-4 rounded-xl bg-rose-50/70 border border-rose-200 space-y-2">
-                <h4 className="font-bold text-rose-950 text-xs flex items-center gap-1.5">
-                  <AlertTriangle className="w-4 h-4 text-rose-600" />
-                  <span>المحظورات الصارمة (DON'Ts):</span>
-                </h4>
-                <ul className="space-y-1.5 text-xs text-rose-900">
-                  {data.safetyWarningsAndCriticalSteps.donts.map((item, idx) => (
-                    <li key={idx} className="flex items-start gap-1.5">
-                      <span className="text-rose-700 font-bold">✕</span>
-                      <span>{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-
-            {/* Emergency Protocol */}
-            <div className="p-4 rounded-xl bg-amber-50 border border-amber-200 text-xs space-y-1">
-              <strong className="block text-amber-950 font-bold">🚨 بروتوكول الاستجابة الفورية لحوادث التعرض المهني:</strong>
-              <p className="text-amber-900 leading-relaxed">
-                {data.safetyWarningsAndCriticalSteps.emergencyIncidentProtocol}
+              <p className="text-2xs sm:text-xs text-slate-300 mt-0.5">
+                تغطية دقيقة لكافة البنود، التعريفات، الجداول، إجراءات التشغيل، المحظورات، ومؤشرات الأداء
               </p>
             </div>
           </div>
 
-          {/* Section 7: Audit Checklist & KPIs */}
-          {data.complianceAndKPIs && (
-            <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs space-y-4">
-              <div className="flex items-center gap-2 text-slate-900 font-bold text-base border-b border-slate-100 pb-3">
-                <Bookmark className="w-5 h-5 text-blue-700" />
-                <h3>7. متطلبات التدقيق التفتيشي ومؤشرات الأداء (KPIs)</h3>
-              </div>
-
-              {/* KPIs */}
-              {data.complianceAndKPIs.kpis?.length > 0 && (
-                <div className="space-y-2">
-                  <h4 className="text-xs font-bold text-slate-700">مؤشرات الأداء المقاسة (KPIs):</h4>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {data.complianceAndKPIs.kpis.map((kpi, idx) => (
-                      <div key={idx} className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-xs space-y-1">
-                        <div className="flex items-center justify-between font-bold text-slate-900">
-                          <span>{kpi.name}</span>
-                          <span className="bg-emerald-100 text-emerald-800 text-2xs px-2 py-0.5 rounded font-mono font-bold">
-                            {kpi.target}
-                          </span>
-                        </div>
-                        <p className="text-slate-600 text-2xs"><strong>المعادلة:</strong> {kpi.formula}</p>
-                        <p className="text-slate-500 text-2xs"><strong>دورية القياس:</strong> {kpi.frequency} | {kpi.responsiblePerson || 'فريق مكافحة العدوى'}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-
-        </div>
-
-        {/* Right Column: Interactive Gemini AI Chat Assistant (4 cols on lg) */}
-        <div className="lg:col-span-4 space-y-4">
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-xs flex flex-col h-[750px] sticky top-20">
-            {/* Chat Header */}
-            <div className="p-4 bg-gradient-to-r from-blue-900 to-indigo-900 text-white rounded-t-2xl flex items-center justify-between">
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-xl bg-blue-500 flex items-center justify-center text-white shadow-sm">
-                  <Sparkles className="w-4 h-4 text-amber-300" />
-                </div>
-                <div>
-                  <h3 className="font-bold text-xs sm:text-sm text-white leading-tight">
-                    اسأل الذكاء الاصطناعي (Gemini AI)
-                  </h3>
-                  <p className="text-2xs text-blue-200">
-                    محادثة تفاعلية فورية ومستمرة حول السياسة
-                  </p>
-                </div>
-              </div>
-              <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping" title="متصل وجاهز" />
-            </div>
-
-            {/* Quick Prompt Suggestions */}
-            <div className="p-3 bg-slate-50 border-b border-slate-200 overflow-x-auto space-y-1.5">
-              <span className="text-2xs font-bold text-slate-500 block">أسئلة سريعة مقترحة:</span>
-              <div className="flex flex-col gap-1.5">
-                {suggestedPrompts.map((prompt, i) => (
-                  <button
-                    key={i}
-                    onClick={() => handleSendMessage(prompt)}
-                    disabled={isChatLoading}
-                    className="text-right text-2xs p-1.5 rounded-lg bg-white hover:bg-blue-50 hover:text-blue-800 text-slate-700 border border-slate-200 transition font-medium truncate"
-                  >
-                    {prompt}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Chat Message List */}
-            <div className="flex-1 p-4 overflow-y-auto space-y-3 text-xs bg-slate-100/50">
-              {chatMessages.map((msg) => (
-                <div
-                  key={msg.id}
-                  className={`flex flex-col ${msg.sender === 'user' ? 'items-end' : 'items-start'}`}
-                >
-                  <div
-                    className={`max-w-[90%] p-3 rounded-2xl ${
-                      msg.sender === 'user'
-                        ? 'bg-blue-800 text-white rounded-br-none shadow-xs'
-                        : 'bg-white text-slate-800 rounded-bl-none border border-slate-200 shadow-xs'
-                    }`}
-                  >
-                    {msg.sender === 'gemini' ? (
-                      <div className="space-y-1.5 leading-relaxed">
-                        <div className="flex items-center gap-1.5 text-2xs text-blue-700 font-bold mb-1 pb-1 border-b border-slate-100">
-                          <Sparkles className="w-3 h-3 text-amber-500" />
-                          <span>Gemini Policy Advisor:</span>
-                        </div>
-                        <div className="whitespace-pre-line text-xs">
-                          {msg.text}
-                        </div>
-                      </div>
-                    ) : (
-                      <p className="whitespace-pre-line text-xs">{msg.text}</p>
-                    )}
-                  </div>
-                  <span className="text-3xs text-slate-400 mt-1 px-1">{msg.timestamp}</span>
-                </div>
-              ))}
-
-              {isChatLoading && (
-                <div className="flex items-start gap-2">
-                  <div className="p-3 rounded-2xl bg-white border border-slate-200 rounded-bl-none text-slate-500 text-xs flex items-center gap-2">
-                    <div className="w-3 h-3 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
-                    <span>جاري صياغة الإجابة الإكلينيكية من Gemini...</span>
-                  </div>
-                </div>
-              )}
-
-              <div ref={chatEndRef} />
-            </div>
-
-            {/* Chat Input */}
-            <div className="p-3 bg-white border-t border-slate-200 rounded-b-2xl">
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  handleSendMessage();
-                }}
-                className="flex items-center gap-2"
+          {/* Quick Toolbar */}
+          <div className="flex flex-wrap items-center gap-2">
+            {/* Font Controls */}
+            <div className="bg-slate-800/80 rounded-xl p-1 border border-slate-700 flex items-center gap-1 text-xs">
+              <button
+                onClick={() => setFontSize('normal')}
+                className={`px-2 py-1 rounded-lg text-2xs font-bold transition ${fontSize === 'normal' ? 'bg-blue-600 text-white' : 'text-slate-300 hover:text-white'}`}
+                title="خط عادي"
               >
-                <input
-                  type="text"
-                  value={chatInput}
-                  onChange={(e) => setChatInput(e.target.value)}
-                  placeholder="اكتب سؤالك عن السياسة أو سيناريو طبي..."
-                  disabled={isChatLoading}
-                  className="flex-1 p-2.5 text-xs rounded-xl border border-slate-200 focus:outline-none focus:border-blue-800 focus:ring-1 focus:ring-blue-100 bg-slate-50"
-                />
-                <button
-                  type="submit"
-                  disabled={!chatInput.trim() || isChatLoading}
-                  className="p-2.5 rounded-xl bg-blue-800 hover:bg-blue-900 disabled:opacity-40 text-white transition shadow-xs"
-                  title="إرسال السؤال"
-                >
-                  <Send className="w-4 h-4" />
-                </button>
-              </form>
+                A
+              </button>
+              <button
+                onClick={() => setFontSize('large')}
+                className={`px-2 py-1 rounded-lg text-xs font-bold transition ${fontSize === 'large' ? 'bg-blue-600 text-white' : 'text-slate-300 hover:text-white'}`}
+                title="خط متوسط"
+              >
+                A+
+              </button>
+              <button
+                onClick={() => setFontSize('xlarge')}
+                className={`px-2 py-1 rounded-lg text-sm font-bold transition ${fontSize === 'xlarge' ? 'bg-blue-600 text-white' : 'text-slate-300 hover:text-white'}`}
+                title="خط كبير"
+              >
+                A++
+              </button>
             </div>
+
+            <button
+              onClick={handleCopy}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold transition border border-slate-700 shadow-xs"
+              title="نسخ النص الكامل للملخص"
+            >
+              {copied ? <CheckCircle2 className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
+              <span>{copied ? 'تم النسخ' : 'نسخ التلخيص'}</span>
+            </button>
+
+            <button
+              onClick={handleDownload}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold transition border border-slate-700 shadow-xs"
+              title="تنزيل كملف Markdown"
+            >
+              <Download className="w-4 h-4 text-blue-400" />
+              <span>تنزيل (MD)</span>
+            </button>
+
+            {onSwitchToA4 && (
+              <button
+                onClick={onSwitchToA4}
+                className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition shadow-xs"
+                title="الانتقال إلى ورقة المراجعة النهائية المعتمدة A4"
+              >
+                <FileText className="w-4 h-4" />
+                <span>وثيقة A4 المعتمدة</span>
+              </button>
+            )}
           </div>
         </div>
 
+        {/* View Mode Navigation Tabs */}
+        <div className="flex items-center gap-2 mt-4 pt-4 border-t border-slate-800 overflow-x-auto">
+          <button
+            onClick={() => setActiveTab('structured')}
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition shrink-0 ${
+              activeTab === 'structured'
+                ? 'bg-blue-600 text-white shadow-xs'
+                : 'bg-slate-800/60 text-slate-300 hover:bg-slate-800 hover:text-white'
+            }`}
+          >
+            <Layers className="w-4 h-4" />
+            <span>العرض المنهجي المنظم (جميع عناصر السياسة)</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('visual_infographics')}
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition shrink-0 ${
+              activeTab === 'visual_infographics'
+                ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-xs'
+                : 'bg-slate-800/60 text-slate-300 hover:bg-slate-800 hover:text-white'
+            }`}
+          >
+            <Sparkles className="w-4 h-4 text-amber-300" />
+            <span>المخططات التوضيحية والإنفوجرافيك الإكلينيكي (بالصور والرسوم)</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('markdown')}
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition shrink-0 ${
+              activeTab === 'markdown'
+                ? 'bg-blue-600 text-white shadow-xs'
+                : 'bg-slate-800/60 text-slate-300 hover:bg-slate-800 hover:text-white'
+            }`}
+          >
+            <BookOpen className="w-4 h-4" />
+            <span>عرض السرد الكامل (ChatGPT & Markdown View)</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('interactive_chat')}
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition shrink-0 ${
+              activeTab === 'interactive_chat'
+                ? 'bg-indigo-600 text-white shadow-xs'
+                : 'bg-slate-800/60 text-slate-300 hover:bg-slate-800 hover:text-white'
+            }`}
+          >
+            <Sparkles className="w-4 h-4 text-amber-300" />
+            <span>المساعد الإكلينيكي الذكي والأسئلة (AI Q&A)</span>
+          </button>
+        </div>
       </div>
+
+      {/* ========================================================================= */}
+      {/* TAB 1: STRUCTURED EXECUTIVE VIEW WITH ALL 15 ELEMENTS                     */}
+      {/* ========================================================================= */}
+      {activeTab === 'structured' && (
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <div className="lg:col-span-8 space-y-6">
+
+            {/* 1. INSTITUTIONAL DOCUMENT CONTROL BOX */}
+            <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs space-y-4">
+              <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-4">
+                <div>
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-2xs font-bold text-blue-800 bg-blue-50 px-2.5 py-1 rounded-md border border-blue-200 font-mono">
+                      كود السياسة: {card.policyCode || 'MUEH.IPC.04'}
+                    </span>
+                    <span className="text-2xs font-bold text-slate-700 bg-slate-100 px-2 py-1 rounded-md border border-slate-200">
+                      معيار: I.P.C 04
+                    </span>
+                    <span className="text-2xs font-bold text-emerald-800 bg-emerald-50 px-2 py-1 rounded-md border border-emerald-200">
+                      الإصدار الثاني (2025/5/1)
+                    </span>
+                  </div>
+                  <h1 className="text-xl sm:text-2xl font-black text-slate-900 mt-2 leading-tight">
+                    {card.titleArabic || 'سياسة وإجراءات نظافة وتطهير الأيدي بالمنشآت الصحية'}
+                  </h1>
+                  <p className="text-xs text-slate-500 font-medium mt-0.5">
+                    {card.titleEnglish || 'Hand Hygiene & Antisepsis Clinical Policy'}
+                  </p>
+                </div>
+                <div className="text-left bg-slate-50 p-3 rounded-xl border border-slate-200/70 text-2xs space-y-1 min-w-[200px]">
+                  <p><span className="text-slate-500">المؤسسة:</span> <strong className="text-slate-800 font-semibold">مستشفيات جامعة المنيا - مستشفى العيون</strong></p>
+                  <p><span className="text-slate-500">تاريخ التفعيل:</span> <strong className="text-slate-800">{card.effectiveDate || '2025/5/15'}</strong></p>
+                  <p><span className="text-slate-500">تاريخ المراجعة:</span> <strong className="text-slate-800">{card.reviewCycle || '2028/4/1 (كل 3 سنوات)'}</strong></p>
+                  <p><span className="text-slate-500">عدد الصفحات:</span> <strong className="text-slate-800">11 صفحة</strong> | <span className="text-slate-500">النسخ:</span> <strong className="text-slate-800">نسخة أصلية 1</strong></p>
+                </div>
+              </div>
+
+              {/* Scope & Standards */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1 text-xs">
+                <div className="bg-slate-50 p-3 rounded-xl border border-slate-200/70">
+                  <strong className="text-slate-900 block font-bold mb-1">مجال ونطاق التطبيق:</strong>
+                  <p className="text-slate-700">جميع أقسام المستشفى (الأطباء - هيئة التمريض - العمال - الإداريون - والزائرون).</p>
+                </div>
+                <div className="bg-slate-50 p-3 rounded-xl border border-slate-200/70">
+                  <strong className="text-slate-900 block font-bold mb-1">المعايير المرجعية المتوافقة:</strong>
+                  <div className="flex flex-wrap gap-1.5 mt-1">
+                    <span className="text-2xs bg-emerald-100/70 text-emerald-900 font-bold px-2 py-0.5 rounded">GAHAR 2025</span>
+                    <span className="text-2xs bg-blue-100/70 text-blue-900 font-bold px-2 py-0.5 rounded">الدليل القومي 2020</span>
+                    <span className="text-2xs bg-purple-100/70 text-purple-900 font-bold px-2 py-0.5 rounded">WHO 5 Moments</span>
+                    <span className="text-2xs bg-amber-100/70 text-amber-900 font-bold px-2 py-0.5 rounded">CDC / APIC / SHEA</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* 2. INSTITUTIONAL SIGN-OFF & APPROVAL MATRIX */}
+            <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs space-y-4">
+              <div className="flex items-center gap-2 text-slate-900 font-bold text-base border-b border-slate-100 pb-3">
+                <FileCheck2 className="w-5 h-5 text-blue-800" />
+                <h3>1. مصفوفة الإعداد والمراجعة الفنية والاعتماد المؤسسي</h3>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+                {/* Prepared by */}
+                <div className="p-3.5 rounded-xl bg-blue-50/60 border border-blue-200 space-y-2">
+                  <span className="font-bold text-blue-950 block border-b border-blue-200/70 pb-1 text-2xs uppercase tracking-wider">
+                    ✍️ إعداد ومراجعة فنية:
+                  </span>
+                  <ul className="space-y-1.5 text-slate-800 text-2xs">
+                    <li className="font-semibold">• أ/ محمود محمد شحاته <span className="text-slate-500">(مشرف مكافحة العدوى)</span></li>
+                    <li className="font-semibold">• أ/ أحمد وحيد شعبان <span className="text-slate-500">(مشرف مكافحة العدوى)</span></li>
+                    <li className="font-semibold">• د/ محمود رمضان عبد السميع <span className="text-slate-500">(مدير فريق مكافحة العدوى)</span></li>
+                  </ul>
+                </div>
+
+                {/* Reviewed by */}
+                <div className="p-3.5 rounded-xl bg-purple-50/60 border border-purple-200 space-y-2">
+                  <span className="font-bold text-purple-950 block border-b border-purple-200/70 pb-1 text-2xs uppercase tracking-wider">
+                    🔍 مراجعة واعتماد الجودة:
+                  </span>
+                  <ul className="space-y-1.5 text-slate-800 text-2xs">
+                    <li className="font-semibold">• أ/ محمد ناجي عبدالمجيد <span className="text-slate-500">(عضو الإدارة المركزية لمكافحة العدوى)</span></li>
+                    <li className="font-semibold">• ص/ باسم ناصف فؤاد <span className="text-slate-500">(منسق اللجنة المركزية للجودة)</span></li>
+                    <li className="font-semibold">• د/ أسماء فؤاد أحمد <span className="text-slate-500">(مدير وحدة الجودة)</span></li>
+                  </ul>
+                </div>
+
+                {/* Approved by */}
+                <div className="p-3.5 rounded-xl bg-emerald-50/60 border border-emerald-200 space-y-2">
+                  <span className="font-bold text-emerald-950 block border-b border-emerald-200/70 pb-1 text-2xs uppercase tracking-wider">
+                    🏛️ الاعتماد النهائي:
+                  </span>
+                  <ul className="space-y-1.5 text-slate-800 text-2xs">
+                    <li className="font-semibold">• د/ مصطفى سيد محمد <span className="text-slate-500">(مدير إدارة مكافحة العدوى المركزية)</span></li>
+                    <li className="font-semibold">• د/ سلمان حمدي محمد <span className="text-slate-500">(مدير وحدات الجودة المركزية)</span></li>
+                    <li className="font-semibold">• ا.د/ أحمد عبد الحميد أحمد <span className="text-slate-500">(مدير عام المستشفى)</span></li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            {/* 3. POLICY STATEMENT & OPERATIONAL OBJECTIVES */}
+            <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs space-y-4">
+              <div className="flex items-center gap-2 text-slate-900 font-bold text-base border-b border-slate-100 pb-3">
+                <BookOpen className="w-5 h-5 text-blue-800" />
+                <h3>2. نص السياسة والأهداف الإكلينيكية والتشغيلية (Policy Statement & Objectives)</h3>
+              </div>
+
+              <div className="bg-blue-50/70 p-4 rounded-xl border border-blue-200 text-slate-900 space-y-2">
+                <strong className="block text-xs font-bold text-blue-950">نص السياسة الإلزامي:</strong>
+                <p className={`text-slate-800 ${fontSizeClass} leading-relaxed text-justify`}>
+                  «التزام جميع العاملين (أطباء - تمريض - عمال - إداريين) وكذلك الزائرين بغسيل الأيدي بطريقة صحيحة تبعاً لنوع الإجراء المتخذ مع المريض، حيث تُعد نظافة اليدين حجر الزاوية في الحد من انتقال العدوى في جميع مرافق الرعاية الصحية، وتُعتبر الاستراتيجية الأكثر فعالية وكفاءة للوقاية من العدوى ومكافحتها.»
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-2">
+                <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-1 text-xs">
+                  <div className="flex items-center gap-1.5 font-bold text-slate-900 text-xs">
+                    <span className="w-5 h-5 rounded-full bg-blue-700 text-white flex items-center justify-center text-2xs">1</span>
+                    <span>سلامة الإجراءات الطبية:</span>
+                  </div>
+                  <p className="text-slate-700 text-2xs">القيام بكافة التدخلات والإجراءات الطبية دون أي ملوثات تنتقل من الأيدي أثناء التعامل مع المرضى.</p>
+                </div>
+
+                <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-1 text-xs">
+                  <div className="flex items-center gap-1.5 font-bold text-slate-900 text-xs">
+                    <span className="w-5 h-5 rounded-full bg-blue-700 text-white flex items-center justify-center text-2xs">2</span>
+                    <span>التدريب المستمر:</span>
+                  </div>
+                  <p className="text-slate-700 text-2xs">تدريب وتأهيل جميع العاملين بالمستشفى بالخطوات والدواعي الصحيحة لنظافة وتطهير الأيدي بنسبة 100%.</p>
+                </div>
+
+                <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-1 text-xs">
+                  <div className="flex items-center gap-1.5 font-bold text-slate-900 text-xs">
+                    <span className="w-5 h-5 rounded-full bg-blue-700 text-white flex items-center justify-center text-2xs">3</span>
+                    <span>حماية المرضى والعاملين:</span>
+                  </div>
+                  <p className="text-slate-700 text-2xs">التأكيد على أهمية نظافة الأيدي لضمان سلامة المرضى والعاملين بالمستشفى على حد سواء وخفض العدوى المكتسبة.</p>
+                </div>
+              </div>
+            </div>
+
+            {/* 4. SCIENTIFIC DEFINITIONS */}
+            {definitions.length > 0 && (
+              <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs space-y-4">
+                <div className="flex items-center gap-2 text-slate-900 font-bold text-base border-b border-slate-100 pb-3">
+                  <FlaskConical className="w-5 h-5 text-indigo-700" />
+                  <h3>3. المفاهيم والمصطلحات العلمية الحاكمة (Scientific Terminology)</h3>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {definitions.map((def: any, idx: number) => (
+                    <div key={idx} className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+                      <h4 className="font-bold text-xs sm:text-sm text-slate-900 flex items-center gap-2 border-b border-slate-200 pb-1.5">
+                        <span className="w-5 h-5 rounded-full bg-blue-800 text-white flex items-center justify-center text-2xs font-bold shrink-0">
+                          {idx + 1}
+                        </span>
+                        {def.term}
+                      </h4>
+                      <p className="text-xs text-slate-700 leading-relaxed">
+                        {def.definition}
+                      </p>
+                      {def.clinicalSignificance && (
+                        <div className="text-2xs bg-emerald-50 text-emerald-950 p-2 rounded-lg border border-emerald-200 font-medium">
+                          <strong>الأهمية الإكلينيكية: </strong> {def.clinicalSignificance}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* 5. COMPARATIVE MATRIX OF TECHNIQUES & DISINFECTANTS */}
+            {techSpecs.length > 0 && (
+              <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs space-y-4">
+                <div className="flex items-center gap-2 text-slate-900 font-bold text-base border-b border-slate-100 pb-3">
+                  <Layers className="w-5 h-5 text-blue-800" />
+                  <h3>4. جدول تقنيات نظافة الأيدي والمواصفات الفنية والمطهرات</h3>
+                </div>
+
+                <div className="overflow-x-auto">
+                  <table className="w-full text-xs text-right border-collapse border border-slate-200 rounded-xl overflow-hidden">
+                    <thead>
+                      <tr className="bg-slate-900 text-white">
+                        <th className="p-3 font-bold border border-slate-700">نوع الإجراء والتقنية</th>
+                        <th className="p-3 font-bold border border-slate-700">المادة الفعالة والتركيز</th>
+                        <th className="p-3 font-bold border border-slate-700 text-center">الحجم والكمية</th>
+                        <th className="p-3 font-bold border border-slate-700 text-center">زمن التلامس</th>
+                        <th className="p-3 font-bold border border-slate-700">القدرة والتأثير الميكروبي</th>
+                        <th className="p-3 font-bold border border-slate-700">دواعي الاستخدام والموانع</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-200 bg-white">
+                      {techSpecs.map((spec: any, idx: number) => (
+                        <tr key={idx} className="hover:bg-slate-50 transition">
+                          <td className="p-3 font-bold text-slate-900 border border-slate-200 align-top">
+                            {spec.techniqueName}
+                          </td>
+                          <td className="p-3 text-slate-800 border border-slate-200 align-top">
+                            {spec.agentAndConcentration}
+                          </td>
+                          <td className="p-3 text-center font-mono font-bold text-blue-900 border border-slate-200 align-top">
+                            {spec.requiredVolume || 'كمية كافية'}
+                          </td>
+                          <td className="p-3 text-center font-mono font-bold text-emerald-800 border border-slate-200 align-top">
+                            {spec.contactTime}
+                          </td>
+                          <td className="p-3 text-slate-700 border border-slate-200 align-top text-2xs">
+                            {spec.techniqueName?.includes("كحول") 
+                              ? "يقضي على الفلورا المؤقتة ويقلل البكتيريا المستوطنة سريعاً"
+                              : spec.techniqueName?.includes("جراحي")
+                              ? "يقضي على الفلورا المؤقتة ويقلل البكتيريا المستوطنة لفترة ممتدة"
+                              : "يزيل جزئياً النبت الجرثومي المؤقت والمواد العضوية"}
+                          </td>
+                          <td className="p-3 text-slate-700 border border-slate-200 align-top text-2xs space-y-1">
+                            <div>
+                              <strong className="text-emerald-900">الدواعي: </strong>
+                              {Array.isArray(spec.indications) ? spec.indications.join(' • ') : spec.indications}
+                            </div>
+                            {Array.isArray(spec.contraindicationsOrLimitations) && spec.contraindicationsOrLimitations.length > 0 && (
+                              <div className="text-rose-900 bg-rose-50 p-1.5 rounded border border-rose-200">
+                                <strong>⚠️ محاذير: </strong>
+                                {spec.contraindicationsOrLimitations.join(' • ')}
+                              </div>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+
+            {/* 6. WHO 5 MOMENTS DETAIL */}
+            {fiveMoments.length > 0 && (
+              <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs space-y-4">
+                <div className="flex items-center gap-2 text-slate-900 font-bold text-base border-b border-slate-100 pb-3">
+                  <Bookmark className="w-5 h-5 text-amber-600" />
+                  <h3>5. اللحظات الخمس (WHO 5 Moments) لتطهير الأيدي بالمنشآت الصحية</h3>
+                </div>
+
+                <div className="space-y-3">
+                  {fiveMoments.map((m: any, idx: number) => (
+                    <div key={idx} className="p-4 rounded-xl bg-slate-50 border border-slate-200 flex flex-col sm:flex-row items-start sm:items-center gap-3.5">
+                      <div className="w-10 h-10 rounded-xl bg-blue-800 text-white font-black flex items-center justify-center shrink-0 text-base shadow-xs">
+                        {m.momentNumber || idx + 1}
+                      </div>
+                      <div className="space-y-1 flex-1 text-xs">
+                        <div className="flex flex-wrap items-center justify-between gap-1">
+                          <h4 className="font-bold text-slate-900 text-sm">{m.momentName}</h4>
+                          <span className="text-2xs bg-blue-100 text-blue-900 px-2 py-0.5 rounded font-medium">
+                            الهدف: {m.timing}
+                          </span>
+                        </div>
+                        <p className="text-slate-600 text-2xs">
+                          <strong className="text-slate-800">أمثلة إكلينيكية واقعية: </strong>
+                          {Array.isArray(m.clinicalExamples) ? m.clinicalExamples.join('، ') : m.clinicalExamples}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* 7. DETAILED SOPS: ROUTINE, ALCOHOL, SURGICAL */}
+            <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs space-y-5">
+              <div className="flex items-center gap-2 text-slate-900 font-bold text-base border-b border-slate-100 pb-3">
+                <CheckCheck className="w-5 h-5 text-emerald-600" />
+                <h3>6. خطوات العمل القياسية (SOPs) المتسلسلة لتقنيات نظافة الأيدي</h3>
+              </div>
+
+              {/* Tabbed or Subdivided SOPs */}
+              <div className="space-y-4">
+                {/* SOP 1: Soap & Water 13 Steps */}
+                <div className="p-4 rounded-xl bg-blue-50/50 border border-blue-200 space-y-2">
+                  <div className="flex items-center justify-between border-b border-blue-200 pb-2">
+                    <h4 className="font-bold text-blue-950 text-xs sm:text-sm flex items-center gap-2">
+                      <span className="w-6 h-6 rounded-full bg-blue-700 text-white flex items-center justify-center text-xs font-bold">A</span>
+                      خطوات غسيل اليدين بالماء والصابون (40 - 60 ثانية):
+                    </h4>
+                    <span className="bg-blue-200 text-blue-900 text-2xs font-mono font-bold px-2 py-0.5 rounded">13 خطوة قياسية</span>
+                  </div>
+                  <ol className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-2xs text-slate-800 list-decimal list-inside pt-1">
+                    <li>خلع جميع المجوهرات والحلي والمعاصم.</li>
+                    <li>فتح الصنبور بالكوع وترطيب اليدين بالماء الجاري.</li>
+                    <li>وضع كمية كافية من الصابون لتغطية كامل سطح اليد.</li>
+                    <li>فرك باطن اليد بباطن اليد الأخرى بحركة دائرية.</li>
+                    <li>فرك باطن اليد اليمنى على ظهر اليد اليسرى مع تداخل الأصابع والعكس.</li>
+                    <li>دلك باطن اليدين مواجهين مع تداخل الأصابع.</li>
+                    <li>دلك قبضة اليد اليمنى بباطن اليد اليسرى وظاهر الأصابع.</li>
+                    <li>الدلك الدائري لإبهام اليد اليسرى باليد اليمنى ثم العكس.</li>
+                    <li>فرك أطراف أصابع اليد اليمنى دائرياً بباطن اليد اليسرى والعكس.</li>
+                    <li>فرك الرسغين بطريقة دائرية لليد اليمنى ثم اليسرى.</li>
+                    <li>شطف اليدين بماء جارٍ من أطراف الأصابع لأعلى مع رفع اليدين.</li>
+                    <li>تجفيف اليدين باستخدام مناديل ورقية وحيدة الاستخدام.</li>
+                    <li>إغلاق الصنبور باستخدام نفس الفوطة قبل التخلص منها.</li>
+                  </ol>
+                </div>
+
+                {/* SOP 2: Alcohol Rub 70% */}
+                <div className="p-4 rounded-xl bg-indigo-50/50 border border-indigo-200 space-y-2">
+                  <div className="flex items-center justify-between border-b border-indigo-200 pb-2">
+                    <h4 className="font-bold text-indigo-950 text-xs sm:text-sm flex items-center gap-2">
+                      <span className="w-6 h-6 rounded-full bg-indigo-700 text-white flex items-center justify-center text-xs font-bold">B</span>
+                      خطوات تدليك اليدين بالكحول 70% (20 - 30 ثانية):
+                    </h4>
+                    <span className="bg-indigo-200 text-indigo-900 text-2xs font-mono font-bold px-2 py-0.5 rounded">3-5 مل كحول</span>
+                  </div>
+                  <p className="text-2xs text-slate-700">
+                    خلع الحلي • وضع 3-5 مل كحول بقبضة اليد حتى الرسغين • دلك الراحتين، ظهر اليدين، تداخل الأصابع، الإبهامين، أطراف الأصابع، والرسغين حتى جفاف الكحول تماماً (20-30 ثانية).
+                  </p>
+                </div>
+
+                {/* SOP 3 & 4: Surgical Scrub & Surgical Rub */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="p-3.5 rounded-xl bg-purple-50/60 border border-purple-200 space-y-1.5 text-2xs">
+                    <h5 className="font-bold text-purple-950 text-xs flex items-center gap-1.5">
+                      <span className="w-5 h-5 rounded-full bg-purple-700 text-white flex items-center justify-center text-2xs">C</span>
+                      الغسل الجراحي (بيتادين 7.5% رغوي):
+                    </h5>
+                    <p className="text-slate-700 leading-relaxed">
+                      بلل اليدين والساعدين 5 سم فوق المرفق • تنظيف أسفل الأظافر • دعك الراحتين وظاهر اليدين والذراعين بحركة دائرية لمدة 3-5 دقائق • الشطف من الأصابع لأعلى • التجفيف بمنشفة معقمة ورفع الأيدي فوق الخصر.
+                    </p>
+                  </div>
+
+                  <div className="p-3.5 rounded-xl bg-emerald-50/60 border border-emerald-200 space-y-1.5 text-2xs">
+                    <h5 className="font-bold text-emerald-950 text-xs flex items-center gap-1.5">
+                      <span className="w-5 h-5 rounded-full bg-emerald-700 text-white flex items-center justify-center text-2xs">D</span>
+                      الدلك الجراحي (كلورهيكسيدين 2%-4%):
+                    </h5>
+                    <p className="text-slate-700 leading-relaxed">
+                      غسل اليدين روتينياً وتجفيفهما أولاً • وضع 5 مل مطهر كحولي • غمر أطراف الأصابع 5 ثوانٍ • تغطية كامل سطح الذراع حتى 5 سم فوق المرفق لمدة 15 ثانية لكل ذراع والتدليك حتى الجفاف التام.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* 8. STRICT PROHIBITIONS & GENERAL PRECAUTIONS */}
+            <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs space-y-4">
+              <div className="flex items-center gap-2 text-slate-900 font-bold text-base border-b border-slate-100 pb-3">
+                <ShieldAlert className="w-5 h-5 text-rose-600" />
+                <h3>7. الإجراءات العامة والمحظورات الصارمة (Strict Prohibitions)</h3>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                <div className="p-3.5 rounded-xl bg-rose-50/70 border border-rose-200 space-y-2">
+                  <h4 className="font-bold text-rose-950 flex items-center gap-1.5">
+                    <AlertTriangle className="w-4 h-4 text-rose-600" />
+                    <span>المحظورات الصارمة (DON'Ts):</span>
+                  </h4>
+                  <ul className="space-y-1 text-2xs text-rose-900">
+                    <li>❌ <strong>حظر المجوهرات والخواتم والساعات:</strong> تعيق وصول المطهر وتمزق القفازات.</li>
+                    <li>❌ <strong>حظر طلاء والأظافر الصناعية:</strong> تأوي الجراثيم تحت الأظافر.</li>
+                    <li>❌ <strong>حظر مجففات الهواء الساخن:</strong> تسبب نقل العدوى بالهواء الملوث ولا تجفف جيداً.</li>
+                    <li>❌ <strong>حظر إعادة ملء العبوات (Top-Up Ban):</strong> يحظر تزويد الصابون/الكحول دون تفريغ وتطهير.</li>
+                    <li>❌ <strong>حظر سكب السوائل في أحواض الأيدي:</strong> الأحواض مخصصة لغسيل الأيدي فقط.</li>
+                  </ul>
+                </div>
+
+                <div className="p-3.5 rounded-xl bg-emerald-50/70 border border-emerald-200 space-y-2">
+                  <h4 className="font-bold text-emerald-950 flex items-center gap-1.5">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                    <span>الممارسات الإلزامية (DOs):</span>
+                  </h4>
+                  <ul className="space-y-1 text-2xs text-emerald-900">
+                    <li>✅ <strong>تقليم الأظافر دائرياً:</strong> وقصيرة خالية من أي التهابات جلدية.</li>
+                    <li>✅ <strong>توفير حوض لكل 4 أسرة:</strong> مخصص لغسيل الأيدي فقط مع ماء وصابون ومناشف ورقية.</li>
+                    <li>✅ <strong>توفير عبوات كحول 70%:</strong> معلقة في أماكن واضحة وعند نقاط تقديم الرعاية.</li>
+                    <li>✅ <strong>ساعة توقيت:</strong> لحساب زمن غسل الأيدي الجراحي بغرف العمليات.</li>
+                    <li>✅ <strong>تدوين تاريخ الاستخدام:</strong> على كافة عبوات الصابون والمطهرات.</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            {/* 9. PPE & GLOVE PROTOCOLS */}
+            <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs space-y-4">
+              <div className="flex items-center gap-2 text-slate-900 font-bold text-base border-b border-slate-100 pb-3">
+                <HeartPulse className="w-5 h-5 text-purple-700" />
+                <h3>8. معدات الوقاية الشخصية وضوابط القفازات</h3>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+                <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-1">
+                  <strong className="text-slate-900 block font-bold text-2xs">1. قفازات نظيفة غير معقمة:</strong>
+                  <p className="text-slate-700 text-2xs">أحادية الاستخدام عند احتمالية التعرض للسوائل، الدم، الضمادات الملوثة، وعينات المرضى.</p>
+                </div>
+                <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-1">
+                  <strong className="text-slate-900 block font-bold text-2xs">2. قفازات معقمة:</strong>
+                  <p className="text-slate-700 text-2xs">قبل العمليات الجراحية، القسطرة البولية، والقسطرة الوريدية المركزية والإجراءات المعقمة.</p>
+                </div>
+                <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-1">
+                  <strong className="text-slate-900 block font-bold text-2xs">3. قفازات شديدة التحمل:</strong>
+                  <p className="text-slate-700 text-2xs">التعامل مع النفايات الطبية، صناديق الأمان، المواد الكيميائية، تنظيف البيئة وغسيل الآلات.</p>
+                </div>
+              </div>
+
+              <div className="p-3 bg-amber-50 rounded-xl border border-amber-200 text-2xs text-amber-950 font-bold flex items-center gap-2">
+                <Flame className="w-4 h-4 text-amber-600 shrink-0" />
+                <span>القاعدة الذهبية الإلزامية: ارتداء القفاز لا يُغني بأي حال من الأحوال عن غسيل وتطهير الأيدي والعكس.</span>
+              </div>
+            </div>
+
+            {/* 10. ROLES & RESPONSIBILITIES */}
+            {roles.length > 0 && (
+              <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs space-y-4">
+                <div className="flex items-center gap-2 text-slate-900 font-bold text-base border-b border-slate-100 pb-3">
+                  <Users className="w-5 h-5 text-blue-800" />
+                  <h3>9. مصفوفة المسؤوليات وتوزيع الأدوار التنفيذية</h3>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {roles.map((r: any, idx: number) => (
+                    <div key={idx} className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-1.5">
+                      <strong className="text-blue-950 font-bold block text-xs border-b border-slate-200 pb-1">
+                        {r.role}
+                      </strong>
+                      <ul className="space-y-1 text-2xs text-slate-700">
+                        {r.responsibilities?.map((res: string, i: number) => (
+                          <li key={i} className="flex items-start gap-1">
+                            <span className="text-blue-700">•</span>
+                            <span>{res}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* 11. AUDIT CHECKLIST & MEASURABLE KPIS */}
+            {kpisData && (
+              <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs space-y-4">
+                <div className="flex items-center gap-2 text-slate-900 font-bold text-base border-b border-slate-100 pb-3">
+                  <Building2 className="w-5 h-5 text-emerald-700" />
+                  <h3>10. معايير التدقيق التفتيشي ومؤشرات الأداء المقاسة (Audit & KPIs)</h3>
+                </div>
+
+                {/* Audit Checklist Table */}
+                {kpisData.auditChecklist?.length > 0 && (
+                  <div className="space-y-2">
+                    <h4 className="text-xs font-bold text-slate-800">قائمة فحص التدقيق الميداني (Audit Checklist):</h4>
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-2xs text-right border-collapse border border-slate-200 rounded-lg">
+                        <thead>
+                          <tr className="bg-slate-100 text-slate-900 font-bold">
+                            <th className="p-2 border border-slate-300 w-16">كود البند</th>
+                            <th className="p-2 border border-slate-300">نقطة التفتيش والمطابقة</th>
+                            <th className="p-2 border border-slate-300 w-28">المرجع القياسي</th>
+                            <th className="p-2 border border-slate-300 w-36">دليل الإثبات المطلوب</th>
+                            <th className="p-2 border border-slate-300 w-16 text-center">التكرار</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-200">
+                          {kpisData.auditChecklist.map((item: any, idx: number) => (
+                            <tr key={idx} className="hover:bg-slate-50">
+                              <td className="p-2 font-mono font-bold text-blue-900 border border-slate-200">{item.id}</td>
+                              <td className="p-2 text-slate-800 border border-slate-200">{item.checkpoint}</td>
+                              <td className="p-2 text-slate-600 border border-slate-200">{item.standardReference}</td>
+                              <td className="p-2 text-emerald-900 font-medium border border-slate-200">{item.evidenceRequired}</td>
+                              <td className="p-2 text-center text-slate-600 border border-slate-200">{item.frequency}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )}
+
+                {/* KPIs Cards */}
+                {kpisData.kpis?.length > 0 && (
+                  <div className="space-y-2 pt-2">
+                    <h4 className="text-xs font-bold text-slate-800">مؤشرات الأداء المقاسة (KPIs):</h4>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      {kpisData.kpis.map((kpi: any, idx: number) => (
+                        <div key={idx} className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-1 text-2xs">
+                          <div className="flex items-center justify-between font-bold text-slate-900 text-xs">
+                            <span>{kpi.name}</span>
+                            <span className="bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded font-mono font-bold">
+                              {kpi.target}
+                            </span>
+                          </div>
+                          <p className="text-slate-600"><strong>المعادلة: </strong>{kpi.formula}</p>
+                          <p className="text-slate-500"><strong>دورية القياس: </strong>{kpi.frequency} | <strong>المسؤول: </strong>{kpi.responsiblePerson || 'فريق مكافحة العدوى'}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* 12. ATTACHMENTS & FORMS */}
+            <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs space-y-3">
+              <div className="flex items-center gap-2 text-slate-900 font-bold text-base border-b border-slate-100 pb-3">
+                <FileText className="w-5 h-5 text-blue-800" />
+                <h3>11. المرفقات والنماذج والمراجع المعتمدة</h3>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-2xs text-slate-700">
+                <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-1">
+                  <strong className="text-slate-900 block font-bold">المرفقات الإلزامية:</strong>
+                  <p>1. استمارة تقييم الاستجابة لغسل الأيدي حسب منظمة الصحة العالمية (شهرياً).</p>
+                  <p>2. كشف حصر وأسماء المتدربين من جميع أقسام المستشفى ونسب التدريب.</p>
+                </div>
+                <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-1">
+                  <strong className="text-slate-900 block font-bold">المراجع العلمية المعتمدة:</strong>
+                  <p>• الدليل القومي المصري لمكافحة العدوى (الإصدار الرابع).</p>
+                  <p>• إرشادات منظمة الصحة العالمية (WHO Guidelines on Hand Hygiene in Healthcare).</p>
+                  <p>• أدلة مراكز مكافحة الأمراض CDC، وجمعيات APIC و SHEA الدولية.</p>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          {/* RIGHT SIDEBAR: QUICK INTERACTIVE WIDGETS & AUDIT SUMMARY */}
+          <div className="lg:col-span-4 space-y-6">
+            
+            {/* Quick Audit Status Card */}
+            <div className="bg-gradient-to-br from-blue-900 to-slate-900 text-white rounded-2xl p-5 border border-blue-800 shadow-md space-y-4">
+              <div className="flex items-center justify-between border-b border-blue-800/80 pb-3">
+                <div className="flex items-center gap-2">
+                  <Building2 className="w-5 h-5 text-amber-300" />
+                  <h3 className="font-bold text-sm text-white">بطاقة التحقق والجاهزية</h3>
+                </div>
+                <span className="bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 text-2xs px-2 py-0.5 rounded font-mono font-bold">
+                  GAHAR Ready
+                </span>
+              </div>
+
+              <div className="space-y-2 text-2xs">
+                <div className="flex justify-between items-center py-1 border-b border-blue-800/50">
+                  <span className="text-blue-200">اكتمال بنود السياسة:</span>
+                  <span className="font-bold text-white">100% (11 صفحة)</span>
+                </div>
+                <div className="flex justify-between items-center py-1 border-b border-blue-800/50">
+                  <span className="text-blue-200">اللحظات الخمس:</span>
+                  <span className="font-bold text-emerald-400">مكتملة ومفصلة</span>
+                </div>
+                <div className="flex justify-between items-center py-1 border-b border-blue-800/50">
+                  <span className="text-blue-200">خطوات SOPs:</span>
+                  <span className="font-bold text-white">4 بروتوكولات تفصيلية</span>
+                </div>
+                <div className="flex justify-between items-center py-1 border-b border-blue-800/50">
+                  <span className="text-blue-200">حظر خلط الصابون:</span>
+                  <span className="font-bold text-amber-300">Top-Up Ban إلزامي</span>
+                </div>
+                <div className="flex justify-between items-center py-1">
+                  <span className="text-blue-200">مستهدف الامتثال:</span>
+                  <span className="font-bold text-emerald-400">≥ 90% شهرياً</span>
+                </div>
+              </div>
+
+              <button
+                onClick={() => setActiveTab('interactive_chat')}
+                className="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs transition flex items-center justify-center gap-2 shadow-sm"
+              >
+                <Sparkles className="w-4 h-4 text-amber-300" />
+                <span>طرح سؤال على الذكاء الاصطناعي</span>
+              </button>
+            </div>
+
+            {/* Quick Key Takeaways */}
+            <div className="bg-amber-50/80 border border-amber-200 rounded-2xl p-5 shadow-xs space-y-3">
+              <div className="flex items-center gap-2 text-amber-950 font-bold text-xs">
+                <Flame className="w-4 h-4 text-amber-600" />
+                <span>الركائز الذهبية الأربع للسياسة:</span>
+              </div>
+
+              <div className="space-y-2 text-2xs text-amber-950">
+                <div className="bg-white p-2.5 rounded-xl border border-amber-200/80">
+                  <strong className="block text-amber-900 font-bold">1. الخيار الأول السريع:</strong>
+                  <span>الدلك بالكحول 70% (20-30 ثانية) طالما الأيدي غير متسخة ظاهرياً.</span>
+                </div>
+                <div className="bg-white p-2.5 rounded-xl border border-amber-200/80">
+                  <strong className="block text-amber-900 font-bold">2. الغسيل بالماء والصابون:</strong>
+                  <span>إلزامي لمدة 40-60 ثانية عند الاتساخ الظاهري أو التلوث بالسوائل.</span>
+                </div>
+                <div className="bg-white p-2.5 rounded-xl border border-amber-200/80">
+                  <strong className="block text-amber-900 font-bold">3. خلو الساعدين (Bare Below Elbows):</strong>
+                  <span>حظر كامل للمجوهرات، الساعات، والأظافر الاصطناعية وطلاء الأظافر.</span>
+                </div>
+                <div className="bg-white p-2.5 rounded-xl border border-amber-200/80">
+                  <strong className="block text-amber-900 font-bold">4. حظر مجففات الهواء الساخن:</strong>
+                  <span>الاعتماد الحصري على المناديل الورقية أحادية الاستخدام.</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Emergency Protocol Box */}
+            <div className="bg-rose-50/80 border border-rose-200 rounded-2xl p-5 shadow-xs space-y-2">
+              <div className="flex items-center gap-2 text-rose-950 font-bold text-xs">
+                <AlertTriangle className="w-4 h-4 text-rose-600" />
+                <span>بروتوكول حوادث التعرض المهني:</span>
+              </div>
+              <p className="text-2xs text-rose-900 leading-relaxed">
+                غسل الموضع فوراً بالماء والصابون أو المحلول الملحي المعقم، وإبلاغ مشرف مكافحة العدوى وضابط السلامة فوراً لبدء إجراءات التقييم والوقاية بعد التعرض (PEP).
+              </p>
+            </div>
+
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* TAB 2: CLINICAL INFOGRAPHICS & VISUAL ILLUSTRATIONS (بالصور والرسوم)     */}
+      {/* ========================================================================= */}
+      {activeTab === 'visual_infographics' && (
+        <div className="space-y-6">
+          <HandHygieneVisualIllustrations />
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* TAB 3: RICH FULL MARKDOWN VIEW (CHATGPT / GEMINI STYLE)                   */}
+      {/* ========================================================================= */}
+      {activeTab === 'markdown' && (
+        <div className="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200 shadow-xs space-y-6">
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-4">
+            <div>
+              <h3 className="text-lg font-bold text-slate-900">
+                السرد التلخيصي الشامل الكامل (ChatGPT & Gemini Markdown)
+              </h3>
+              <p className="text-xs text-slate-500 mt-0.5">
+                تنسيق مقالي غني ومنظم يشمل كافة الجداول، البنود، والتوجيهات المعتمدة
+              </p>
+            </div>
+            <button
+              onClick={handleCopy}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-50 text-blue-800 border border-blue-200 text-xs font-bold hover:bg-blue-100 transition"
+            >
+              {copied ? <CheckCircle2 className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4" />}
+              <span>{copied ? 'تم النسخ' : 'نسخ النص'}</span>
+            </button>
+          </div>
+
+          <div className={`prose max-w-none text-slate-800 ${fontSizeClass}`}>
+            <div className="space-y-4 markdown-rendered">
+              <Markdown>{fullMarkdownSummary}</Markdown>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* TAB 3: INTERACTIVE AI Q&A CHAT ASSISTANT                                  */}
+      {/* ========================================================================= */}
+      {activeTab === 'interactive_chat' && (
+        <div className="bg-white rounded-2xl border border-slate-200 shadow-xs flex flex-col h-[750px] overflow-hidden">
+          {/* Chat Header */}
+          <div className="p-4 bg-gradient-to-r from-blue-900 to-indigo-900 text-white flex items-center justify-between">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-xl bg-blue-500 flex items-center justify-center text-white shadow-sm">
+                <Sparkles className="w-4 h-4 text-amber-300" />
+              </div>
+              <div>
+                <h3 className="font-bold text-xs sm:text-sm text-white leading-tight">
+                  مستشار السياسات والاعتماد الذكي (Gemini Policy AI)
+                </h3>
+                <p className="text-2xs text-blue-200">
+                  اطرح أي سؤال حول بنود السياسة، معايير جهار 2025، وسيناريوهات التفتيش الميداني
+                </p>
+              </div>
+            </div>
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping" title="متصل وجاهز" />
+          </div>
+
+          {/* Quick Prompt Suggestions */}
+          <div className="p-3 bg-slate-50 border-b border-slate-200 overflow-x-auto space-y-1.5">
+            <span className="text-2xs font-bold text-slate-500 block">أسئلة مقترحة سريعة:</span>
+            <div className="flex flex-wrap gap-1.5">
+              {suggestedPrompts.map((prompt, i) => (
+                <button
+                  key={i}
+                  onClick={() => handleSendMessage(prompt)}
+                  disabled={isChatLoading}
+                  className="text-right text-2xs px-2.5 py-1.5 rounded-lg bg-white hover:bg-blue-50 hover:text-blue-800 text-slate-700 border border-slate-200 transition font-medium"
+                >
+                  {prompt}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Chat Message List */}
+          <div className="flex-1 p-4 overflow-y-auto space-y-3 text-xs bg-slate-100/50">
+            {chatMessages.map((msg) => (
+              <div
+                key={msg.id}
+                className={`flex flex-col ${msg.sender === 'user' ? 'items-end' : 'items-start'}`}
+              >
+                <div
+                  className={`max-w-[85%] p-3.5 rounded-2xl ${
+                    msg.sender === 'user'
+                      ? 'bg-blue-800 text-white rounded-br-none shadow-xs'
+                      : 'bg-white text-slate-800 rounded-bl-none border border-slate-200 shadow-xs'
+                  }`}
+                >
+                  {msg.sender === 'gemini' ? (
+                    <div className="space-y-1.5 leading-relaxed">
+                      <div className="flex items-center gap-1.5 text-2xs text-blue-700 font-bold mb-1 pb-1 border-b border-slate-100">
+                        <Sparkles className="w-3 h-3 text-amber-500" />
+                        <span>Gemini Policy Advisor:</span>
+                      </div>
+                      <div className="whitespace-pre-line text-xs">
+                        {msg.text}
+                      </div>
+                    </div>
+                  ) : (
+                    <p className="whitespace-pre-line text-xs">{msg.text}</p>
+                  )}
+                </div>
+                <span className="text-3xs text-slate-400 mt-1 px-1">{msg.timestamp}</span>
+              </div>
+            ))}
+
+            {isChatLoading && (
+              <div className="flex items-start gap-2">
+                <div className="p-3 rounded-2xl bg-white border border-slate-200 rounded-bl-none text-slate-500 text-xs flex items-center gap-2">
+                  <div className="w-3 h-3 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
+                  <span>جاري صياغة الإجابة الإكلينيكية من Gemini...</span>
+                </div>
+              </div>
+            )}
+
+            <div ref={chatEndRef} />
+          </div>
+
+          {/* Chat Input Form */}
+          <div className="p-3 bg-white border-t border-slate-200">
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleSendMessage();
+              }}
+              className="flex items-center gap-2"
+            >
+              <input
+                type="text"
+                value={chatInput}
+                onChange={(e) => setChatInput(e.target.value)}
+                placeholder="اكتب استفسارك حول السياسة أو معايير جهار 2025..."
+                disabled={isChatLoading}
+                className="flex-1 p-2.5 text-xs rounded-xl border border-slate-200 focus:outline-none focus:border-blue-800 focus:ring-1 focus:ring-blue-100 bg-slate-50"
+              />
+              <button
+                type="submit"
+                disabled={!chatInput.trim() || isChatLoading}
+                className="p-2.5 rounded-xl bg-blue-800 hover:bg-blue-900 disabled:opacity-40 text-white transition shadow-xs"
+                title="إرسال السؤال"
+              >
+                <Send className="w-4 h-4" />
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
