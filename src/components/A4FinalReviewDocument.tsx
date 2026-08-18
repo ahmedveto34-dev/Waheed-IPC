@@ -24,6 +24,7 @@ interface A4FinalReviewDocumentProps {
 export const A4FinalReviewDocument: React.FC<A4FinalReviewDocumentProps> = ({ data, isPrintOnly = false }) => {
   const card = data.policyCard || ({} as any);
   const purpose = data.purposeAndScope || ({} as any);
+  const roles = Array.isArray(data.rolesAndResponsibilities) ? data.rolesAndResponsibilities : [];
   const sop = data.sopPhases || ({} as any);
   const safety = data.safetyWarningsAndCriticalSteps || ({} as any);
   const kpisData = data.complianceAndKPIs || ({} as any);
@@ -150,8 +151,13 @@ export const A4FinalReviewDocument: React.FC<A4FinalReviewDocumentProps> = ({ da
                 النطاق والفئات الملزمة:
               </strong>
               <p className="text-emerald-900 leading-snug">
-                {Array.isArray(purpose.scope) ? purpose.scope.slice(0, 2).join('، ') : 'كافة الكوادر الطبية والتمريضية'}
+                {Array.isArray(purpose.scope) && purpose.scope.length > 0 ? purpose.scope.join('، ') : 'كافة الكوادر الطبية والتمريضية'}
               </p>
+              {Array.isArray(purpose.exclusions) && purpose.exclusions.length > 0 && (
+                <div className="text-[6.5pt] text-rose-800 pt-0.5 border-t border-emerald-200/60 mt-1">
+                  <strong>الاستثناءات: </strong> {purpose.exclusions.join('، ')}
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -194,6 +200,33 @@ export const A4FinalReviewDocument: React.FC<A4FinalReviewDocumentProps> = ({ da
           </tbody>
         </table>
       </section>
+
+      {/* ================= 2.5 ROLES & RESPONSIBILITIES ================= */}
+      {roles.length > 0 && (
+        <section className="avoid-break mb-3.5 border border-slate-300 rounded-lg overflow-hidden">
+          <div className="bg-slate-800 text-white px-3 py-1 font-bold text-[8pt] flex items-center justify-between">
+            <span>مصفوفة الأدوار والمسؤوليات الإكلينيكية والتنفيذية (Roles & Responsibilities)</span>
+            <span className="text-[7pt] text-slate-300">المساءلة وتوزيع المهام</span>
+          </div>
+          <div className="p-2 grid grid-cols-1 md:grid-cols-3 gap-2 text-[7.5pt]">
+            {roles.map((r: any, idx: number) => (
+              <div key={idx} className="bg-slate-50 border border-slate-200 p-2 rounded">
+                <strong className="text-slate-950 font-bold block mb-1 text-[8pt] pb-1 border-b border-slate-200">
+                  {r.role}
+                </strong>
+                <ul className="space-y-1 text-slate-700">
+                  {Array.isArray(r.responsibilities) && r.responsibilities.map((resp: string, rIdx: number) => (
+                    <li key={rIdx} className="flex items-start gap-1">
+                      <span className="text-blue-700 font-bold font-mono text-[7pt]">•</span>
+                      <span className="leading-snug">{resp}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* ================= 3. STEP-BY-STEP SOP TABLE ================= */}
       <section className="avoid-break mb-3.5 border border-slate-300 rounded-lg overflow-hidden">
