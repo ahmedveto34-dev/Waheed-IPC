@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { PolicyAnalysisResult } from '../types';
 import { A4FinalReviewDocument } from './A4FinalReviewDocument';
+import { exportElementToPdf } from '../utils/pdfExport';
 import { 
   X, 
   Printer, 
@@ -13,7 +14,9 @@ import {
   Copy, 
   Maximize2,
   Minimize2,
-  Sparkles
+  Sparkles,
+  Loader2,
+  FileDown
 } from 'lucide-react';
 
 interface A4PreviewModalProps {
@@ -26,11 +29,40 @@ export const A4PreviewModal: React.FC<A4PreviewModalProps> = ({ isOpen, onClose,
   const [zoom, setZoom] = useState<number>(100);
   const [isCopied, setIsCopied] = useState(false);
   const [isMaximized, setIsMaximized] = useState(false);
+  const [isExportingPdf, setIsExportingPdf] = useState(false);
+  const [exportProgress, setExportProgress] = useState<string>('');
+  const documentRef = useRef<HTMLDivElement>(null);
 
   if (!isOpen) return null;
 
   const handlePrint = () => {
     window.print();
+  };
+
+  const handleExportPdfDirect = async () => {
+    if (!documentRef.current || isExportingPdf) return;
+    setIsExportingPdf(true);
+    setExportProgress('جاري تحضير المستند للتحميل...');
+
+    try {
+      const code = data.policyCard?.policyCode || 'Policy';
+      const cleanTitle = (data.policyCard?.titleArabic || 'Medical_Policy')
+        .replace(/[/\\?%*:|"<>]/g, '_')
+        .slice(0, 40);
+      const filename = `${code}_${cleanTitle}_Executive_Review.pdf`;
+
+      await exportElementToPdf(documentRef.current, {
+        filename,
+        title: data.policyCard?.titleArabic,
+        onProgress: (text) => setExportProgress(text)
+      });
+    } catch (err) {
+      console.error('PDF export failed:', err);
+      alert('حدث خطأ أثناء تصدير ملف PDF، يمكنك استخدام زر "طباعة / حفظ PDF" كخيار بديل.');
+    } finally {
+      setIsExportingPdf(false);
+      setExportProgress('');
+    }
   };
 
   const handleCopyText = async () => {
@@ -92,7 +124,7 @@ ${data.safetyWarningsAndCriticalSteps.emergencyIncidentProtocol || 'الالتز
                 </span>
               </div>
               <p className="text-2xs text-slate-400">
-                تنسيق معياري متوافق مع مقاسات الطباعة المعتمدة A4 Portrait
+                {isExportingPdf ? exportProgress : 'تنسيق معياري متوافق مع مقاسات الطباعة وتصدير PDF عالي الدقة A4'}
               </p>
             </div>
           </div>
@@ -125,6 +157,26 @@ ${data.safetyWarningsAndCriticalSteps.emergencyIncidentProtocol || 'الالتز
               </button>
             </div>
 
+            {/* Direct High-Quality PDF Download Button */}
+            <button
+              onClick={handleExportPdfDirect}
+              disabled={isExportingPdf}
+              className="px-3.5 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 disabled:bg-blue-800 text-white text-xs font-bold transition shadow-sm flex items-center gap-1.5 cursor-pointer disabled:cursor-not-allowed"
+              title="تحميل ملف PDF عالي الجودة مباشرة"
+            >
+              {isExportingPdf ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin text-blue-200" />
+                  <span>جاري التصدير...</span>
+                </>
+              ) : (
+                <>
+                  <FileDown className="w-4 h-4" />
+                  <span>تصدير PDF مباشر</span>
+                </>
+              )}
+            </button>
+
             {/* Copy Button */}
             <button
               onClick={handleCopyText}
@@ -137,10 +189,11 @@ ${data.safetyWarningsAndCriticalSteps.emergencyIncidentProtocol || 'الالتز
             {/* Print / Save PDF Button */}
             <button
               onClick={handlePrint}
-              className="px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition shadow-sm flex items-center gap-1.5"
+              className="px-3 py-1.5 rounded-lg bg-emerald-700 hover:bg-emerald-600 text-white text-xs font-bold transition shadow-sm flex items-center gap-1.5"
+              title="طباعة عبر المتصفح"
             >
               <Printer className="w-4 h-4" />
-              <span>طباعة / حفظ PDF</span>
+              <span>طباعة</span>
             </button>
 
             {/* Maximize / Minimize */}
@@ -163,15 +216,27 @@ ${data.safetyWarningsAndCriticalSteps.emergencyIncidentProtocol || 'الالتز
           </div>
         </div>
 
+        {/* Export Progress Notification Banner */}
+        {isExportingPdf && (
+          <div className="bg-blue-600 text-white px-4 py-2 text-xs font-bold flex items-center justify-between border-b border-blue-500 animate-pulse">
+            <div className="flex items-center gap-2">
+              <Loader2 className="w-4 h-4 animate-spin" />
+              <span>{exportProgress || 'جاري توليد ملف PDF عالي الجودة يضم كافة الجداول والصور والنصوص...'}</span>
+            </div>
+            <span className="text-2xs bg-blue-700 px-2 py-0.5 rounded font-mono">DPI: 300</span>
+          </div>
+        )}
+
         {/* Paper Sheet Preview Area */}
         <div className="flex-1 overflow-y-auto p-3 sm:p-6 bg-slate-200/80 flex justify-center">
           <div 
+            ref={documentRef}
             style={{ 
               transform: `scale(${zoom / 100})`, 
               transformOrigin: 'top center',
               transition: 'transform 0.15s ease-out'
             }}
-            className="w-full max-w-[210mm] transition-all"
+            className="w-full max-w-[210mm] transition-all bg-white"
           >
             <A4FinalReviewDocument data={data} isPrintOnly={false} />
           </div>

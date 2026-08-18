@@ -26,10 +26,14 @@ import {
   Activity, 
   Share2, 
   RotateCcw,
-  Zap
+  Zap,
+  FileDown,
+  Loader2
 } from 'lucide-react';
 import Markdown from 'react-markdown';
 import { PolicyAnalysisResult } from '../types';
+import { exportElementToPdf } from '../utils/pdfExport';
+import { A4FinalReviewDocument } from './A4FinalReviewDocument';
 
 interface GeminiStyleSummaryProps {
   data: PolicyAnalysisResult;
@@ -44,10 +48,13 @@ interface ChatMessage {
 }
 
 export function GeminiStyleSummary({ data, onSwitchToA4 }: GeminiStyleSummaryProps) {
-  const [activeTab, setActiveTab] = useState<'master' | 'sops' | 'technical' | 'safety_roles' | 'kpis_audit' | 'markdown' | 'interactive_chat'>('master');
+  const [activeTab, setActiveTab] = useState<'master' | 'revision_memo' | 'sops' | 'technical' | 'safety_roles' | 'kpis_audit' | 'markdown' | 'interactive_chat'>('revision_memo');
   const [copied, setCopied] = useState(false);
   const [fontSize, setFontSize] = useState<'normal' | 'large' | 'xlarge'>('normal');
   const [checkedAuditItems, setCheckedAuditItems] = useState<Record<string, boolean>>({});
+  const [isExportingPdf, setIsExportingPdf] = useState(false);
+  const [exportProgress, setExportProgress] = useState('');
+  const pdfExportContainerRef = useRef<HTMLDivElement>(null);
   
   // Interactive Chat State
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([
@@ -61,6 +68,36 @@ export function GeminiStyleSummary({ data, onSwitchToA4 }: GeminiStyleSummaryPro
   const [chatInput, setChatInput] = useState('');
   const [isChatLoading, setIsChatLoading] = useState(false);
   const chatEndRef = useRef<HTMLDivElement | null>(null);
+
+  const handleDirectPdfDownload = async () => {
+    if (!pdfExportContainerRef.current || isExportingPdf) return;
+    setIsExportingPdf(true);
+    setExportProgress('جاري تحضير وتنسيق عناصر الملخص للتحميل كـ PDF...');
+
+    try {
+      const code = data.policyCard?.policyCode || 'Policy';
+      const cleanTitle = (data.policyCard?.titleArabic || 'Medical_Policy')
+        .replace(/[/\\?%*:|"<>]/g, '_')
+        .slice(0, 40);
+      const filename = `${code}_${cleanTitle}_Executive_Review.pdf`;
+
+      await exportElementToPdf(pdfExportContainerRef.current, {
+        filename,
+        title: data.policyCard?.titleArabic,
+        onProgress: (text) => setExportProgress(text)
+      });
+    } catch (err) {
+      console.error('PDF export failed:', err);
+      if (onSwitchToA4) {
+        onSwitchToA4();
+      } else {
+        window.print();
+      }
+    } finally {
+      setIsExportingPdf(false);
+      setExportProgress('');
+    }
+  };
 
   // Safe data extraction
   const card = data.policyCard || ({} as any);
@@ -343,12 +380,32 @@ export function GeminiStyleSummary({ data, onSwitchToA4 }: GeminiStyleSummaryPro
             </div>
 
             <div className="flex flex-col gap-2">
+              {/* Direct High-Quality PDF Export */}
+              <button
+                onClick={handleDirectPdfDownload}
+                disabled={isExportingPdf}
+                className="flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-blue-700 hover:bg-blue-800 disabled:bg-blue-900 text-white text-xs font-bold transition shadow-xs cursor-pointer disabled:cursor-not-allowed"
+                title="تصدير وتحميل الملخص النهائي مباشرة كملف PDF عالي الجودة"
+              >
+                {isExportingPdf ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin text-blue-200" />
+                    <span>جاري التصدير...</span>
+                  </>
+                ) : (
+                  <>
+                    <FileDown className="w-4 h-4 text-white" />
+                    <span>تصدير PDF مباشر</span>
+                  </>
+                )}
+              </button>
+
               <button
                 onClick={handleCopyMarkdown}
-                className="flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-blue-800 hover:bg-blue-900 text-white text-xs font-bold transition shadow-xs cursor-pointer"
+                className="flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold transition shadow-xs cursor-pointer"
               >
                 {copied ? <CheckCircle2 className="w-4 h-4 text-emerald-300" /> : <Copy className="w-4 h-4" />}
-                <span>{copied ? 'تم النسخ بنجاح' : 'نسخ التلخيص'}</span>
+                <span>{copied ? 'تم النسخ' : 'نسخ التلخيص'}</span>
               </button>
 
               {onSwitchToA4 && (
@@ -357,7 +414,7 @@ export function GeminiStyleSummary({ data, onSwitchToA4 }: GeminiStyleSummaryPro
                   className="flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold transition border border-slate-200 cursor-pointer"
                 >
                   <FileText className="w-3.5 h-3.5" />
-                  <span>عرض وثيقة A4</span>
+                  <span>معاينة ورقة A4</span>
                 </button>
               )}
             </div>
@@ -386,16 +443,60 @@ export function GeminiStyleSummary({ data, onSwitchToA4 }: GeminiStyleSummaryPro
           </div>
         )}
 
-        {/* Executive Summary Narrative Snippet */}
+        {/* Executive Summary Narrative Snippet & Golden Cram Capsules */}
         {data.executiveSummarySnippet && (
-          <div className="bg-gradient-to-l from-blue-50/90 via-indigo-50/50 to-white p-5 rounded-2xl border border-blue-200/80 text-slate-900 space-y-2">
-            <div className="flex items-center gap-2 text-blue-950 font-black text-sm">
-              <Sparkles className="w-4 h-4 text-amber-500" />
-              <span>الملخص التنفيذي والاستراتيجي للسياسة:</span>
+          <div className="bg-gradient-to-l from-blue-50/90 via-indigo-50/50 to-white p-5 rounded-2xl border border-blue-200/80 text-slate-900 space-y-3.5">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 text-blue-950 font-black text-sm">
+                <Sparkles className="w-4 h-4 text-amber-500" />
+                <span>الملخص التنفيذي والكبسولة الذهبية للسياسة:</span>
+              </div>
+              <span className="text-2xs font-bold bg-amber-100 text-amber-900 px-2.5 py-0.5 rounded-md border border-amber-300">
+                مذكرة المراجعة السريعة
+              </span>
             </div>
             <p className={`text-slate-800 ${fontSizeClass} leading-relaxed text-justify font-normal`}>
               {data.executiveSummarySnippet}
             </p>
+
+            {/* 4 Golden Revision Capsules */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 pt-1">
+              <div className="bg-amber-50 border border-amber-300 p-3 rounded-xl space-y-1">
+                <strong className="text-amber-950 font-bold block text-xs flex items-center gap-1">
+                  <span>⭐</span> الهدف الإكلينيكي:
+                </strong>
+                <p className="text-amber-900 text-2xs leading-snug">
+                  {purpose.mainObjective || 'الحد من انتقال العدوى وضمان سلامة المرضى والكوادر.'}
+                </p>
+              </div>
+
+              <div className="bg-blue-50 border border-blue-300 p-3 rounded-xl space-y-1">
+                <strong className="text-blue-950 font-bold block text-xs flex items-center gap-1">
+                  <span>⏱️</span> أزمنة ذهبية:
+                </strong>
+                <p className="text-blue-900 text-2xs leading-snug">
+                  فرك كحولي: <strong>20-30 ثانية</strong> (3-5 مل) • غسيل مائي: <strong>40-60 ثانية</strong>.
+                </p>
+              </div>
+
+              <div className="bg-rose-50 border border-rose-300 p-3 rounded-xl space-y-1">
+                <strong className="text-rose-950 font-bold block text-xs flex items-center gap-1">
+                  <span>🚫</span> خط أحمر قطعي:
+                </strong>
+                <p className="text-rose-900 text-2xs leading-snug">
+                  حظر تزويد العبوات <strong>(Zero Top-up)</strong>، والقفازات لا تغني عن تطهير اليدين.
+                </p>
+              </div>
+
+              <div className="bg-emerald-50 border border-emerald-300 p-3 rounded-xl space-y-1">
+                <strong className="text-emerald-950 font-bold block text-xs flex items-center gap-1">
+                  <span>🎯</span> مستهدف الامتثال:
+                </strong>
+                <p className="text-emerald-900 text-2xs leading-snug">
+                  تحقيق نسبة امتثال <strong>≥ 90%</strong> في جولات التفتيش والملاحظة المباشرة.
+                </p>
+              </div>
+            </div>
           </div>
         )}
       </div>
@@ -406,6 +507,18 @@ export function GeminiStyleSummary({ data, onSwitchToA4 }: GeminiStyleSummaryPro
       <div className="bg-slate-900 p-2 sm:p-2.5 rounded-2xl border border-slate-800 shadow-sm flex flex-wrap items-center justify-between gap-2 text-xs no-print">
         <div className="flex flex-wrap items-center gap-1.5">
           <button
+            onClick={() => setActiveTab('revision_memo')}
+            className={`flex items-center gap-2 px-3.5 py-2 rounded-xl font-bold transition cursor-pointer ${
+              activeTab === 'revision_memo'
+                ? 'bg-amber-500 text-slate-950 shadow-xs font-black'
+                : 'text-amber-300 hover:bg-slate-800 hover:text-amber-200'
+            }`}
+          >
+            <Sparkles className="w-4 h-4 text-amber-300" />
+            <span>⚡ مذكرة المراجعة النهائية (Cram Notes & Q&A)</span>
+          </button>
+
+          <button
             onClick={() => setActiveTab('master')}
             className={`flex items-center gap-2 px-3.5 py-2 rounded-xl font-bold transition cursor-pointer ${
               activeTab === 'master'
@@ -413,7 +526,7 @@ export function GeminiStyleSummary({ data, onSwitchToA4 }: GeminiStyleSummaryPro
                 : 'text-slate-300 hover:bg-slate-800 hover:text-white'
             }`}
           >
-            <Layers className="w-4 h-4 text-amber-300" />
+            <Layers className="w-4 h-4 text-blue-300" />
             <span>📋 التلخيص الشامل الموحد</span>
           </button>
 
@@ -518,6 +631,246 @@ export function GeminiStyleSummary({ data, onSwitchToA4 }: GeminiStyleSummaryPro
           </button>
         </div>
       </div>
+
+      {/* ========================================================================= */}
+      {/* 🌟 TAB 0: HIGH-YIELD REVISION MEMO & CRAM SHEET (مذكرة المراجعة النهائية)   */}
+      {/* ========================================================================= */}
+      {activeTab === 'revision_memo' && (
+        <div className="space-y-6">
+          
+          {/* Header Banner for Revision Guide */}
+          <div className="bg-gradient-to-l from-amber-500 via-amber-600 to-amber-700 text-slate-950 p-6 rounded-3xl shadow-md space-y-3">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <span className="bg-black text-amber-300 px-3 py-1 rounded-xl text-xs font-black tracking-wide uppercase">
+                  High-Yield Master Cram Sheet
+                </span>
+                <span className="bg-white/30 backdrop-blur-xs text-slate-950 px-2.5 py-0.5 rounded-lg text-2xs font-bold">
+                  مذكرة المراجعة النهائية المركزة
+                </span>
+              </div>
+              <span className="text-2xs font-bold bg-amber-900/40 text-white px-3 py-1 rounded-xl">
+                الإصدار التنافسي المعتمد 2025/2026
+              </span>
+            </div>
+
+            <h2 className="text-xl sm:text-2xl font-black text-slate-950">
+              ملخص المراجعة السريعة وسيناريوهات التفتيش الميداني
+            </h2>
+            <p className="text-xs sm:text-sm font-medium text-slate-900 leading-relaxed max-w-4xl">
+              تم إعداد هذه المذكرة خصيصاً كمرجع فوري مكثف لكافة الكوادر الطبية والمراجعين الصحيين، لتركيز المعايير الذهبية، المقادير والأزمنة الحتمية، والمحظورات الصارمة، وبنك الأسئلة السريعة لجولات الاعتماد.
+            </p>
+          </div>
+
+          {/* 1. Golden Cram Capsules */}
+          <div className="bg-white rounded-3xl p-6 sm:p-7 border border-slate-200/80 shadow-xs space-y-4">
+            <div className="flex items-center gap-2.5 text-slate-900 font-bold text-base border-b border-slate-100 pb-3.5">
+              <div className="w-8 h-8 rounded-xl bg-amber-100 text-amber-900 flex items-center justify-center font-bold">
+                <Sparkles className="w-4 h-4 text-amber-700" />
+              </div>
+              <h3>1. الكبسولات الذهبية المركزة (High-Yield Golden Capsules)</h3>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+              <div className="p-4 rounded-2xl bg-amber-50/90 border border-amber-300 space-y-2">
+                <strong className="text-amber-950 font-black text-xs flex items-center gap-1.5">
+                  <span className="text-sm">⭐</span> الهدف الإكلينيكي الحرج:
+                </strong>
+                <p className="text-amber-900 text-2xs leading-relaxed font-medium">
+                  {purpose.mainObjective || 'الحد من انتقال العدوى المكتسبة وضمان بيئة استشفاء آمنة وخالية من الميكروبات المقاومة.'}
+                </p>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-blue-50/90 border border-blue-300 space-y-2">
+                <strong className="text-blue-950 font-black text-xs flex items-center gap-1.5">
+                  <span className="text-sm">⏱️</span> أزمنة وكميات التطبيق:
+                </strong>
+                <p className="text-blue-900 text-2xs leading-relaxed font-medium">
+                  • فرك كحولي: <strong>20 - 30 ثانية</strong> (3-5 مل).<br />
+                  • غسيل مائي: <strong>40 - 60 ثانية</strong> (ماء وصابون).
+                </p>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-rose-50/90 border border-rose-300 space-y-2">
+                <strong className="text-rose-950 font-black text-xs flex items-center gap-1.5">
+                  <span className="text-sm">🚫</span> الخطوط الحمراء الصارمة:
+                </strong>
+                <p className="text-rose-900 text-2xs leading-relaxed font-medium">
+                  • حظر تزويد العبوات <strong>(Zero Top-up)</strong>.<br />
+                  • القفازات لا تغني عن تطهير اليدين إطلاقاً.
+                </p>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-emerald-50/90 border border-emerald-300 space-y-2">
+                <strong className="text-emerald-950 font-black text-xs flex items-center gap-1.5">
+                  <span className="text-sm">🎯</span> مستهدفات الجودة والامتثال:
+                </strong>
+                <p className="text-emerald-900 text-2xs leading-relaxed font-medium">
+                  • نسبة الامتثال العامة المستهدفة: <strong>≥ 90%</strong>.<br />
+                  • معدل استهلاك الكحول: <strong>≥ 20 لتر / 1000 يوم مريض</strong>.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* 2. Rapid Q&A Review Bank */}
+          <div className="bg-white rounded-3xl p-6 sm:p-7 border border-slate-200/80 shadow-xs space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3.5">
+              <div className="flex items-center gap-2.5 text-slate-900 font-bold text-base">
+                <div className="w-8 h-8 rounded-xl bg-blue-100 text-blue-900 flex items-center justify-center font-bold">
+                  <span className="text-sm font-black">❓</span>
+                </div>
+                <h3>2. بنك أسئلة وأجوبة المراجعة السريعة للاختبارات والتفتيش (Rapid Q&A Review Bank)</h3>
+              </div>
+              <span className="text-2xs font-bold text-blue-900 bg-blue-50 px-2.5 py-1 rounded-lg border border-blue-200">
+                أسئلة المقيمين والمرور
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+                <div className="flex items-center gap-2 text-blue-950 font-bold text-xs">
+                  <span className="w-5 h-5 rounded-full bg-blue-900 text-white flex items-center justify-center text-2xs shrink-0">س1</span>
+                  <span>متى يكون غسيل الأيدي بالماء والصابون إجبارياً بدلاً من الفرك الكحولي؟</span>
+                </div>
+                <div className="p-3 rounded-xl bg-white border border-slate-200/80 text-xs text-slate-800 leading-relaxed">
+                  <strong className="text-emerald-800 font-bold">الجواب المعتمد: </strong>
+                  عند وجود اتساخ مرئي بالدم أو سوائل الجسم، أو بعد استخدام المرحاض، أو عند التعامل مع حالات العدوى المتبوغة مثل <em>Clostridioides difficile</em> والروتافيروس (حيث أن الكحول غير قاتل للأبواغ الجرثومية).
+                </div>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+                <div className="flex items-center gap-2 text-blue-950 font-bold text-xs">
+                  <span className="w-5 h-5 rounded-full bg-blue-900 text-white flex items-center justify-center text-2xs shrink-0">س2</span>
+                  <span>ما هي اللحظات الخمس لنظافة الأيدي المعتمدة من منظمة الصحة العالمية (WHO 5 Moments)؟</span>
+                </div>
+                <div className="p-3 rounded-xl bg-white border border-slate-200/80 text-xs text-slate-800 leading-relaxed">
+                  <strong className="text-emerald-800 font-bold">الجواب المعتمد: </strong>
+                  1. قبل ملامسة المريض • 2. قبل الإجراءات النظيفة/المعقمة • 3. بعد التعرض لسوائل الجسم • 4. بعد ملامسة المريض • 5. بعد ملامسة البيئة المحيطة بالمريض.
+                </div>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+                <div className="flex items-center gap-2 text-blue-950 font-bold text-xs">
+                  <span className="w-5 h-5 rounded-full bg-blue-900 text-white flex items-center justify-center text-2xs shrink-0">س3</span>
+                  <span>ما هي شروط وسياسة تعبئة موزعات المطهرات (Zero Top-up Policy)؟</span>
+                </div>
+                <div className="p-3 rounded-xl bg-white border border-slate-200/80 text-xs text-slate-800 leading-relaxed">
+                  <strong className="text-emerald-800 font-bold">الجواب المعتمد: </strong>
+                  يحظر قطعياً سكب مطهر جديد فوق المتبقي بالعبوة. يجب استهلاك العبوة حتى الفراغ، ثم غسلها وتطهيرها وتجفيفها كلياً قبل إعادة التعبئة، ويفضل الاعتماد على العبوات وحيدة الاستخدام ذات النظام المقفل.
+                </div>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+                <div className="flex items-center gap-2 text-blue-950 font-bold text-xs">
+                  <span className="w-5 h-5 rounded-full bg-blue-900 text-white flex items-center justify-center text-2xs shrink-0">س4</span>
+                  <span>هل يغني ارتداء القفازات الطبية عن تطهير اليدين؟</span>
+                </div>
+                <div className="p-3 rounded-xl bg-white border border-slate-200/80 text-xs text-slate-800 leading-relaxed">
+                  <strong className="text-emerald-800 font-bold">الجواب المعتمد: </strong>
+                  القفازات لا تغني إطلاقاً عن نظافة الأيدي. يجب تطهير اليدين مباشرة قبل ارتداء القفازات وفور نزعها، مع تبديل القفازات بين كل إجراء ومريض، وحظر تطهير القفازات بالكحول.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* 3. Common Pitfalls vs Golden Standard Comparison */}
+          <div className="bg-white rounded-3xl p-6 sm:p-7 border border-slate-200/80 shadow-xs space-y-4">
+            <div className="flex items-center gap-2.5 text-slate-900 font-bold text-base border-b border-slate-100 pb-3.5">
+              <div className="w-8 h-8 rounded-xl bg-rose-100 text-rose-900 flex items-center justify-center font-bold">
+                <XCircle className="w-4 h-4 text-rose-700" />
+              </div>
+              <h3>3. جدول مقارنة الأخطاء الشائعة المحظورة مقابل المعيار الذهبي الإلزامي</h3>
+            </div>
+
+            <div className="overflow-hidden border border-slate-200 rounded-2xl">
+              <table className="w-full border-collapse text-xs">
+                <thead>
+                  <tr className="bg-slate-900 text-white font-bold">
+                    <th className="p-3.5 text-right w-1/2 text-rose-300">❌ الخطأ الإكلينيكي الشائع المحظور (Pitfall)</th>
+                    <th className="p-3.5 text-right w-1/2 text-emerald-300">✅ الصواب والمعيار الذهبي الإلزامي (Standard)</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-200">
+                  <tr className="bg-rose-50/40 hover:bg-rose-50/70 transition">
+                    <td className="p-3.5 text-rose-950 font-medium leading-relaxed">
+                      تجفيف اليدين بالمناشف أو التلويح بعد الفرك الكحولي لتسريعه قبل اكتمال المدة.
+                    </td>
+                    <td className="p-3.5 text-emerald-950 font-bold bg-emerald-50/60 leading-relaxed">
+                      ترك الكحول يجف ذاتياً بالهواء (20-30 ثانية) حتى اكتمال التبخر والقتل الميكروبي الفعال.
+                    </td>
+                  </tr>
+                  <tr className="bg-rose-50/40 hover:bg-rose-50/70 transition">
+                    <td className="p-3.5 text-rose-950 font-medium leading-relaxed">
+                      استخدام الكحول عند وجود اتساخ مرئي أو دماء أو مع ميكروب C. difficile.
+                    </td>
+                    <td className="p-3.5 text-emerald-950 font-bold bg-emerald-50/60 leading-relaxed">
+                      الغسيل المائي الإجباري بالماء والصابون (40-60 ثانية) للتخلص الميكانيكي من الأبواغ.
+                    </td>
+                  </tr>
+                  <tr className="bg-rose-50/40 hover:bg-rose-50/70 transition">
+                    <td className="p-3.5 text-rose-950 font-medium leading-relaxed">
+                      تزويد أو سكب محلول مطهر جديد فوق المتبقي في العبوة (Top-up).
+                    </td>
+                    <td className="p-3.5 text-emerald-950 font-bold bg-emerald-50/60 leading-relaxed">
+                      تفريغ العبوة بالكامل، ثم غسلها وتطهيرها وتجفيفها قبل الملء، أو استبدالها بعبوة مقفلة جديدة.
+                    </td>
+                  </tr>
+                  <tr className="bg-rose-50/40 hover:bg-rose-50/70 transition">
+                    <td className="p-3.5 text-rose-950 font-medium leading-relaxed">
+                      ارتداء القفازات كبديل عن تطهير اليدين أو الانتقال بها بين المرضى.
+                    </td>
+                    <td className="p-3.5 text-emerald-950 font-bold bg-emerald-50/60 leading-relaxed">
+                      القفازات لا تغني عن نظافة الأيدي؛ تطهير اليدين قبل الارتداء وفور النزع وتبديلها بين المرضى.
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* 4. Self-Assessment Readiness Checklist */}
+          <div className="bg-white rounded-3xl p-6 sm:p-7 border border-slate-200/80 shadow-xs space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3.5">
+              <div className="flex items-center gap-2.5 text-slate-900 font-bold text-base">
+                <div className="w-8 h-8 rounded-xl bg-teal-100 text-teal-900 flex items-center justify-center font-bold">
+                  <CheckSquare className="w-4 h-4 text-teal-700" />
+                </div>
+                <h3>4. قائمة التحقق الذاتي من الاستيعاب والجاهزية الفورية (Self-Check Test List)</h3>
+              </div>
+              <span className="text-2xs text-slate-500 font-medium">اضغط لتحديد مدى جاهزيتك</span>
+            </div>
+
+            <div className="space-y-2.5">
+              {[
+                { id: 'sc1', text: 'أعرف كود السياسة، هدفها الإكلينيكي الأساسي، ومعايير الاعتماد المتوافقة معها.' },
+                { id: 'sc2', text: 'أتقن الخطوات الست للفرك الكحولي (20-30 ثانية) والغسيل اليدوي (40-60 ثانية).' },
+                { id: 'sc3', text: 'أحفظ اللحظات الخمس (WHO 5 Moments) لتطهير اليدين وأطبقها بدقة عند كل مريض.' },
+                { id: 'sc4', text: 'ألتزم بسياسة عدم تزويد العبوات (Zero Top-up) وضرورة نزع الحلي وساعات اليد.' },
+                { id: 'sc5', text: 'أعرف متى يكون الغسيل بالماء والصابون إلزامياً (الاتساخ المرئي، C. difficile).' },
+                { id: 'sc6', text: 'أعرف مؤشر الأداء المستهدف للسياسة (نسبة الامتثال ≥ 90%) وآلية الإبلاغ عن الحوادث.' }
+              ].map((item) => (
+                <label 
+                  key={item.id}
+                  className={`flex items-center gap-3 p-3.5 rounded-2xl border transition cursor-pointer ${
+                    checkedAuditItems[item.id] 
+                      ? 'bg-teal-50/80 border-teal-300 text-teal-950 font-bold' 
+                      : 'bg-slate-50/60 border-slate-200 text-slate-800 hover:bg-slate-100/80'
+                  }`}
+                >
+                  <input 
+                    type="checkbox"
+                    checked={!!checkedAuditItems[item.id]}
+                    onChange={(e) => setCheckedAuditItems(prev => ({ ...prev, [item.id]: e.target.checked }))}
+                    className="w-4 h-4 rounded text-teal-600 focus:ring-teal-500 border-slate-300"
+                  />
+                  <span className="text-xs leading-relaxed">{item.text}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ========================================================================= */}
       {/* TAB 1: MASTER COMPREHENSIVE VIEW (ALL SECTIONS STRUCTURED BEAUTIFULLY)   */}
@@ -1389,6 +1742,24 @@ export function GeminiStyleSummary({ data, onSwitchToA4 }: GeminiStyleSummaryPro
           </div>
         </div>
       )}
+
+      {/* Floating Export Toast when generating PDF */}
+      {isExportingPdf && (
+        <div className="fixed bottom-6 left-6 z-50 bg-slate-900 text-white px-5 py-3 rounded-2xl shadow-2xl border border-slate-700 flex items-center gap-3 animate-bounce">
+          <Loader2 className="w-5 h-5 animate-spin text-blue-400" />
+          <div className="text-xs">
+            <p className="font-bold">{exportProgress || 'جاري توليد ملف PDF عالي الجودة...'}</p>
+            <p className="text-2xs text-slate-400">يرجى الانتظار بضع ثوانٍ</p>
+          </div>
+        </div>
+      )}
+
+      {/* Dedicated Hidden Offscreen A4 Sheet for Direct High-Res PDF Export */}
+      <div className="fixed -left-[99999px] top-0 pointer-events-none opacity-0" aria-hidden="true">
+        <div ref={pdfExportContainerRef} className="w-[210mm] bg-white p-0 m-0">
+          <A4FinalReviewDocument data={data} isPrintOnly={false} />
+        </div>
+      </div>
 
     </div>
   );

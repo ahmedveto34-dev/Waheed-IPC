@@ -81,45 +81,51 @@ export const A4FinalReviewDocument: React.FC<A4FinalReviewDocumentProps> = ({ da
       <header className="border-b-2 border-slate-900 pb-3 mb-4 flex items-start justify-between gap-4 avoid-break">
         <div className="space-y-1.5 flex-1">
           <div className="flex items-center gap-2.5">
-            <div className="w-10 h-10 rounded-lg bg-slate-950 text-white flex items-center justify-center font-black text-base font-mono border border-slate-700 shrink-0">
-              W
+            <div className="w-11 h-11 rounded-xl bg-slate-950 text-amber-400 flex flex-col items-center justify-center font-black text-xs font-mono border border-slate-700 shrink-0 shadow-sm">
+              <span className="text-[10pt] leading-none text-white">⭐</span>
+              <span className="text-[6pt] text-amber-300 font-bold uppercase tracking-wider">REV</span>
             </div>
             <div>
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <h1 className="text-sm md:text-base font-black text-slate-950 tracking-tight leading-tight">
-                  وثيقة المراجعة والتلخيص التنفيذي العلمي للسياسة والإجراءات الإكلينيكية
+                  مذكرة المراجعة النهائية المركزة والملخص التنفيذي للسياسة الإكلينيكية
                 </h1>
-                <span className="px-2 py-0.5 rounded bg-blue-900 text-white text-[7pt] font-bold font-mono">
-                  GAHAR 2025 • CBAHI • JCI
+                <span className="px-2 py-0.5 rounded-md bg-amber-500 text-slate-950 text-[7pt] font-black tracking-wide uppercase shadow-2xs">
+                  ⚡ كبسولة ليلة الاعتماد والتقييم
                 </span>
               </div>
-              <p className="text-[7.5pt] text-slate-600 font-semibold">
-                اللجنة العليا للجودة ومكافحة العدوى والسلامة الإكلينيكية والمهنية
+              <p className="text-[7.5pt] text-slate-600 font-bold flex items-center gap-1.5 mt-0.5">
+                <span>الدليل الميداني الشامل للمراجعة السريعة ومطابقة المعايير:</span>
+                <span className="text-blue-900 font-extrabold">GAHAR 2025 • CBAHI • JCI • WHO</span>
               </p>
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-1.5 text-[7pt] font-semibold text-emerald-900 bg-emerald-50/90 px-2.5 py-1 rounded border border-emerald-200">
-            <ShieldCheck className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
-            <span>معايير الاعتماد والامتثال المرجعي:</span>
-            <span className="font-bold">معايير جهار (GAHAR 2025)</span>
+          <div className="flex flex-wrap items-center gap-1.5 text-[7pt] font-bold text-slate-900 bg-slate-100 px-2.5 py-1 rounded-md border border-slate-300">
+            <span className="text-amber-700">📌 تصنيف الوثيقة:</span>
+            <span className="font-extrabold text-blue-950">مذكرة مراجعة إكلينيكية موجزة وشاملة (High-Yield Master Cram Sheet)</span>
             <span>•</span>
-            <span className="font-bold">الدليل القومي لمكافحة العدوى 2020</span>
-            <span>•</span>
-            <span className="font-bold">CBAHI</span>
-            <span>•</span>
-            <span className="font-bold">JCI IPSG.5</span>
-            <span>•</span>
-            <span className="font-bold">CDC & WHO Hand Hygiene</span>
+            <span className="text-emerald-800 font-bold">جاهزة للاختبارات، التدقيق الميداني، ومطابقة الاعتماد</span>
           </div>
         </div>
 
         {/* Policy Quick Meta Box */}
-        <div className="text-left font-mono text-[7.5pt] border border-slate-300 p-2 rounded bg-slate-50 space-y-0.5 min-w-[185px] shrink-0">
-          <div>كود الوثيقة: <strong className="text-blue-950 font-bold">{card.policyCode || 'GAHAR-IPC-01'}</strong></div>
-          <div>تاريخ الإصدار: <strong>{card.effectiveDate || '2026/01/01'}</strong></div>
-          <div>دورة المراجعة: <strong>{card.reviewCycle || 'سنوياً'}</strong></div>
-          <div className="text-emerald-700 font-bold">الحالة: وثيقة إلزامية معتمدة للتطبيق</div>
+        <div className="text-left font-mono text-[7.5pt] border-2 border-slate-900 p-2 rounded-lg bg-amber-50/50 space-y-0.5 min-w-[195px] shrink-0 shadow-2xs">
+          <div className="flex justify-between items-center border-b border-amber-200 pb-0.5">
+            <span className="font-bold text-slate-700">كود السياسة:</span>
+            <strong className="text-blue-950 font-black text-[8pt]">{card.policyCode || 'GAHAR-IPC-01'}</strong>
+          </div>
+          <div className="flex justify-between items-center text-[7pt]">
+            <span className="text-slate-600">تاريخ الاعتماد:</span>
+            <strong>{card.effectiveDate || '2026/01/01'}</strong>
+          </div>
+          <div className="flex justify-between items-center text-[7pt]">
+            <span className="text-slate-600">دورة المراجعة:</span>
+            <strong>{card.reviewCycle || 'سنوياً'}</strong>
+          </div>
+          <div className="text-center font-bold text-emerald-800 text-[6.5pt] bg-emerald-100/80 px-1 py-0.5 rounded border border-emerald-300 mt-1">
+            ✓ معتمدة للتطبيق الإلزامي
+          </div>
         </div>
       </header>
 
@@ -128,48 +134,69 @@ export const A4FinalReviewDocument: React.FC<A4FinalReviewDocumentProps> = ({ da
         <div className="bg-slate-900 text-white px-3 py-1.5 font-bold text-[8.5pt] flex items-center justify-between">
           <div className="flex items-center gap-1.5">
             <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-            <span>1. الملخص التنفيذي العلمي والاستراتيجي المركز (Executive & Clinical Review)</span>
+            <span>1. الملخص التنفيذي والكبسولة الذهبية للمراجعة (Executive Cram Capsule)</span>
           </div>
-          <span className="text-[7pt] text-slate-300 font-normal">ملخص شامل وموثوق للسياسة</span>
+          <span className="text-[7pt] text-amber-300 font-bold">مراجعة سريعة قبل التقييم</span>
         </div>
         
-        <div className="p-3 space-y-2 text-[8pt]">
-          <div className="leading-relaxed text-slate-800 text-justify bg-slate-50 p-2.5 rounded border border-slate-200 whitespace-pre-line">
+        <div className="p-3 space-y-2.5 text-[8pt]">
+          <div className="leading-relaxed text-slate-800 text-justify bg-slate-50 p-2.5 rounded-lg border border-slate-200 whitespace-pre-line">
             {data.executiveSummarySnippet || 'تم إعداد وتلخيص وثيقة السياسة بدقة علمية ومنهجية تامة لتتوافق مع معايير جهار 2025 والدليل القومي المصري لمكافحة العدوى والمعايير الدولية.'}
           </div>
 
-          {/* Core Objectives Triad */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-2 pt-1 text-[7.5pt]">
-            <div className="bg-blue-50/70 p-2 rounded border border-blue-200 space-y-0.5">
-              <strong className="text-blue-950 font-bold block flex items-center gap-1">
-                <CheckCircle2 className="w-3 h-3 text-blue-700 shrink-0" />
-                الهدف الاستراتيجي الأساسي:
+          {/* 4 Golden Revision Capsules */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-[7pt]">
+            <div className="bg-amber-50/90 border border-amber-300 p-2 rounded-lg space-y-1">
+              <strong className="text-amber-950 font-black block flex items-center gap-1 text-[7.5pt]">
+                <span>⭐</span> الهدف الإكلينيكي:
               </strong>
-              <p className="text-blue-900 leading-snug">{purpose.mainObjective || 'الحد من انتقال العدوى المكتسبة داخل المنشأة وضمان بيئة علاجية آمنة.'}</p>
-            </div>
-
-            <div className="bg-amber-50/70 p-2 rounded border border-amber-200 space-y-0.5">
-              <strong className="text-amber-950 font-bold block flex items-center gap-1">
-                <AlertTriangle className="w-3 h-3 text-amber-700 shrink-0" />
-                المبرر الإكلينيكي الحرج:
-              </strong>
-              <p className="text-amber-900 leading-snug">{purpose.clinicalRationale || 'خفض معدلات العدوى بالمستشفيات والميكروبات المقاومة للأدوية المتعددة (MDROs).'}</p>
-            </div>
-
-            <div className="bg-emerald-50/70 p-2 rounded border border-emerald-200 space-y-0.5">
-              <strong className="text-emerald-950 font-bold block flex items-center gap-1">
-                <ShieldCheck className="w-3 h-3 text-emerald-700 shrink-0" />
-                النطاق والفئات الملزمة:
-              </strong>
-              <p className="text-emerald-900 leading-snug">
-                {Array.isArray(purpose.scope) && purpose.scope.length > 0 ? purpose.scope.join('، ') : 'كافة الكوادر الطبية والتمريضية والمساندة'}
+              <p className="text-amber-900 leading-snug font-medium">
+                {purpose.mainObjective || 'الحد من انتقال العدوى المكتسبة وضمان سلامة المرضى والكوادر.'}
               </p>
-              {Array.isArray(purpose.exclusions) && purpose.exclusions.length > 0 && (
-                <div className="text-[6.5pt] text-rose-800 pt-0.5 border-t border-emerald-200/60 mt-1">
-                  <strong>الاستثناءات والمحددات: </strong> {purpose.exclusions.join('، ')}
-                </div>
-              )}
             </div>
+
+            <div className="bg-blue-50/90 border border-blue-300 p-2 rounded-lg space-y-1">
+              <strong className="text-blue-950 font-black block flex items-center gap-1 text-[7.5pt]">
+                <span>⏱️</span> أزمنة وكميات ذهبية:
+              </strong>
+              <p className="text-blue-900 leading-snug font-medium">
+                فرك كحولي: <strong>20-30 ثانية</strong> (3-5 مل) • غسيل مائي: <strong>40-60 ثانية</strong>.
+              </p>
+            </div>
+
+            <div className="bg-rose-50/90 border border-rose-300 p-2 rounded-lg space-y-1">
+              <strong className="text-rose-950 font-black block flex items-center gap-1 text-[7.5pt]">
+                <span>🚫</span> خط أحمر قطعي:
+              </strong>
+              <p className="text-rose-900 leading-snug font-medium">
+                حظر تزويد العبوات <strong>(Zero Top-up)</strong>، والقفازات لا تغني عن تطهير اليدين.
+              </p>
+            </div>
+
+            <div className="bg-emerald-50/90 border border-emerald-300 p-2 rounded-lg space-y-1">
+              <strong className="text-emerald-950 font-black block flex items-center gap-1 text-[7.5pt]">
+                <span>🎯</span> مستهدف الامتثال:
+              </strong>
+              <p className="text-emerald-900 leading-snug font-medium">
+                تحقيق نسبة امتثال <strong>≥ 90%</strong> في جولات التفتيش والملاحظة المباشرة.
+              </p>
+            </div>
+          </div>
+
+          {/* Core Scope and Exclusions */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 pt-1 text-[7.5pt]">
+            <div className="bg-slate-50 p-2 rounded border border-slate-200">
+              <strong className="text-slate-900 font-bold block mb-0.5">النطاق والفئات الملزمة بالتطبيق:</strong>
+              <p className="text-slate-700">
+                {Array.isArray(purpose.scope) && purpose.scope.length > 0 ? purpose.scope.join('، ') : 'كافة الكوادر الطبية والتمريضية والمساندة والفنية'}
+              </p>
+            </div>
+            {Array.isArray(purpose.exclusions) && purpose.exclusions.length > 0 && (
+              <div className="bg-rose-50/60 p-2 rounded border border-rose-200">
+                <strong className="text-rose-950 font-bold block mb-0.5">الاستثناءات والمحددات:</strong>
+                <p className="text-rose-900">{purpose.exclusions.join('، ')}</p>
+              </div>
+            )}
           </div>
         </div>
       </section>
@@ -473,42 +500,99 @@ export const A4FinalReviewDocument: React.FC<A4FinalReviewDocumentProps> = ({ da
             </div>
           )}
 
-          {/* Visual Illustrated 6 Steps Quick Matrix */}
-          <div className="bg-slate-50 border border-slate-200 p-2 rounded mt-2">
-            <strong className="text-[7.5pt] font-bold text-slate-900 block mb-1.5 flex items-center gap-1">
-              <Sparkles className="w-3 h-3 text-blue-600" />
-              <span>المخطط التوضيحي المصور للحركات الست لفرك وتطهير الأيدي (Illustrated 6 Core Motions):</span>
-            </strong>
-            <div className="grid grid-cols-3 sm:grid-cols-6 gap-1.5 text-center text-[6.5pt]">
-              <div className="bg-white p-1.5 rounded border border-slate-200 space-y-0.5">
-                <span className="w-3.5 h-3.5 rounded-full bg-blue-700 text-white font-bold mx-auto flex items-center justify-center text-[6pt]">1</span>
-                <strong className="block text-slate-900">باطن بالباطن</strong>
-                <span className="text-slate-500 text-[5.5pt]">Palm to Palm</span>
+          {/* Visual Illustrated 6 Steps Quick Matrix with SVG Vector Art */}
+          <div className="bg-slate-50 border border-slate-200 p-2.5 rounded-lg mt-2">
+            <div className="flex items-center justify-between mb-2">
+              <strong className="text-[7.5pt] font-bold text-slate-900 flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5 text-blue-700" />
+                <span>المخطط الإيضاحي المصور لتقنيات وخطوات الفرك والتطهير الإكلينيكي (Illustrated Clinical Motions):</span>
+              </strong>
+              <span className="text-[6.5pt] font-mono text-blue-950 font-bold bg-blue-100/80 px-2 py-0.5 rounded">
+                WHO Standard Technique
+              </span>
+            </div>
+
+            <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 text-center text-[6.5pt]">
+              {/* Step 1 Illustration */}
+              <div className="bg-white p-2 rounded-lg border border-slate-200 shadow-2xs space-y-1 hover:border-blue-300 transition">
+                <div className="w-8 h-8 mx-auto rounded-full bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-700">
+                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                    <path d="M7 11V7a2 2 0 0 1 4 0v4" />
+                    <path d="M11 11V6a2 2 0 0 1 4 0v5" />
+                    <path d="M15 11V8a2 2 0 0 1 4 0v6a6 6 0 0 1-6 6H9a6 6 0 0 1-6-6v-3a2 2 0 0 1 4 0v2" />
+                  </svg>
+                </div>
+                <span className="inline-block w-3.5 h-3.5 rounded-full bg-blue-900 text-white font-bold text-[6pt] leading-none py-0.5">1</span>
+                <strong className="block text-slate-950 font-bold leading-tight">باطن بالباطن</strong>
+                <span className="text-slate-500 text-[5.5pt] block">Palm to Palm</span>
               </div>
-              <div className="bg-white p-1.5 rounded border border-slate-200 space-y-0.5">
-                <span className="w-3.5 h-3.5 rounded-full bg-blue-700 text-white font-bold mx-auto flex items-center justify-center text-[6pt]">2</span>
-                <strong className="block text-slate-900">ظهر اليد متداخلاً</strong>
-                <span className="text-slate-500 text-[5.5pt]">Dorsum Interlaced</span>
+
+              {/* Step 2 Illustration */}
+              <div className="bg-white p-2 rounded-lg border border-slate-200 shadow-2xs space-y-1 hover:border-blue-300 transition">
+                <div className="w-8 h-8 mx-auto rounded-full bg-indigo-50 border border-indigo-200 flex items-center justify-center text-indigo-700">
+                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                    <path d="M18 11V6a2 2 0 0 0-4 0v5" />
+                    <path d="M14 10V4a2 2 0 0 0-4 0v7" />
+                    <path d="M10 10.5V6a2 2 0 0 0-4 0v8a5 5 0 0 0 5 5h3a6 6 0 0 0 6-6v-4a2 2 0 0 0-4 0v2" />
+                  </svg>
+                </div>
+                <span className="inline-block w-3.5 h-3.5 rounded-full bg-blue-900 text-white font-bold text-[6pt] leading-none py-0.5">2</span>
+                <strong className="block text-slate-950 font-bold leading-tight">ظهر اليد متداخلاً</strong>
+                <span className="text-slate-500 text-[5.5pt] block">Dorsum Interlaced</span>
               </div>
-              <div className="bg-white p-1.5 rounded border border-slate-200 space-y-0.5">
-                <span className="w-3.5 h-3.5 rounded-full bg-blue-700 text-white font-bold mx-auto flex items-center justify-center text-[6pt]">3</span>
-                <strong className="block text-slate-900">تشابك الأصابع</strong>
-                <span className="text-slate-500 text-[5.5pt]">Fingers Interlaced</span>
+
+              {/* Step 3 Illustration */}
+              <div className="bg-white p-2 rounded-lg border border-slate-200 shadow-2xs space-y-1 hover:border-blue-300 transition">
+                <div className="w-8 h-8 mx-auto rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-700">
+                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                    <path d="M8 13V5a2 2 0 0 1 4 0v6" />
+                    <path d="M12 11V4a2 2 0 0 1 4 0v7" />
+                    <path d="M16 12V7a2 2 0 0 1 4 0v6a6 6 0 0 1-6 6H9a5 5 0 0 1-5-5V9a2 2 0 0 1 4 0v5" />
+                  </svg>
+                </div>
+                <span className="inline-block w-3.5 h-3.5 rounded-full bg-blue-900 text-white font-bold text-[6pt] leading-none py-0.5">3</span>
+                <strong className="block text-slate-950 font-bold leading-tight">تشابك الأصابع</strong>
+                <span className="text-slate-500 text-[5.5pt] block">Fingers Interlaced</span>
               </div>
-              <div className="bg-white p-1.5 rounded border border-slate-200 space-y-0.5">
-                <span className="w-3.5 h-3.5 rounded-full bg-blue-700 text-white font-bold mx-auto flex items-center justify-center text-[6pt]">4</span>
-                <strong className="block text-slate-900">ظهر الأصابع بالقبضة</strong>
-                <span className="text-slate-500 text-[5.5pt]">Back of Fingers</span>
+
+              {/* Step 4 Illustration */}
+              <div className="bg-white p-2 rounded-lg border border-slate-200 shadow-2xs space-y-1 hover:border-blue-300 transition">
+                <div className="w-8 h-8 mx-auto rounded-full bg-purple-50 border border-purple-200 flex items-center justify-center text-purple-700">
+                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                    <rect x="4" y="6" width="16" height="12" rx="3" />
+                    <path d="M9 10v4" />
+                    <path d="M15 10v4" />
+                  </svg>
+                </div>
+                <span className="inline-block w-3.5 h-3.5 rounded-full bg-blue-900 text-white font-bold text-[6pt] leading-none py-0.5">4</span>
+                <strong className="block text-slate-950 font-bold leading-tight">ظهر الأصابع بالقبضة</strong>
+                <span className="text-slate-500 text-[5.5pt] block">Back of Fingers</span>
               </div>
-              <div className="bg-white p-1.5 rounded border border-slate-200 space-y-0.5">
-                <span className="w-3.5 h-3.5 rounded-full bg-blue-700 text-white font-bold mx-auto flex items-center justify-center text-[6pt]">5</span>
-                <strong className="block text-slate-900">دلك الإبهامين دائرياً</strong>
-                <span className="text-slate-500 text-[5.5pt]">Rotational Thumbs</span>
+
+              {/* Step 5 Illustration */}
+              <div className="bg-white p-2 rounded-lg border border-slate-200 shadow-2xs space-y-1 hover:border-blue-300 transition">
+                <div className="w-8 h-8 mx-auto rounded-full bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-700">
+                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                    <path d="M12 2a4 4 0 0 0-4 4v7a4 4 0 0 0 8 0V6a4 4 0 0 0-4-4Z" />
+                    <path d="M16 14a6 6 0 0 1-8 0" />
+                  </svg>
+                </div>
+                <span className="inline-block w-3.5 h-3.5 rounded-full bg-blue-900 text-white font-bold text-[6pt] leading-none py-0.5">5</span>
+                <strong className="block text-slate-950 font-bold leading-tight">دلك الإبهامين دائرياً</strong>
+                <span className="text-slate-500 text-[5.5pt] block">Rotational Thumbs</span>
               </div>
-              <div className="bg-white p-1.5 rounded border border-slate-200 space-y-0.5">
-                <span className="w-3.5 h-3.5 rounded-full bg-blue-700 text-white font-bold mx-auto flex items-center justify-center text-[6pt]">6</span>
-                <strong className="block text-slate-900">فرك أطراف الأصابع</strong>
-                <span className="text-slate-500 text-[5.5pt]">Fingertips & Nails</span>
+
+              {/* Step 6 Illustration */}
+              <div className="bg-white p-2 rounded-lg border border-slate-200 shadow-2xs space-y-1 hover:border-blue-300 transition">
+                <div className="w-8 h-8 mx-auto rounded-full bg-rose-50 border border-rose-200 flex items-center justify-center text-rose-700">
+                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                    <circle cx="12" cy="12" r="9" />
+                    <path d="m10 15 5-3-5-3v6Z" />
+                  </svg>
+                </div>
+                <span className="inline-block w-3.5 h-3.5 rounded-full bg-blue-900 text-white font-bold text-[6pt] leading-none py-0.5">6</span>
+                <strong className="block text-slate-950 font-bold leading-tight">فرك أطراف الأصابع</strong>
+                <span className="text-slate-500 text-[5.5pt] block">Fingertips & Nails</span>
               </div>
             </div>
           </div>
@@ -518,14 +602,47 @@ export const A4FinalReviewDocument: React.FC<A4FinalReviewDocumentProps> = ({ da
       {/* Page break marker for multipage printed reports */}
       <div className="page-break" />
 
-      {/* ================= 8. CRITICAL DO's & DONT's MATRIX ================= */}
+      {/* ================= 8. CRITICAL DO's & DONT's MATRIX + PITFALLS COMPARISON ================= */}
       <section className="avoid-break mb-3.5 border border-slate-300 rounded-lg overflow-hidden">
         <div className="bg-slate-800 text-white px-3 py-1 font-bold text-[8pt] flex items-center justify-between">
-          <span>8. مصفوفة الممارسات الإلزامية والمحظورات الصارمة (DOs & DON'Ts Matrix)</span>
-          <span className="text-[7pt] text-slate-300">نقاط التقييم والملاحظة المباشرة</span>
+          <div className="flex items-center gap-1.5">
+            <XCircle className="w-3.5 h-3.5 text-rose-400" />
+            <span>8. مصفوفة المحظورات الصارمة ومقارنة الأخطاء الشائعة بالصواب (Pitfalls vs Golden Standard)</span>
+          </div>
+          <span className="text-[7pt] text-amber-300 font-bold">الخطوط الحمراء</span>
         </div>
 
         <div className="p-2.5 space-y-2 text-[7.5pt]">
+          {/* Quick Pitfalls vs Golden Standard Matrix */}
+          <div className="border border-slate-300 rounded-md overflow-hidden">
+            <table className="w-full border-collapse text-[7pt]">
+              <thead>
+                <tr className="bg-slate-900 text-white font-bold">
+                  <th className="p-1.5 text-right w-1/2 text-rose-300">❌ الخطأ الإكلينيكي الشائع المحظور (Pitfall)</th>
+                  <th className="p-1.5 text-right w-1/2 text-emerald-300">✅ الصواب والمعيار الذهبي الإلزامي (Standard)</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-200">
+                <tr className="bg-rose-50/30">
+                  <td className="p-1.5 text-rose-950 font-medium">تجفيف اليدين بالمناشف أو التلويح بعد الفرك الكحولي لتسريعه.</td>
+                  <td className="p-1.5 text-emerald-950 font-bold bg-emerald-50/40">ترك الكحول يجف ذاتياً بالهواء (20-30 ثانية) حتى اكتمال التبخر والقتل الميكروبي.</td>
+                </tr>
+                <tr className="bg-rose-50/30">
+                  <td className="p-1.5 text-rose-950 font-medium">استخدام الكحول عند اتساخ اليدين بالدم أو الإفرازات أو مع جراثيم C. diff.</td>
+                  <td className="p-1.5 text-emerald-950 font-bold bg-emerald-50/40">الغسيل الإجباري بالماء الجاري والصابون (40-60 ثانية) لإزالة الأبواغ والاتساخ العضوي.</td>
+                </tr>
+                <tr className="bg-rose-50/30">
+                  <td className="p-1.5 text-rose-950 font-medium">تزويد أو سكب محلول جديد فوق المتبقي في العبوة (Top-up).</td>
+                  <td className="p-1.5 text-emerald-950 font-bold bg-emerald-50/40">تفريغ العبوة بالكامل، ثم غسلها وتطهيرها وتجفيفها قبل الملء، أو استبدالها بعبوة جاهزة.</td>
+                </tr>
+                <tr className="bg-rose-50/30">
+                  <td className="p-1.5 text-rose-950 font-medium">ارتداء القفازات كبديل عن تطهير اليدين أو الانتقال بها بين المرضى.</td>
+                  <td className="p-1.5 text-emerald-950 font-bold bg-emerald-50/40">القفازات لا تغني عن نظافة الأيدي مطلقاً؛ تطهير اليدين قبل الارتداء وفور النزع.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
             {/* DO's */}
             <div className="border border-emerald-300 p-2 rounded bg-emerald-50/40">
@@ -596,10 +713,70 @@ export const A4FinalReviewDocument: React.FC<A4FinalReviewDocumentProps> = ({ da
         </div>
       </section>
 
-      {/* ================= 9. AUDIT CHECKLIST FOR INSPECTIONS ================= */}
+      {/* ================= 9. RAPID Q&A REVIEW BANK (سؤال وجواب المراجعة النهائية) ================= */}
+      <section className="avoid-break mb-3.5 border border-slate-300 rounded-lg overflow-hidden bg-white">
+        <div className="bg-slate-900 text-white px-3 py-1 font-bold text-[8pt] flex items-center justify-between">
+          <div className="flex items-center gap-1.5">
+            <span className="text-amber-400 font-black text-[9pt]">❓</span>
+            <span>9. بنك أسئلة وأجوبة المراجعة السريعة للاختبارات والتفتيش (Rapid Q&A Review Bank)</span>
+          </div>
+          <span className="text-[7pt] text-amber-300 font-bold">سؤال وجواب للمراجعة الفورية</span>
+        </div>
+
+        <div className="p-2.5 grid grid-cols-1 md:grid-cols-2 gap-2 text-[7pt] bg-slate-50/40">
+          <div className="bg-white border border-slate-200 p-2 rounded-lg space-y-1 shadow-2xs">
+            <strong className="text-blue-950 font-bold block text-[7.5pt] flex items-center gap-1">
+              <span className="w-4 h-4 rounded-full bg-blue-900 text-white text-[6pt] flex items-center justify-center font-bold">س1</span>
+              متى يكون غسيل الأيدي بالماء والصابون إجبارياً بدلاً من الفرك الكحولي؟
+            </strong>
+            <p className="text-slate-700 leading-snug bg-slate-50 p-1.5 rounded border border-slate-100">
+              <strong className="text-emerald-800">الجواب: </strong>
+              عند وجود اتساخ مرئي بالدم أو سوائل الجسم، أو بعد استخدام المرحاض، أو بعد التعامل مع حالات العدوى المتبوغة مثل <em>Clostridioides difficile</em> والروتافيروس لأن الكحول غير فعال ضد الأبواغ.
+            </p>
+          </div>
+
+          <div className="bg-white border border-slate-200 p-2 rounded-lg space-y-1 shadow-2xs">
+            <strong className="text-blue-950 font-bold block text-[7.5pt] flex items-center gap-1">
+              <span className="w-4 h-4 rounded-full bg-blue-900 text-white text-[6pt] flex items-center justify-center font-bold">س2</span>
+              ما هو الحجم المناسب وزمن الفرك الكحولي الفعال؟
+            </strong>
+            <p className="text-slate-700 leading-snug bg-slate-50 p-1.5 rounded border border-slate-100">
+              <strong className="text-emerald-800">الجواب: </strong>
+              استخدام 3 إلى 5 مل من المستحضر الكحولي (ملء راحة اليد المقعرة)، والفرك المستمر لمدة <strong>20 إلى 30 ثانية</strong> وتغطية كافة أسطح اليدين حتى الجفاف التام بالهواء.
+            </p>
+          </div>
+
+          <div className="bg-white border border-slate-200 p-2 rounded-lg space-y-1 shadow-2xs">
+            <strong className="text-blue-950 font-bold block text-[7.5pt] flex items-center gap-1">
+              <span className="w-4 h-4 rounded-full bg-blue-900 text-white text-[6pt] flex items-center justify-center font-bold">س3</span>
+              ما هي سياسة تفريغ وتعبئة الموزعات (Zero Top-up Policy)؟
+            </strong>
+            <p className="text-slate-700 leading-snug bg-slate-50 p-1.5 rounded border border-slate-100">
+              <strong className="text-emerald-800">الجواب: </strong>
+              يُحظر تماماً إضافة أو صب مطهر فوق المتبقي بالعبوة. يجب استهلاك العبوة حتى النهاية، ثم غسلها وتطهيرها وتجفيفها بالكامل قبل إعادة التعبئة، ويفضل استخدام العبوات وحيدة الاستخدام ذات الخراطيش المقفلة.
+            </p>
+          </div>
+
+          <div className="bg-white border border-slate-200 p-2 rounded-lg space-y-1 shadow-2xs">
+            <strong className="text-blue-950 font-bold block text-[7.5pt] flex items-center gap-1">
+              <span className="w-4 h-4 rounded-full bg-blue-900 text-white text-[6pt] flex items-center justify-center font-bold">س4</span>
+              هل يغني ارتداء القفازات الطبية عن إجراء نظافة الأيدي؟
+            </strong>
+            <p className="text-slate-700 leading-snug bg-slate-50 p-1.5 rounded border border-slate-100">
+              <strong className="text-emerald-800">الجواب: </strong>
+              قطعياً لا. يجب تطهير الأيدي فوراً قبل ارتداء القفازات، وفور نزعها، مع تغيير القفازات فوراً بين كل مريض وآخر وعدم غسل القفازات أو فركها بالكحول.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* ================= 10. AUDIT CHECKLIST FOR INSPECTIONS ================= */}
       <section className="avoid-break mb-3.5 border border-slate-300 rounded-lg overflow-hidden">
         <div className="bg-slate-800 text-white px-3 py-1 font-bold text-[8pt] flex items-center justify-between">
-          <span>9. قائمة المراجعة والتدقيق الميداني للاعتماد (Audit Checklist & GAHAR Survey)</span>
+          <div className="flex items-center gap-1.5">
+            <CheckSquare className="w-3.5 h-3.5 text-teal-300" />
+            <span>10. قائمة المراجعة والتدقيق الميداني للاعتماد (Audit Checklist & Survey)</span>
+          </div>
           <span className="text-[7pt] text-slate-300">أداة المقيّم والمفتش الصحي</span>
         </div>
 
@@ -641,10 +818,13 @@ export const A4FinalReviewDocument: React.FC<A4FinalReviewDocumentProps> = ({ da
         </div>
       </section>
 
-      {/* ================= 10. KEY PERFORMANCE INDICATORS (KPIs) ================= */}
+      {/* ================= 11. KEY PERFORMANCE INDICATORS (KPIs) ================= */}
       <section className="avoid-break mb-3.5 border border-slate-300 rounded-lg overflow-hidden">
         <div className="bg-slate-800 text-white px-3 py-1 font-bold text-[8pt] flex items-center justify-between">
-          <span>10. مؤشرات الأداء الرئيسية المقاسة (Key Performance Indicators - KPIs)</span>
+          <div className="flex items-center gap-1.5">
+            <Activity className="w-3.5 h-3.5 text-amber-300" />
+            <span>11. مؤشرات الأداء الرئيسية المقاسة والمستهدفات (Key Performance Indicators - KPIs)</span>
+          </div>
           <span className="text-[7pt] text-slate-300">معدلات الجودة ومستهدفات GAHAR</span>
         </div>
 

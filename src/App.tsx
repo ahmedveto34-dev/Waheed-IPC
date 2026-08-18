@@ -11,7 +11,9 @@ import {
   Copy, 
   Trash2,
   LogOut,
-  Sparkles
+  Sparkles,
+  FileDown,
+  Loader2
 } from 'lucide-react';
 
 import { PolicyAnalysisResult } from './types';
@@ -20,6 +22,7 @@ import { PrintableReport } from './components/PrintableReport';
 import { A4FinalReviewDocument } from './components/A4FinalReviewDocument';
 import { GeminiStyleSummary } from './components/GeminiStyleSummary';
 import { LoginPage } from './components/LoginPage';
+import { exportElementToPdf } from './utils/pdfExport';
 
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
@@ -40,9 +43,13 @@ export default function App() {
   const [analysisResult, setAnalysisResult] = useState<PolicyAnalysisResult | null>(null);
   const [copySuccess, setCopySuccess] = useState(false);
   const [viewMode, setViewMode] = useState<'gemini' | 'a4'>('gemini');
+  const [isExportingPdf, setIsExportingPdf] = useState(false);
+  const [exportProgress, setExportProgress] = useState('');
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const resultsRef = useRef<HTMLDivElement | null>(null);
+  const a4ContainerRef = useRef<HTMLDivElement | null>(null);
+  const hiddenA4Ref = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (analysisResult && resultsRef.current) {
@@ -226,6 +233,34 @@ export default function App() {
 
   const handlePrint = () => {
     window.print();
+  };
+
+  const handleDirectPdfDownload = async () => {
+    const targetElement = viewMode === 'a4' ? a4ContainerRef.current : hiddenA4Ref.current;
+    if (!targetElement || isExportingPdf || !analysisResult) return;
+
+    setIsExportingPdf(true);
+    setExportProgress('جاري تحضير وتنسيق عناصر الملخص للتحميل كـ PDF...');
+
+    try {
+      const code = analysisResult.policyCard?.policyCode || 'Policy';
+      const cleanTitle = (analysisResult.policyCard?.titleArabic || 'Medical_Policy')
+        .replace(/[/\\?%*:|"<>]/g, '_')
+        .slice(0, 40);
+      const filename = `${code}_${cleanTitle}_Executive_Review.pdf`;
+
+      await exportElementToPdf(targetElement, {
+        filename,
+        title: analysisResult.policyCard?.titleArabic,
+        onProgress: (text) => setExportProgress(text)
+      });
+    } catch (err) {
+      console.error('PDF export failed:', err);
+      window.print();
+    } finally {
+      setIsExportingPdf(false);
+      setExportProgress('');
+    }
   };
 
   const handleCopySummary = async () => {
@@ -608,7 +643,27 @@ ${analysisResult.safetyWarningsAndCriticalSteps.emergencyIncidentProtocol}
               </div>
 
               {/* Quick Global Action Buttons */}
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
+                {/* Direct High-Quality PDF Export Button */}
+                <button
+                  onClick={handleDirectPdfDownload}
+                  disabled={isExportingPdf}
+                  className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-blue-700 hover:bg-blue-800 disabled:bg-blue-900 text-white font-bold text-xs transition shadow-sm hover:shadow active:scale-[0.98] cursor-pointer disabled:cursor-not-allowed"
+                  title="تصدير وتحميل الملخص مباشرة كملف PDF عالي الجودة"
+                >
+                  {isExportingPdf ? (
+                    <>
+                      <Loader2 className="w-3.5 h-3.5 animate-spin text-blue-200" />
+                      <span>جاري التصدير...</span>
+                    </>
+                  ) : (
+                    <>
+                      <FileDown className="w-4 h-4" />
+                      <span>تصدير PDF مباشر</span>
+                    </>
+                  )}
+                </button>
+
                 <button
                   onClick={handleCopySummary}
                   className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition border border-slate-200"
@@ -628,13 +683,24 @@ ${analysisResult.safetyWarningsAndCriticalSteps.emergencyIncidentProtocol}
 
                 <button
                   onClick={handlePrint}
-                  className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition shadow-sm hover:shadow active:scale-[0.98]"
+                  className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition shadow-sm hover:shadow active:scale-[0.98]"
                 >
                   <Printer className="w-4 h-4" />
-                  <span>طباعة / حفظ PDF</span>
+                  <span>طباعة عبر المتصفح</span>
                 </button>
               </div>
             </div>
+
+            {/* Export Progress Notification Banner */}
+            {isExportingPdf && (
+              <div className="bg-blue-600 text-white px-4 py-2.5 rounded-xl text-xs font-bold flex items-center justify-between shadow-md animate-pulse">
+                <div className="flex items-center gap-2">
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <span>{exportProgress || 'جاري توليد ملف PDF عالي الجودة يضم كافة الجداول والصور والنصوص...'}</span>
+                </div>
+                <span className="text-2xs bg-blue-700 px-2 py-0.5 rounded font-mono">DPI: 300</span>
+              </div>
+            )}
 
             {/* Active View Container */}
             {viewMode === 'gemini' ? (
@@ -644,9 +710,18 @@ ${analysisResult.safetyWarningsAndCriticalSteps.emergencyIncidentProtocol}
               />
             ) : (
               <div className="bg-slate-200/90 p-3 sm:p-8 rounded-2xl border border-slate-300 shadow-inner flex justify-center overflow-x-auto no-print">
-                <A4FinalReviewDocument data={analysisResult} isPrintOnly={false} />
+                <div ref={a4ContainerRef} className="w-[210mm] bg-white">
+                  <A4FinalReviewDocument data={analysisResult} isPrintOnly={false} />
+                </div>
               </div>
             )}
+
+            {/* Hidden Offscreen Container for Direct PDF Export from any tab */}
+            <div className="fixed -left-[99999px] top-0 pointer-events-none opacity-0" aria-hidden="true">
+              <div ref={hiddenA4Ref} className="w-[210mm] bg-white">
+                <A4FinalReviewDocument data={analysisResult} isPrintOnly={false} />
+              </div>
+            </div>
           </div>
         )}
       </main>
