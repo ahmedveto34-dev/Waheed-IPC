@@ -204,14 +204,16 @@ export const PrintableReport: React.FC<PrintableReportProps> = ({ data }) => {
         </div>
         <div className="p-3 text-[8pt] space-y-2.5">
           {/* Critical Control Points */}
-          <div className="bg-amber-50/60 p-2 rounded border border-amber-200">
-            <strong className="text-amber-950 font-bold block mb-1">نقاط التحكم والمراقبة الحرجة (Critical Control Points - CCPs):</strong>
-            <ul className="list-disc list-inside space-y-0.5 text-amber-900 text-[7.5pt]">
-              {data.safetyWarningsAndCriticalSteps.criticalControlPoints.map((ccp, i) => (
-                <li key={i}>{ccp}</li>
-              ))}
-            </ul>
-          </div>
+          {Array.isArray(data.safetyWarningsAndCriticalSteps?.criticalControlPoints) && data.safetyWarningsAndCriticalSteps.criticalControlPoints.length > 0 && (
+            <div className="bg-amber-50/60 p-2 rounded border border-amber-200">
+              <strong className="text-amber-950 font-bold block mb-1">نقاط التحكم والمراقبة الحرجة (Critical Control Points - CCPs):</strong>
+              <ul className="list-disc list-inside space-y-0.5 text-amber-900 text-[7.5pt]">
+                {data.safetyWarningsAndCriticalSteps.criticalControlPoints.map((ccp: any, i: number) => (
+                  <li key={i}>{typeof ccp === 'string' ? ccp : ccp?.text || JSON.stringify(ccp)}</li>
+                ))}
+              </ul>
+            </div>
+          )}
 
           {/* DO's & DON'Ts Grid */}
           <div className="grid grid-cols-2 gap-2 text-[7.5pt]">
@@ -221,9 +223,19 @@ export const PrintableReport: React.FC<PrintableReportProps> = ({ data }) => {
                 الممارسات الإلزامية (DO's):
               </strong>
               <ul className="list-disc list-inside space-y-0.5 text-emerald-950">
-                {data.safetyWarningsAndCriticalSteps.dos.map((d, i) => (
-                  <li key={i}>{d}</li>
-                ))}
+                {Array.isArray(data.safetyWarningsAndCriticalSteps?.dos) ? (
+                  data.safetyWarningsAndCriticalSteps.dos.map((d: any, i: number) => (
+                    <li key={i}>{typeof d === 'string' ? d : d?.instruction || d?.text || JSON.stringify(d)}</li>
+                  ))
+                ) : Array.isArray((data.safetyWarningsAndCriticalSteps as any)?.dosAndDonts) ? (
+                  (data.safetyWarningsAndCriticalSteps as any).dosAndDonts
+                    .filter((item: any) => item?.type === 'DO' || (typeof item === 'string' && !item.toLowerCase().startsWith("don't")))
+                    .map((d: any, i: number) => (
+                      <li key={i}>{typeof d === 'string' ? d : d?.instruction || d?.text || JSON.stringify(d)}</li>
+                    ))
+                ) : (
+                  <li>الالتزام بالاحتياطات القياسية المعتمدة.</li>
+                )}
               </ul>
             </div>
             <div className="border border-rose-300 p-2 rounded bg-rose-50/40">
@@ -232,18 +244,34 @@ export const PrintableReport: React.FC<PrintableReportProps> = ({ data }) => {
                 المحظورات الصارمة (DON'Ts):
               </strong>
               <ul className="list-disc list-inside space-y-0.5 text-rose-950">
-                {data.safetyWarningsAndCriticalSteps.donts.map((d, i) => (
-                  <li key={i}>{d}</li>
-                ))}
+                {Array.isArray(data.safetyWarningsAndCriticalSteps?.donts) ? (
+                  data.safetyWarningsAndCriticalSteps.donts.map((d: any, i: number) => (
+                    <li key={i}>{typeof d === 'string' ? d : d?.instruction || d?.text || JSON.stringify(d)}</li>
+                  ))
+                ) : Array.isArray((data.safetyWarningsAndCriticalSteps as any)?.dosAndDonts) ? (
+                  (data.safetyWarningsAndCriticalSteps as any).dosAndDonts
+                    .filter((item: any) => item?.type === 'DONT' || item?.type === "DON'T" || (typeof item === 'string' && item.toLowerCase().startsWith("don't")))
+                    .map((d: any, i: number) => (
+                      <li key={i}>{typeof d === 'string' ? d : d?.instruction || d?.text || JSON.stringify(d)}</li>
+                    ))
+                ) : (
+                  <li>يحظر مخالفة تعليمات مكافحة العدوى والسلامة.</li>
+                )}
               </ul>
             </div>
           </div>
 
           {/* Emergency Incident Protocol */}
-          <div className="bg-slate-100 p-2 rounded border border-slate-300 text-[7.5pt]">
-            <strong className="text-slate-900 font-bold">بروتوكول الطوارئ والاستجابة الفورية عند التعرض أو الخلل: </strong>
-            <span className="text-slate-800">{data.safetyWarningsAndCriticalSteps.emergencyIncidentProtocol}</span>
-          </div>
+          {(data.safetyWarningsAndCriticalSteps?.emergencyIncidentProtocol || (data.safetyWarningsAndCriticalSteps as any)?.exposureProtocol) && (
+            <div className="bg-slate-100 p-2 rounded border border-slate-300 text-[7.5pt]">
+              <strong className="text-slate-900 font-bold">بروتوكول الطوارئ والاستجابة الفورية عند التعرض أو الخلل: </strong>
+              <span className="text-slate-800">
+                {typeof data.safetyWarningsAndCriticalSteps?.emergencyIncidentProtocol === 'string'
+                  ? data.safetyWarningsAndCriticalSteps.emergencyIncidentProtocol
+                  : (data.safetyWarningsAndCriticalSteps as any)?.exposureProtocol || ''}
+              </span>
+            </div>
+          )}
         </div>
       </section>
 

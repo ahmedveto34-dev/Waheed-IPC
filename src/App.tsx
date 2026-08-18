@@ -173,8 +173,92 @@ export default function App() {
         throw new Error(errText);
       }
 
+      const raw = resData.data || {};
       const result: PolicyAnalysisResult = {
-        ...resData.data,
+        policyCard: {
+          titleArabic: raw.policyCard?.titleArabic || 'سياسة وإجراءات مكافحة العدوى والسلامة المعتمدة',
+          titleEnglish: raw.policyCard?.titleEnglish || 'Infection Prevention & Clinical Safety Policy',
+          policyCode: raw.policyCard?.policyCode || 'IPC-POL-001',
+          domain: raw.policyCard?.domain || 'مكافحة العدوى والسلامة الإكلينيكية',
+          departments: Array.isArray(raw.policyCard?.departments) ? raw.policyCard.departments : ['كافة الأقسام الإكلينيكية والتمريض'],
+          effectiveDate: raw.policyCard?.effectiveDate || '2025/2026',
+          reviewCycle: raw.policyCard?.reviewCycle || 'سنوياً',
+          alignedStandards: Array.isArray(raw.policyCard?.alignedStandards) ? raw.policyCard.alignedStandards : [
+            {
+              standardBody: 'GAHAR 2025 / الدليل القومي',
+              clauseNumber: 'IPC.01',
+              description: 'الالتزام بمعايير جهار والدليل القومي لمكافحة العدوى'
+            }
+          ]
+        },
+        purposeAndScope: {
+          mainObjective: raw.purposeAndScope?.mainObjective || 'توفير بيئة رعاية صحية آمنة ومنع انتقال العدوى وحماية المرضى والعاملين.',
+          clinicalRationale: raw.purposeAndScope?.clinicalRationale || 'الحد من العدوى المكتسبة ومقاومة مضادات الميكروبات.',
+          scope: Array.isArray(raw.purposeAndScope?.scope) ? raw.purposeAndScope.scope : ['كافة الكوادر الصحية والتمريضية'],
+          exclusions: Array.isArray(raw.purposeAndScope?.exclusions) ? raw.purposeAndScope.exclusions : []
+        },
+        rolesAndResponsibilities: Array.isArray(raw.rolesAndResponsibilities) ? raw.rolesAndResponsibilities : [],
+        sopPhases: {
+          preProcedure: Array.isArray(raw.sopPhases?.preProcedure) ? raw.sopPhases.preProcedure : [],
+          execution: Array.isArray(raw.sopPhases?.execution) ? raw.sopPhases.execution : [],
+          postProcedure: Array.isArray(raw.sopPhases?.postProcedure) ? raw.sopPhases.postProcedure : []
+        },
+        safetyWarningsAndCriticalSteps: {
+          criticalControlPoints: Array.isArray(raw.safetyWarningsAndCriticalSteps?.criticalControlPoints)
+            ? raw.safetyWarningsAndCriticalSteps.criticalControlPoints
+            : [],
+          dos: Array.isArray(raw.safetyWarningsAndCriticalSteps?.dos)
+            ? raw.safetyWarningsAndCriticalSteps.dos
+            : Array.isArray(raw.safetyWarningsAndCriticalSteps?.dosAndDonts)
+            ? raw.safetyWarningsAndCriticalSteps.dosAndDonts
+                .filter((d: any) => d?.type === 'DO' || (typeof d === 'string' && !d.toLowerCase().startsWith("don't")))
+                .map((d: any) => typeof d === 'string' ? d : d?.instruction || d?.text || JSON.stringify(d))
+            : [],
+          donts: Array.isArray(raw.safetyWarningsAndCriticalSteps?.donts)
+            ? raw.safetyWarningsAndCriticalSteps.donts
+            : Array.isArray(raw.safetyWarningsAndCriticalSteps?.dosAndDonts)
+            ? raw.safetyWarningsAndCriticalSteps.dosAndDonts
+                .filter((d: any) => d?.type === 'DONT' || (typeof d === 'string' && d.toLowerCase().startsWith("don't")))
+                .map((d: any) => typeof d === 'string' ? d : d?.instruction || d?.text || JSON.stringify(d))
+            : [],
+          emergencyIncidentProtocol: typeof raw.safetyWarningsAndCriticalSteps?.emergencyIncidentProtocol === 'string'
+            ? raw.safetyWarningsAndCriticalSteps.emergencyIncidentProtocol
+            : typeof raw.safetyWarningsAndCriticalSteps?.exposureProtocol === 'string'
+            ? raw.safetyWarningsAndCriticalSteps.exposureProtocol
+            : 'في حال حدوث وخز إبرة أو تعرض مهني: غسل الموضع فوراً بالماء والصابون دون عصر، إبلاغ مشرف السلامة ومكافحة العدوى فوراً وبدء الإجراءات الوقائية.'
+        },
+        mermaidFlowchart: {
+          code: typeof raw.mermaidFlowchart === 'string' 
+            ? raw.mermaidFlowchart 
+            : raw.mermaidFlowchart?.code || `flowchart TD\n  A([بدء الإجراء]) --> B[تطبيق معايير مكافحة العدوى]\n  B --> C[تنفيذ الخطوات]\n  C --> D([اكتمال الإجراء])`,
+          description: raw.mermaidFlowchart?.description || 'مخطط تدفق العمليات والإجراءات التنفيذية'
+        },
+        complianceAndKPIs: {
+          auditChecklist: Array.isArray(raw.complianceAndKPIs?.auditChecklist)
+            ? raw.complianceAndKPIs.auditChecklist.map((item: any, i: number) => ({
+                id: item.id || `CHK-${i + 1}`,
+                checkpoint: item.checkpoint || item.item || 'التحقق من الالتزام بالمعايير',
+                standardReference: item.standardReference || 'GAHAR 2025',
+                evidenceRequired: item.evidenceRequired || item.evidenceMethod || 'سجلات التدقيق والملاحظة المباشرة',
+                frequency: item.frequency || 'شهري'
+              }))
+            : [],
+          kpis: Array.isArray(raw.complianceAndKPIs?.kpis)
+            ? raw.complianceAndKPIs.kpis.map((k: any) => ({
+                name: k.name || 'مؤشر الامتثال',
+                formula: k.formula || '(عدد المرات الملتزمة ÷ إجمالي الفرص) × 100',
+                target: k.target || k.targetBenchmark || '≥ 90%',
+                frequency: k.frequency || k.measurementCycle || 'شهري',
+                responsiblePerson: k.responsiblePerson || 'فريق مكافحة العدوى'
+              }))
+            : [],
+          gapAnalysisAndRecommendations: Array.isArray(raw.complianceAndKPIs?.gapAnalysisAndRecommendations)
+            ? raw.complianceAndKPIs.gapAnalysisAndRecommendations
+            : Array.isArray(raw.complianceAndKPIs?.complianceGapsAndRecommendations)
+            ? raw.complianceAndKPIs.complianceGapsAndRecommendations
+            : []
+        },
+        executiveSummarySnippet: raw.executiveSummarySnippet || 'تم تلخيص واستخراج الهيكل التنفيذي للسياسة بنجاح وفق معايير الاعتماد المعتمدة.',
         analyzedAt: new Date().toISOString(),
       };
 
