@@ -17,6 +17,7 @@ import {
 import { PolicyAnalysisResult } from './types';
 import { PrintableReport } from './components/PrintableReport';
 import { A4FinalReviewDocument } from './components/A4FinalReviewDocument';
+import { GeminiStyleSummary } from './components/GeminiStyleSummary';
 import { LoginPage } from './components/LoginPage';
 
 export default function App() {
@@ -36,6 +37,7 @@ export default function App() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [analysisResult, setAnalysisResult] = useState<PolicyAnalysisResult | null>(null);
   const [copySuccess, setCopySuccess] = useState(false);
+  const [viewMode, setViewMode] = useState<'gemini' | 'a4'>('gemini');
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const resultsRef = useRef<HTMLDivElement | null>(null);
@@ -493,47 +495,56 @@ ${analysisResult.safetyWarningsAndCriticalSteps.emergencyIncidentProtocol}
               {isLoading ? (
                 <>
                   <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  <span>جاري تلخيص السياسة وتنسيق ورقة المراجعة النهائية A4...</span>
+                  <span>جاري تلخيص السياسة وتوليد ملخص الذكاء الاصطناعي الشامل...</span>
                 </>
               ) : (
                 <>
                   <Sparkles className="w-4 h-4 text-amber-300" />
-                  <span>تلخيص السياسة وتوليد ورقة المراجعة النهائية (A4)</span>
+                  <span>تلخيص السياسة بالذكاء الاصطناعي (مثل ChatGPT & Gemini Pro)</span>
                 </>
               )}
             </button>
           </div>
         </section>
 
-        {/* Results Section: Direct Formatted A4 Final Review Document */}
+        {/* Results Section: Direct Formatted A4 Final Review Document or Gemini Style Summary */}
         {analysisResult && (
           <div ref={resultsRef} className="space-y-4 pt-2">
-            {/* Minimal Clean Toolbar for A4 Document */}
-            <div className="bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-2xs flex flex-wrap items-center justify-between gap-3 no-print">
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-lg bg-blue-900 text-white flex items-center justify-center font-bold">
-                  <FileText className="w-4 h-4" />
-                </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <h2 className="text-sm sm:text-base font-bold text-slate-900 leading-tight">
-                      ورقة المراجعة النهائية المنسقة (A4 Executive Review)
-                    </h2>
-                    <span className="px-2 py-0.5 rounded bg-emerald-50 text-emerald-800 text-2xs font-bold border border-emerald-200">
-                      جاهزة للاعتماد والطباعة
-                    </span>
-                  </div>
-                  <p className="text-2xs text-slate-500 font-mono">
-                    كود الوثيقة: {analysisResult.policyCard.policyCode || 'IPC-POL-01'}
-                  </p>
-                </div>
+            {/* View Mode Switcher Header */}
+            <div className="bg-white p-3 sm:p-4 rounded-2xl border border-slate-200 shadow-2xs flex flex-wrap items-center justify-between gap-3 no-print">
+              {/* Tab Selector */}
+              <div className="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200">
+                <button
+                  onClick={() => setViewMode('gemini')}
+                  className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-bold transition ${
+                    viewMode === 'gemini'
+                      ? 'bg-blue-800 text-white shadow-xs'
+                      : 'text-slate-700 hover:text-slate-900'
+                  }`}
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                  <span>ملخص الذكاء الاصطناعي (ChatGPT & Gemini)</span>
+                </button>
+
+                <button
+                  onClick={() => setViewMode('a4')}
+                  className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-bold transition ${
+                    viewMode === 'a4'
+                      ? 'bg-blue-800 text-white shadow-xs'
+                      : 'text-slate-700 hover:text-slate-900'
+                  }`}
+                >
+                  <FileText className="w-3.5 h-3.5" />
+                  <span>وثيقة المراجعة المعتمدة (A4 Document)</span>
+                </button>
               </div>
 
-              {/* Action Buttons */}
+              {/* Quick Global Action Buttons */}
               <div className="flex items-center gap-2">
                 <button
                   onClick={handleCopySummary}
                   className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition border border-slate-200"
+                  title="نسخ ملخص السياسة"
                 >
                   {copySuccess ? <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
                   <span>{copySuccess ? 'تم النسخ' : 'نسخ الملخص'}</span>
@@ -552,15 +563,22 @@ ${analysisResult.safetyWarningsAndCriticalSteps.emergencyIncidentProtocol}
                   className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition shadow-sm hover:shadow active:scale-[0.98]"
                 >
                   <Printer className="w-4 h-4" />
-                  <span>طباعة / حفظ PDF (A4)</span>
+                  <span>طباعة / حفظ PDF</span>
                 </button>
               </div>
             </div>
 
-            {/* Direct A4 Paper Sheet Display */}
-            <div className="bg-slate-200/90 p-3 sm:p-8 rounded-2xl border border-slate-300 shadow-inner flex justify-center overflow-x-auto no-print">
-              <A4FinalReviewDocument data={analysisResult} isPrintOnly={false} />
-            </div>
+            {/* Active View Container */}
+            {viewMode === 'gemini' ? (
+              <GeminiStyleSummary
+                data={analysisResult}
+                onSwitchToA4={() => setViewMode('a4')}
+              />
+            ) : (
+              <div className="bg-slate-200/90 p-3 sm:p-8 rounded-2xl border border-slate-300 shadow-inner flex justify-center overflow-x-auto no-print">
+                <A4FinalReviewDocument data={analysisResult} isPrintOnly={false} />
+              </div>
+            )}
           </div>
         )}
       </main>

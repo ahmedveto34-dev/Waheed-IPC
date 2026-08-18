@@ -125,6 +125,12 @@ export interface PolicyAnalysisResult {
   mermaidFlowchart: MermaidFlowchart;
   complianceAndKPIs: ComplianceAndKPIs;
   executiveSummarySnippet: string;
+  markdownSummary?: string;
+  faqScenarios?: {
+    question: string;
+    answer: string;
+    clinicalRationale?: string;
+  }[];
   analyzedAt?: string;
 }
 
