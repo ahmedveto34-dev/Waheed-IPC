@@ -30,17 +30,30 @@
   background: #94a3b8;
 }
 
+/* On-screen A4 Paper Mockup */
+.a4-paper-sheet {
+  width: 100%;
+  max-width: 210mm;
+  min-height: 297mm;
+  background-color: #ffffff;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+  margin-left: auto;
+  margin-right: auto;
+  padding: 14mm 16mm;
+  box-sizing: border-box;
+}
+
 @media print {
   @page {
     size: A4 portrait;
-    margin: 12mm 15mm 15mm 15mm;
+    margin: 10mm 12mm 12mm 12mm;
   }
   
   html, body {
     background: white !important;
     color: #0f172a !important;
-    font-size: 11pt !important;
-    line-height: 1.5 !important;
+    font-size: 10pt !important;
+    line-height: 1.4 !important;
     width: 100% !important;
     margin: 0 !important;
     padding: 0 !important;
@@ -60,6 +73,13 @@
     margin: 0 !important;
   }
 
+  .a4-paper-sheet {
+    box-shadow: none !important;
+    padding: 0 !important;
+    max-width: 100% !important;
+    min-height: auto !important;
+  }
+
   .page-break {
     page-break-before: always !important;
     break-before: page !important;
@@ -70,4 +90,5 @@
     break-inside: avoid !important;
   }
 }
+
 

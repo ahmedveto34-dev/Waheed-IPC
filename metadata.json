@@ -1,6 +1,6 @@
 {
   "name": "محلل السياسات الطبية ومكافحة العدوى",
-  "description": "تحليل وتلخيص وثائق السياسات والإجراءات الطبية ومعايير الجودة والسلامة CBAHI / JCI / OSHA مع مخططات تدفق تفاعلية وقوائم تدقيق",
+  "description": "تحليل وتلخيص وثائق السياسات والإجراءات الطبية ومعايير الاعتماد GAHAR 2025 والدليل القومي وCBAHI وJCI مع ورقة المراجعة النهائية A4 ومخططات تفاعلية",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

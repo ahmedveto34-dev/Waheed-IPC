@@ -37,6 +37,8 @@ import { MermaidViewer } from './components/MermaidViewer';
 import { AuditAndKpisSection } from './components/AuditAndKpisSection';
 import { AskExpertModal } from './components/AskExpertModal';
 import { PrintableReport } from './components/PrintableReport';
+import { A4FinalReviewDocument } from './components/A4FinalReviewDocument';
+import { A4PreviewModal } from './components/A4PreviewModal';
 import { LoginPage } from './components/LoginPage';
 import { LogOut } from 'lucide-react';
 
@@ -58,6 +60,7 @@ export default function App() {
   const [analysisResult, setAnalysisResult] = useState<PolicyAnalysisResult | null>(null);
   const [activeSection, setActiveSection] = useState<string>('all');
   const [isExpertModalOpen, setIsExpertModalOpen] = useState(false);
+  const [isA4ModalOpen, setIsA4ModalOpen] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [copySuccess, setCopySuccess] = useState(false);
 
@@ -689,12 +692,21 @@ ${analysisResult.policyCard.alignedStandards.map((s) => `- ${s.standardBody}: ${
                   </button>
 
                   <button
-                    onClick={handlePrint}
+                    onClick={() => setIsA4ModalOpen(true)}
                     className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition shadow-xs"
-                    title="تصدير وثيقة السياسة A4 أو الطباعة المباشرة"
+                    title="معاينة وطباعة ورقة المراجعة النهائية المنسقة A4"
+                  >
+                    <FileText className="w-3.5 h-3.5" />
+                    <span>📄 ورقة المراجعة النهائية A4</span>
+                  </button>
+
+                  <button
+                    onClick={handlePrint}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-bold text-xs transition shadow-xs"
+                    title="الطباعة المباشرة لملف A4"
                   >
                     <Printer className="w-3.5 h-3.5" />
-                    <span>طباعة / تصدير A4</span>
+                    <span>طباعة سريعة</span>
                   </button>
 
                   <button
@@ -726,6 +738,7 @@ ${analysisResult.policyCard.alignedStandards.map((s) => `- ${s.standardBody}: ${
             <div className="sticky top-16 z-30 bg-white/95 backdrop-blur-md p-1.5 rounded-xl border border-slate-200 shadow-2xs flex items-center gap-1 overflow-x-auto">
               {[
                 { id: 'all', label: 'كافة الأقسام' },
+                { id: 'a4', label: '📄 ورقة المراجعة النهائية (A4)' },
                 { id: 'card', label: '1. بطاقة السياسة' },
                 { id: 'scope', label: '2. الهدف والنطاق' },
                 { id: 'roles', label: '3. الأدوار والمسؤوليات' },
@@ -750,6 +763,31 @@ ${analysisResult.policyCard.alignedStandards.map((s) => `- ${s.standardBody}: ${
 
             {/* Structured Sections Output */}
             <div className="space-y-5">
+              {/* Dedicated A4 Sheet View */}
+              {activeSection === 'a4' && (
+                <div className="bg-slate-200 p-4 sm:p-8 rounded-2xl border border-slate-300 shadow-inner flex flex-col items-center gap-4">
+                  <div className="w-full max-w-[210mm] flex items-center justify-between gap-2 bg-white/90 backdrop-blur-sm p-3 rounded-xl border border-slate-300 text-xs text-slate-700">
+                    <div className="flex items-center gap-2 font-bold text-slate-900">
+                      <FileText className="w-4 h-4 text-blue-700" />
+                      <span>معاينة ورقة المراجعة النهائية للسياسة (Standard A4 Review Document)</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={handlePrint}
+                        className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition shadow-xs flex items-center gap-1.5"
+                      >
+                        <Printer className="w-3.5 h-3.5" />
+                        <span>طباعة / حفظ PDF</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="w-full flex justify-center overflow-x-auto">
+                    <A4FinalReviewDocument data={analysisResult} isPrintOnly={false} />
+                  </div>
+                </div>
+              )}
+
               {/* Section 1: Policy Card */}
               {(activeSection === 'all' || activeSection === 'card') && (
                 <PolicyCardSection card={analysisResult.policyCard} />
@@ -810,6 +848,15 @@ ${analysisResult.policyCard.alignedStandards.map((s) => `- ${s.standardBody}: ${
           </div>
         </div>
       </footer>
+
+      {/* A4 Fullscreen / Preview Modal */}
+      {analysisResult && (
+        <A4PreviewModal
+          isOpen={isA4ModalOpen}
+          onClose={() => setIsA4ModalOpen(false)}
+          data={analysisResult}
+        />
+      )}
 
       {/* Ask Expert Consultation Modal */}
       {analysisResult && (
