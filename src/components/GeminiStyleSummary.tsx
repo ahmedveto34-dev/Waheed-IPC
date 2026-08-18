@@ -47,7 +47,7 @@ interface ChatMessage {
 }
 
 export function GeminiStyleSummary({ data, onSwitchToA4, onSwitchToDashboard }: GeminiStyleSummaryProps) {
-  const [activeTab, setActiveTab] = useState<'structured' | 'clinical_guide' | 'visual_infographics' | 'markdown' | 'interactive_chat'>('structured');
+  const [activeTab, setActiveTab] = useState<'unified' | 'clinical_guide' | 'structured' | 'visual_infographics' | 'markdown' | 'interactive_chat'>('unified');
   const [copied, setCopied] = useState(false);
   const [fontSize, setFontSize] = useState<'normal' | 'large' | 'xlarge'>('normal');
   
@@ -412,71 +412,168 @@ export function GeminiStyleSummary({ data, onSwitchToA4, onSwitchToDashboard }: 
         {/* View Mode Navigation Tabs */}
         <div className="flex items-center gap-2 mt-4 pt-4 border-t border-slate-800 overflow-x-auto">
           <button
-            onClick={() => setActiveTab('structured')}
+            onClick={() => setActiveTab('unified')}
             className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition shrink-0 ${
-              activeTab === 'structured'
-                ? 'bg-blue-600 text-white shadow-xs'
-                : 'bg-slate-800/60 text-slate-300 hover:bg-slate-800 hover:text-white'
+              activeTab === 'unified'
+                ? 'bg-gradient-to-r from-emerald-600 via-blue-600 to-indigo-600 text-white shadow-md'
+                : 'bg-slate-800/80 text-emerald-400 border border-emerald-500/30 hover:bg-slate-800 hover:text-white'
             }`}
           >
-            <Layers className="w-4 h-4" />
-            <span>العرض المنهجي للسياسة (كامل العناصر)</span>
+            <Sparkles className="w-4 h-4 text-amber-300 animate-pulse" />
+            <span>🌟 العرض الشامل الموحد (تجميع كل العناصر معاً في شاشة واحدة)</span>
           </button>
 
           <button
             onClick={() => setActiveTab('clinical_guide')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition shrink-0 ${
+            className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition shrink-0 ${
               activeTab === 'clinical_guide'
                 ? 'bg-emerald-600 text-white shadow-xs'
                 : 'bg-slate-800/60 text-slate-300 hover:bg-slate-800 hover:text-white'
             }`}
           >
             <Stethoscope className="w-4 h-4 text-emerald-300" />
-            <span>🩺 دليل ومراجعة الفريق الطبي والتمريض السريع</span>
+            <span>🩺 دليل الفريق الطبي والتمريض</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('structured')}
+            className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition shrink-0 ${
+              activeTab === 'structured'
+                ? 'bg-blue-600 text-white shadow-xs'
+                : 'bg-slate-800/60 text-slate-300 hover:bg-slate-800 hover:text-white'
+            }`}
+          >
+            <Layers className="w-4 h-4" />
+            <span>📋 العرض المنهجي للسياسة (100% العناصر)</span>
           </button>
 
           <button
             onClick={() => setActiveTab('visual_infographics')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition shrink-0 ${
+            className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition shrink-0 ${
               activeTab === 'visual_infographics'
-                ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-xs'
+                ? 'bg-indigo-600 text-white shadow-xs'
                 : 'bg-slate-800/60 text-slate-300 hover:bg-slate-800 hover:text-white'
             }`}
           >
-            <Sparkles className="w-4 h-4 text-amber-300" />
-            <span>المخططات التوضيحية والإنفوجرافيك الإكلينيكي (بالصور والرسوم)</span>
+            <ImageIcon className="w-4 h-4 text-sky-300" />
+            <span>🖼️ الإنفوجرافيك والرسوم المصورة</span>
           </button>
 
           <button
             onClick={() => setActiveTab('markdown')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition shrink-0 ${
+            className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition shrink-0 ${
               activeTab === 'markdown'
                 ? 'bg-blue-600 text-white shadow-xs'
                 : 'bg-slate-800/60 text-slate-300 hover:bg-slate-800 hover:text-white'
             }`}
           >
             <BookOpen className="w-4 h-4" />
-            <span>عرض السرد الكامل (ChatGPT & Markdown View)</span>
+            <span>📝 السرد الكامل (Markdown)</span>
           </button>
 
           <button
             onClick={() => setActiveTab('interactive_chat')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition shrink-0 ${
+            className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition shrink-0 ${
               activeTab === 'interactive_chat'
                 ? 'bg-indigo-600 text-white shadow-xs'
                 : 'bg-slate-800/60 text-slate-300 hover:bg-slate-800 hover:text-white'
             }`}
           >
             <Sparkles className="w-4 h-4 text-amber-300" />
-            <span>المساعد الإكلينيكي الذكي والأسئلة (AI Q&A)</span>
+            <span>💬 المستشار الذكي (AI Q&A)</span>
           </button>
         </div>
       </div>
 
       {/* ========================================================================= */}
+      {/* 🌟 UNIFIED MASTER VIEW: ALL ELEMENTS COMBINED INTO ONE SINGLE FLOW        */}
+      {/* ========================================================================= */}
+      {activeTab === 'unified' && (
+        <div className="space-y-8">
+          {/* Quick Floating / Sticky Navigation Bar for the Unified View */}
+          <div className="bg-slate-900/95 backdrop-blur-md sticky top-16 z-30 p-3 rounded-2xl border border-slate-700/80 shadow-lg flex flex-wrap items-center justify-between gap-3 text-xs text-white">
+            <div className="flex items-center gap-2 text-amber-300 font-bold text-xs shrink-0">
+              <Sparkles className="w-4 h-4 animate-pulse" />
+              <span>فهرس الانتقال السريع للأقسام المجمعة:</span>
+            </div>
+            <div className="flex flex-wrap items-center gap-1.5 shrink-0">
+              <button
+                onClick={() => document.getElementById('unified-clinical-guide')?.scrollIntoView({ behavior: 'smooth' })}
+                className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-emerald-600 transition text-emerald-300 hover:text-white text-2xs font-bold flex items-center gap-1 cursor-pointer"
+              >
+                <Stethoscope className="w-3.5 h-3.5" />
+                <span>1. دليل ومراجعة الفريق الطبي</span>
+              </button>
+              <button
+                onClick={() => document.getElementById('unified-structured-policy')?.scrollIntoView({ behavior: 'smooth' })}
+                className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-blue-600 transition text-blue-300 hover:text-white text-2xs font-bold flex items-center gap-1 cursor-pointer"
+              >
+                <Layers className="w-3.5 h-3.5" />
+                <span>2. العرض المنهجي الشامل (100%)</span>
+              </button>
+              <button
+                onClick={() => document.getElementById('unified-visual-illustrations')?.scrollIntoView({ behavior: 'smooth' })}
+                className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-indigo-600 transition text-indigo-300 hover:text-white text-2xs font-bold flex items-center gap-1 cursor-pointer"
+              >
+                <ImageIcon className="w-3.5 h-3.5" />
+                <span>3. الرسوم والإنفوجرافيك المصور</span>
+              </button>
+              <button
+                onClick={() => document.getElementById('unified-markdown-summary')?.scrollIntoView({ behavior: 'smooth' })}
+                className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-blue-600 transition text-slate-200 hover:text-white text-2xs font-bold flex items-center gap-1 cursor-pointer"
+              >
+                <BookOpen className="w-3.5 h-3.5" />
+                <span>4. السرد المقالي المعتمد</span>
+              </button>
+              <button
+                onClick={() => document.getElementById('unified-chat-advisor')?.scrollIntoView({ behavior: 'smooth' })}
+                className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-amber-600 transition text-amber-300 hover:text-white text-2xs font-bold flex items-center gap-1 cursor-pointer"
+              >
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>5. المستشار الذكي (AI)</span>
+              </button>
+            </div>
+          </div>
+
+          {/* SECTION 1: CLINICAL GUIDE */}
+          <div id="unified-clinical-guide" className="space-y-4 pt-2">
+            <div className="flex items-center justify-between bg-gradient-to-r from-emerald-950 via-teal-900 to-slate-900 text-white p-4 rounded-2xl shadow-xs border border-emerald-700/50">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-xl bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center text-emerald-300">
+                  <Stethoscope className="w-5 h-5" />
+                </div>
+                <div>
+                  <h2 className="text-sm sm:text-base font-bold text-white">القسم الأول: دليل ومراجعة الفريق الطبي وهيئة التمريض الإكلينيكي السريع</h2>
+                  <p className="text-2xs text-emerald-200">شجرة اتخاذ القرار السريع، مصفوفات المهام، والسيناريوهات الإكلينيكية اليومية</p>
+                </div>
+              </div>
+              <span className="text-2xs bg-emerald-700/60 text-emerald-100 px-2.5 py-1 rounded-full font-mono font-bold">1 / 5</span>
+            </div>
+            <ClinicalTeamPolicyGuide data={data} />
+          </div>
+
+          {/* SECTION 2: STRUCTURED MASTER POLICY HEADER */}
+          <div id="unified-structured-policy" className="space-y-4 pt-6 border-t-2 border-dashed border-slate-200">
+            <div className="flex items-center justify-between bg-gradient-to-r from-blue-950 via-slate-900 to-indigo-950 text-white p-4 rounded-2xl shadow-xs border border-blue-700/50">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-xl bg-blue-500/20 border border-blue-400/40 flex items-center justify-center text-blue-300">
+                  <Layers className="w-5 h-5" />
+                </div>
+                <div>
+                  <h2 className="text-sm sm:text-base font-bold text-white">القسم الثاني: العرض المنهجي التحليلي الكامل لعناصر السياسة (تغطية 100% لكافة البنود)</h2>
+                  <p className="text-2xs text-blue-200">الأهداف الثلاثة، جدول المطهرات الكيميائية، اللحظات الخمس، إجراءات التشغيل الـ 4، والمحظورات الـ 7 ومؤشرات الأداء</p>
+                </div>
+              </div>
+              <span className="text-2xs bg-blue-700/60 text-blue-100 px-2.5 py-1 rounded-full font-mono font-bold">2 / 5</span>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
       {/* TAB 1: STRUCTURED EXECUTIVE VIEW WITH ALL 15 ELEMENTS                     */}
       {/* ========================================================================= */}
-      {activeTab === 'structured' && (
+      {(activeTab === 'structured' || activeTab === 'unified') && (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           <div className="lg:col-span-8 space-y-6">
 
@@ -984,7 +1081,198 @@ export function GeminiStyleSummary({ data, onSwitchToA4, onSwitchToDashboard }: 
       )}
 
       {/* ========================================================================= */}
-      {/* TAB 2: CLINICAL TEAM FAST REFERENCE & DECISION PATHWAY GUIDE              */}
+      {/* SECTIONS 3, 4, 5 FOR UNIFIED MODE                                         */}
+      {/* ========================================================================= */}
+      {activeTab === 'unified' && (
+        <div className="space-y-8">
+          {/* SECTION 3: VISUAL ILLUSTRATIONS & INFOGRAPHICS */}
+          <div id="unified-visual-illustrations" className="space-y-4 pt-6 border-t-2 border-dashed border-slate-200">
+            <div className="flex items-center justify-between bg-gradient-to-r from-indigo-950 via-slate-900 to-blue-950 text-white p-4 rounded-2xl shadow-xs border border-indigo-700/50">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-xl bg-indigo-500/20 border border-indigo-400/40 flex items-center justify-center text-indigo-300">
+                  <ImageIcon className="w-5 h-5" />
+                </div>
+                <div>
+                  <h2 className="text-sm sm:text-base font-bold text-white">القسم الثالث: المخططات والرسوم الإكلينيكية المصورة لخطوات الغسيل والدلك والتطهير</h2>
+                  <p className="text-2xs text-indigo-200">رسومات الخطوات بالتفصيل وأماكن التركيز وأزمنة التلامس ومصفوفة خلو الساعدين</p>
+                </div>
+              </div>
+              <span className="text-2xs bg-indigo-700/60 text-indigo-100 px-2.5 py-1 rounded-full font-mono font-bold">3 / 5</span>
+            </div>
+            <HandHygieneVisualIllustrations />
+          </div>
+
+          {/* SECTION 4: FULL MARKDOWN NARRATIVE SUMMARY */}
+          <div id="unified-markdown-summary" className="space-y-4 pt-6 border-t-2 border-dashed border-slate-200">
+            <div className="flex items-center justify-between bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 text-white p-4 rounded-2xl shadow-xs border border-slate-700">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-xl bg-amber-500/20 border border-amber-400/40 flex items-center justify-center text-amber-300">
+                  <BookOpen className="w-5 h-5" />
+                </div>
+                <div>
+                  <h2 className="text-sm sm:text-base font-bold text-white">القسم الرابع: السرد المقالي التلخيصي الشامل المعتمد (Full Markdown Narrative)</h2>
+                  <p className="text-2xs text-slate-300">نص متصل ومنسق بالكامل لسهولة القراءة أو النسخ والطباعة السريعة</p>
+                </div>
+              </div>
+              <span className="text-2xs bg-slate-700 text-slate-200 px-2.5 py-1 rounded-full font-mono font-bold">4 / 5</span>
+            </div>
+            
+            <div className="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200 shadow-xs space-y-6">
+              <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-4">
+                <div>
+                  <h3 className="text-lg font-bold text-slate-900">
+                    السرد التلخيصي الشامل الكامل (ChatGPT & Gemini Markdown)
+                  </h3>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    تنسيق مقالي غني ومنظم يشمل كافة الجداول، البنود، والتوجيهات المعتمدة
+                  </p>
+                </div>
+                <button
+                  onClick={handleCopy}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-50 text-blue-800 border border-blue-200 text-xs font-bold hover:bg-blue-100 transition cursor-pointer"
+                >
+                  {copied ? <CheckCircle2 className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4" />}
+                  <span>{copied ? 'تم النسخ' : 'نسخ النص'}</span>
+                </button>
+              </div>
+
+              <div className={`prose max-w-none text-slate-800 ${fontSizeClass}`}>
+                <div className="space-y-4 markdown-rendered">
+                  <Markdown>{fullMarkdownSummary}</Markdown>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* SECTION 5: INTERACTIVE AI CHAT ADVISOR */}
+          <div id="unified-chat-advisor" className="space-y-4 pt-6 border-t-2 border-dashed border-slate-200">
+            <div className="flex items-center justify-between bg-gradient-to-r from-indigo-950 via-slate-900 to-indigo-900 text-white p-4 rounded-2xl shadow-xs border border-indigo-700/50">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-xl bg-amber-500/20 border border-amber-400/40 flex items-center justify-center text-amber-300">
+                  <Sparkles className="w-5 h-5" />
+                </div>
+                <div>
+                  <h2 className="text-sm sm:text-base font-bold text-white">القسم الخامس: المستشار الإكلينيكي الذكي والأسئلة التفاعلية (Interactive Policy AI Advisor)</h2>
+                  <p className="text-2xs text-indigo-200">استفسر عن أي معيار أو سيناريو تفتيش أو طلب اختبار سريع للكادر الطبي</p>
+                </div>
+              </div>
+              <span className="text-2xs bg-indigo-800 text-indigo-100 px-2.5 py-1 rounded-full font-mono font-bold">5 / 5</span>
+            </div>
+            
+            {/* Embedded Chat Box */}
+            <div className="bg-white rounded-2xl border border-slate-200 shadow-xs flex flex-col h-[700px] overflow-hidden">
+              <div className="p-4 bg-gradient-to-r from-blue-900 to-indigo-900 text-white flex items-center justify-between">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-xl bg-blue-500 flex items-center justify-center text-white shadow-sm">
+                    <Sparkles className="w-4 h-4 text-amber-300" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-xs sm:text-sm text-white leading-tight">
+                      مستشار السياسات والاعتماد الذكي (Gemini Policy AI)
+                    </h3>
+                    <p className="text-2xs text-blue-200">
+                      اطرح أي سؤال حول بنود السياسة، معايير جهار 2025، وسيناريوهات التفتيش الميداني
+                    </p>
+                  </div>
+                </div>
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping" title="متصل وجاهز" />
+              </div>
+
+              {/* Quick Prompt Suggestions */}
+              <div className="p-3 bg-slate-50 border-b border-slate-200 overflow-x-auto space-y-1.5">
+                <span className="text-2xs font-bold text-slate-500 block">أسئلة مقترحة سريعة:</span>
+                <div className="flex flex-wrap gap-1.5">
+                  {suggestedPrompts.map((prompt, i) => (
+                    <button
+                      key={i}
+                      onClick={() => handleSendMessage(prompt)}
+                      disabled={isChatLoading}
+                      className="text-right text-2xs px-2.5 py-1.5 rounded-lg bg-white hover:bg-blue-50 hover:text-blue-800 text-slate-700 border border-slate-200 transition font-medium cursor-pointer"
+                    >
+                      {prompt}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Chat Message List */}
+              <div className="flex-1 p-4 overflow-y-auto space-y-3 text-xs bg-slate-100/50">
+                {chatMessages.map((msg) => (
+                  <div
+                    key={msg.id}
+                    className={`flex flex-col ${msg.sender === 'user' ? 'items-end' : 'items-start'}`}
+                  >
+                    <div
+                      className={`max-w-[85%] p-3.5 rounded-2xl ${
+                        msg.sender === 'user'
+                          ? 'bg-blue-800 text-white rounded-br-none shadow-xs'
+                          : 'bg-white text-slate-800 rounded-bl-none border border-slate-200 shadow-xs'
+                      }`}
+                    >
+                      {msg.sender === 'gemini' ? (
+                        <div className="space-y-1.5 leading-relaxed">
+                          <div className="flex items-center gap-1.5 text-2xs text-blue-700 font-bold mb-1 pb-1 border-b border-slate-100">
+                            <Sparkles className="w-3 h-3 text-amber-500" />
+                            <span>Gemini Policy Advisor:</span>
+                          </div>
+                          <div className="whitespace-pre-line text-xs">
+                            {msg.text}
+                          </div>
+                        </div>
+                      ) : (
+                        <p className="whitespace-pre-line text-xs">{msg.text}</p>
+                      )}
+                    </div>
+                    <span className="text-3xs text-slate-400 mt-1 px-1">{msg.timestamp}</span>
+                  </div>
+                ))}
+
+                {isChatLoading && (
+                  <div className="flex items-start gap-2">
+                    <div className="p-3 rounded-2xl bg-white border border-slate-200 rounded-bl-none text-slate-500 text-xs flex items-center gap-2">
+                      <div className="w-3 h-3 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
+                      <span>جاري صياغة الإجابة الإكلينيكية من Gemini...</span>
+                    </div>
+                  </div>
+                )}
+
+                <div ref={chatEndRef} />
+              </div>
+
+              {/* Chat Input Form */}
+              <div className="p-3 bg-white border-t border-slate-200">
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    handleSendMessage();
+                  }}
+                  className="flex items-center gap-2"
+                >
+                  <input
+                    type="text"
+                    value={chatInput}
+                    onChange={(e) => setChatInput(e.target.value)}
+                    placeholder="اكتب استفسارك حول السياسة أو معايير جهار 2025..."
+                    disabled={isChatLoading}
+                    className="flex-1 p-2.5 text-xs rounded-xl border border-slate-200 focus:outline-none focus:border-blue-800 focus:ring-1 focus:ring-blue-100 bg-slate-50"
+                  />
+                  <button
+                    type="submit"
+                    disabled={!chatInput.trim() || isChatLoading}
+                    className="p-2.5 rounded-xl bg-blue-800 hover:bg-blue-900 disabled:opacity-40 text-white transition shadow-xs cursor-pointer"
+                    title="إرسال السؤال"
+                  >
+                    <Send className="w-4 h-4" />
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* INDIVIDUAL TAB VIEWS (When a specific isolated tab is clicked)            */}
       {/* ========================================================================= */}
       {activeTab === 'clinical_guide' && (
         <div className="space-y-6">
@@ -992,9 +1280,6 @@ export function GeminiStyleSummary({ data, onSwitchToA4, onSwitchToDashboard }: 
         </div>
       )}
 
-      {/* ========================================================================= */}
-      {/* TAB 3: CLINICAL INFOGRAPHICS & VISUAL ILLUSTRATIONS (بالصور والرسوم)     */}
-      {/* ========================================================================= */}
       {activeTab === 'visual_infographics' && (
         <div className="space-y-6">
           <HandHygieneVisualIllustrations />
