@@ -4,7 +4,10 @@ import { createServer as createViteServer } from "vite";
 import { GoogleGenAI, Type } from "@google/genai";
 import dotenv from "dotenv";
 import mammoth from "mammoth";
+import * as pdfParseModule from "pdf-parse";
 import { generateFallbackAnalysis } from "./server/fallback.js";
+
+const pdfParse: any = (pdfParseModule as any).default || pdfParseModule;
 
 dotenv.config();
 
@@ -66,6 +69,21 @@ app.post("/api/analyze-policy", async (req, res) => {
     return res.status(400).json({ error: "يرجى تزويد نص السياسة أو رفع وثيقة السياسة (PDF / Word / صورة) المطلوب تلخيصها." });
   }
 
+  // Handle PDF extraction via pdf-parse
+  if (fileData && mimeType && (mimeType === "application/pdf" || mimeType.includes("pdf"))) {
+    try {
+      console.log("Extracting text from uploaded PDF document using pdf-parse...");
+      const buffer = Buffer.from(fileData, "base64");
+      const pdfData = await pdfParse(buffer);
+      if (pdfData && pdfData.text && pdfData.text.trim().length > 30) {
+        content = (content ? content + "\n\n" : "") + pdfData.text.trim();
+        console.log(`Successfully extracted ${pdfData.text.length} characters and ${pdfData.numpages} pages from PDF.`);
+      }
+    } catch (pdfErr) {
+      console.warn("Failed to extract PDF text with pdf-parse, passing raw base64 to Gemini:", pdfErr);
+    }
+  }
+
   // Handle Word Documents (.docx / .doc) by extracting raw text using mammoth
   if (fileData && mimeType && (mimeType.includes("wordprocessingml") || mimeType.includes("msword") || mimeType.includes("docx") || mimeType.includes("doc") || mimeType === "application/octet-stream")) {
     try {
@@ -107,14 +125,14 @@ app.post("/api/analyze-policy", async (req, res) => {
   }
 
   try {
-    const systemPrompt = `أنت خبير واستشاري معتمد في مراجعة وتلخيص وتنظيم سياسات وإجراءات الرعاية الصحية والمستشفيات والجودة والاعتماد الطبي (GAHAR 2025 / CBAHI / JCI / OSH).
+    const systemPrompt = `أنت خبير واستشاري معتمد أول في مراجعة وتلخيص وتنظيم سياسات وإجراءات الرعاية الصحية والمستشفيات والجودة والاعتماد الطبي (GAHAR 2025 / CBAHI / JCI / OSHA / CDC).
 
 مهمتك الأساسية والأكيدة:
-1. اقرأ وثيقة السياسة المرفقة كاملةً بكل دقة وأمانة (سواء كانت 5 صفحات أو 11 صفحة أو 50 صفحة) أياً كان موضوعها ومجالها.
-2. قم بتلخيص وتنظيم السياسة بالكامل في وثيقة ملخصة شاملة وواضحة ومنسقة بنظام (Organized & Comprehensive Policy Summary) يعكس محتوى الوثيقة الحقيقي 100% دون أي اختلاق لبيانات وهمية ودون فرض قوالب خارج نص الوثيقة.
+1. اقرأ واستوعب وثيقة السياسة المرفقة بالكامل أياً كان موضوعها ومجالها الطبي أو الإداري أو الفني.
+2. قم بتلخيص وتنظيم السياسة بالكامل في وثيقة ملخصة شاملة ومحترفة ومنسقة تعكس محتوى الوثيقة الحقيقي 100% دون أي اختلاق لبيانات وهمية ودون فرض قوالب خارج نص الوثيقة.
 3. التلخيص في حقل (markdownSummary):
-   - يجب أن يكون وافياً، مفصلاً، ومستوعباً لكافة أقسام السياسة كما وردت في الوثيقة الأصلية (العنوان والكود، الغرض والمبررات، النطاق والتطبيق، التعريفات والمصطلحات، خطوات العمل القياسية المفصلة SOPs، مصفوفة المسؤوليات وتوزيع الأدوار، المحظورات ونقاط التحكم الحرجة، الجداول والمواصفات، النماذج ومؤشرات المتابعة والتدقيق).
-   - استخدم تنسيق Markdown الغني: جداول منظمة، نقاط متسلسلة، خطوط بارزة، واقتباسات تنبيهية واضحة.
+   - يجب أن يكون وافياً، مفصلاً، ومستوعباً لكافة أقسام السياسة كما وردت في الوثيقة الأصلية (العنوان والكود، الغرض والمبررات الإكلينيكية، النطاق والتطبيق، التعريفات والمصطلحات، خطوات العمل القياسية المفصلة SOPs، مصفوفة المسؤوليات وتوزيع الأدوار، المحظورات ونقاط التحكم الحرجة، الجداول والمواصفات، النماذج ومؤشرات المتابعة والتدقيق).
+   - استخدم تنسيق Markdown الغني: جداول منظمة، نقاط متسلسلة، خطوط بارزة، واقتباسات تنبيهية وإرشادات واضحة.
 4. املأ باقي الحقول الهيكلية المستخرجة بدقة من صلب الوثيقة لخدمة البحث والتصدير.`;
 
     const parts: any[] = [];
@@ -320,7 +338,7 @@ app.post("/api/analyze-policy", async (req, res) => {
     };
 
     // Candidate model strategy with automatic failover for high-demand spikes (503 / 429)
-    const candidateModels = ["gemini-2.5-flash", "gemini-3.7-flash", "gemini-flash-latest"];
+    const candidateModels = ["gemini-3.7-flash", "gemini-flash-latest"];
     let lastError: any = null;
     let rawOutput = "";
 
@@ -363,20 +381,25 @@ app.post("/api/analyze-policy", async (req, res) => {
     if (content && content.trim().length > 50) {
       try {
         console.warn("Building extractive summary from user text after API failure...");
-        const lines = content.split("\n").filter((l: string) => l.trim().length > 0);
-        const titleLine = lines[0] || "ملخص وثيقة السياسة";
+        const lines = content.split("\n").map((l: string) => l.trim()).filter(Boolean);
+        const titleLine = lines[0] || "ملخص وثيقة السياسة والإجراءات";
         
         const fallbackExtracted = {
           policyCard: {
-            titleArabic: titleLine.replace(/^#+\s*/, "").slice(0, 80),
+            titleArabic: titleLine.replace(/^[#*\-:\s]+/, "").slice(0, 100),
             domain: "السياسات والإجراءات الطبية المعتمدة",
-            departments: ["الأقسام ذات الصلة"],
+            departments: ["الأقسام ذات الصلة والمعنية بالتطبيق"],
             effectiveDate: "2025/2026",
             reviewCycle: "سنوي",
-            alignedStandards: [{ standardBody: "معايير الاعتماد والجودة", description: "التطبيق الإكلينيكي المعتمد" }]
+            alignedStandards: [{ standardBody: standardFocus || "معايير الجودة والاعتماد الصحي (GAHAR 2025)", description: "التطبيق المعتمد" }]
           },
-          executiveSummarySnippet: lines.slice(0, 5).join(" ").slice(0, 350) + "...",
-          markdownSummary: `# ${titleLine}\n\n## 📄 محتوى السياسة المنظم المستخرج\n\n` + content.slice(0, 4000)
+          purposeAndScope: {
+            mainObjective: lines.slice(1, 4).join(" ").slice(0, 250),
+            clinicalRationale: "ضمان سلامة المرضى وتوحيد المعايير الإكلينيكية والتشغيلية.",
+            scope: ["كافة الممارسين والكوادر المعنية بالسياسة"]
+          },
+          executiveSummarySnippet: lines.slice(0, 6).join(" ").slice(0, 400),
+          markdownSummary: `# ${titleLine}\n\n## 📄 محتوى السياسة المنظم والمستخرج من الوثيقة\n\n` + content
         };
 
         return res.json({ 
