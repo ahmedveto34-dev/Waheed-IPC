@@ -443,16 +443,15 @@ export function GeminiStyleSummary({ data, onSwitchToA4 }: GeminiStyleSummaryPro
 
           <div className="flex items-center gap-1.5 overflow-x-auto py-0.5">
             {[
-              { id: 'sec-executive', label: '1. الملخص التنفيذي' },
-              ...(data.markdownSummary ? [{ id: 'sec-markdown', label: '2. نص الوثيقة الكامل' }] : []),
-              { id: 'sec-purpose', label: '3. الأهداف والنطاق' },
-              ...(definitions.length > 0 ? [{ id: 'sec-definitions', label: '4. التعريفات' }] : []),
-              ...(techSpecs.length > 0 ? [{ id: 'sec-tech', label: '5. المواصفات الفنية' }] : []),
-              { id: 'sec-sops', label: '6. خطوات العمل (SOPs)' },
-              { id: 'sec-safety', label: '7. المحظورات والخطوط الحمراء' },
-              ...(roles.length > 0 ? [{ id: 'sec-roles', label: '8. مصفوفة المسؤوليات' }] : []),
-              { id: 'sec-kpis', label: '9. مؤشرات الأداء والتدقيق' },
-              { id: 'sec-faqs', label: '10. أسئلة المراجعة السريعة' },
+              { id: 'sec-markdown', label: '📄 نص وتنظيم السياسة الكامل' },
+              { id: 'sec-executive', label: '💡 الملخص التنفيذي' },
+              ...(definitions.length > 0 ? [{ id: 'sec-definitions', label: '📖 التعريفات' }] : []),
+              ...(techSpecs.length > 0 ? [{ id: 'sec-tech', label: '🔬 المواصفات الفنية' }] : []),
+              ...(sop.execution?.length > 0 ? [{ id: 'sec-sops', label: '⚙️ خطوات العمل (SOPs)' }] : []),
+              { id: 'sec-safety', label: '⚠️ المحظورات ونقاط الأمان' },
+              ...(roles.length > 0 ? [{ id: 'sec-roles', label: '👥 المسؤوليات' }] : []),
+              ...(kpiItems.length > 0 || auditItems.length > 0 ? [{ id: 'sec-kpis', label: '📊 مؤشرات الأداء والتدقيق' }] : []),
+              ...(dynamicFaqs.length > 0 ? [{ id: 'sec-faqs', label: '❓ أسئلة المراجعة' }] : []),
               { id: 'sec-advisor', label: '💬 المستشار الذكي' }
             ].map(item => (
               <button
@@ -491,17 +490,41 @@ export function GeminiStyleSummary({ data, onSwitchToA4 }: GeminiStyleSummaryPro
           </div>
         </div>
 
-        {/* ================= 2. SECTION: EXECUTIVE SUMMARY & STRATEGIC HIGHLIGHTS ================= */}
+        {/* ================= 2. SECTION: FULL NATURAL POLICY DOCUMENT & SUMMARY (كما هي بدون قيود) ================= */}
+        {data.markdownSummary ? (
+          <div id="sec-markdown" className="p-6 sm:p-8 space-y-5 bg-white">
+            <div className="flex items-center justify-between border-b border-slate-200 pb-3">
+              <div className="flex items-center gap-2.5 text-slate-900 font-bold text-base sm:text-lg">
+                <div className="w-8 h-8 rounded-xl bg-blue-50 text-blue-800 flex items-center justify-center font-bold">
+                  <FileText className="w-4 h-4" />
+                </div>
+                <h2>نص وتنظيم السياسة الكامل كما وردت في الوثيقة</h2>
+              </div>
+              <span className="text-2xs font-bold bg-emerald-50 text-emerald-800 px-3 py-1 rounded-full border border-emerald-200">
+                ✨ ملخص وتنظيم كامل دون أي حذف
+              </span>
+            </div>
+
+            {/* Rendered Markdown Container with Custom High-Contrast Styling */}
+            <div className="p-5 sm:p-7 rounded-2xl bg-slate-50/70 border border-slate-200 prose prose-slate max-w-none prose-headings:font-black prose-headings:text-slate-900 prose-h1:text-xl prose-h2:text-lg prose-h3:text-base prose-p:text-xs sm:prose-p:text-sm prose-p:leading-relaxed prose-table:text-xs prose-th:bg-slate-800 prose-th:text-white prose-th:p-2.5 prose-td:p-2.5 prose-td:border prose-td:border-slate-200">
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                {data.markdownSummary}
+              </ReactMarkdown>
+            </div>
+          </div>
+        ) : null}
+
+        {/* ================= 3. SECTION: EXECUTIVE SUMMARY & STRATEGIC HIGHLIGHTS ================= */}
         <div id="sec-executive" className="p-6 sm:p-8 space-y-5 bg-gradient-to-b from-amber-50/40 via-white to-white">
           <div className="flex items-center justify-between border-b border-amber-200/80 pb-3">
             <div className="flex items-center gap-2.5 text-slate-950 font-black text-base sm:text-lg">
               <div className="w-8 h-8 rounded-xl bg-amber-500 text-slate-950 flex items-center justify-center font-bold shadow-xs">
                 <Sparkles className="w-4 h-4" />
               </div>
-              <h2>1. الملخص التنفيذي والاستراتيجي للسياسة (Executive Summary)</h2>
+              <h2>الملخص التنفيذي المركز (Executive Summary)</h2>
             </div>
             <span className="text-2xs font-bold bg-amber-100 text-amber-900 px-3 py-1 rounded-full border border-amber-300">
-              الملخص العلمي المعتمد
+              أبرز النقاط الجوهرية
             </span>
           </div>
 
@@ -536,7 +559,7 @@ export function GeminiStyleSummary({ data, onSwitchToA4 }: GeminiStyleSummaryPro
 
             <div className="p-4 rounded-2xl bg-rose-50/90 border border-rose-300 space-y-2">
               <strong className="text-rose-950 font-black text-xs flex items-center gap-1.5">
-                <span>🚫</span> الخطوط الحمراء الصارمة:
+                <span>🚫</span> الخطوط الحمراء والمحظورات:
               </strong>
               <p className="text-rose-900 text-2xs leading-relaxed font-medium">
                 {dontsList.length > 0 
@@ -557,30 +580,6 @@ export function GeminiStyleSummary({ data, onSwitchToA4 }: GeminiStyleSummaryPro
             </div>
           </div>
         </div>
-
-        {/* ================= 3. SECTION: FULL UNTRUNCATED MARKDOWN SUMMARY ================= */}
-        {data.markdownSummary && (
-          <div id="sec-markdown" className="p-6 sm:p-8 space-y-5 bg-white">
-            <div className="flex items-center justify-between border-b border-slate-200 pb-3">
-              <div className="flex items-center gap-2.5 text-slate-900 font-bold text-base sm:text-lg">
-                <div className="w-8 h-8 rounded-xl bg-blue-50 text-blue-800 flex items-center justify-center font-bold">
-                  <FileText className="w-4 h-4" />
-                </div>
-                <h2>2. تفريغ وتنسيق نص وثيقة السياسة الكاملة (Full Markdown Document)</h2>
-              </div>
-              <span className="text-2xs font-bold bg-emerald-50 text-emerald-800 px-3 py-1 rounded-full border border-emerald-200">
-                ✨ شامل كافة الجداول والبنود دون حذف
-              </span>
-            </div>
-
-            {/* Rendered Markdown Container with Custom High-Contrast Styling */}
-            <div className="p-5 sm:p-7 rounded-2xl bg-slate-50/70 border border-slate-200 prose prose-slate max-w-none prose-headings:font-black prose-headings:text-slate-900 prose-h1:text-xl prose-h2:text-lg prose-h3:text-base prose-p:text-xs sm:prose-p:text-sm prose-p:leading-relaxed prose-table:text-xs prose-th:bg-slate-800 prose-th:text-white prose-th:p-2.5 prose-td:p-2.5 prose-td:border prose-td:border-slate-200">
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                {data.markdownSummary}
-              </ReactMarkdown>
-            </div>
-          </div>
-        )}
 
         {/* ================= 4. SECTION: PURPOSE, RATIONALE & SCOPE ================= */}
         <div id="sec-purpose" className="p-6 sm:p-8 space-y-5 bg-slate-50/40">
