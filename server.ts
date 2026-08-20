@@ -107,18 +107,15 @@ app.post("/api/analyze-policy", async (req, res) => {
   }
 
   try {
-    const systemPrompt = `أنت خبير واستشاري متميز في تحليل وتلخيص وتنظيم سياسات وإجراءات الرعاية الصحية ومكافحة العدوى والجودة الصحية (GAHAR 2025 / CBAHI / JCI).
+    const systemPrompt = `أنت خبير واستشاري معتمد في مراجعة وتلخيص وتنظيم سياسات وإجراءات الرعاية الصحية والمستشفيات والجودة والاعتماد الطبي (GAHAR 2025 / CBAHI / JCI / OSH).
 
-المهمة الأساسية:
-- تلخيص وتنظيم وثيقة السياسة كما هي تماماً وفق محتواها الحقيقي، وأقسامها، وعناوينها، وتسلسلها الطبيعي دون فرض ترتيب مصطنع أو تقيد بقوالب جامدة لا تتناسب مع نص الوثيقة.
-- استخراج وتلخيص جميع البنود، التفاصيل، الشروط، الجداول، المسؤوليات، والخطوات الموجودة في الوثيقة بأمانة تامة وبأسلوب علمي واضح ومنسق، دون أي بتر أو اختصار مخل.
-
-القواعد الحاكمة:
-1. التلخيص الطبيعي للسياسة (Natural & Faithful Summary):
-   - في حقل (markdownSummary): قم بكتابة التلخيص الكامل والمنظم للسياسة تماماً كما وردت في الوثيقة الأصلية، محتفظاً بأقسامها وترتيبها ومنطقها (كالترويسة، الغرض، النطاق، التعريفات، الخطوات التنفيذية، المسؤوليات، الموانع، النماذج، ومؤشرات المتابعة حسب ورودها في الوثيقة الأصلية). استخدم الجداول، النقاط، والخطوط البارزة لتوضيح المحتوى بجمالية واحترافية.
-   - في حقل (executiveSummarySnippet): قدم ملخصاً تنفيذياً مركّزاً وواضحاً لجوهر السياسة وأهم ما يجب على الممارس والمدقق معرفته.
-2. استخراج الحقول الإضافية بمرونة وواقعية:
-   - قم بملء الحقول الهيكلية (policyCard, purposeAndScope, scientificDefinitions, technicalSpecifications, rolesAndResponsibilities, sopPhases, safetyWarningsAndCriticalSteps, complianceAndKPIs) بما يتطابق بصدق مع محتوى الوثيقة الأصلية لخدمة التصدير والبحث. إذا لم تحتوِ الوثيقة على أحد هذه العناصر، استخرج ما يقابلها بدقة من السياق دون اختلاق بيانات وهمية.`;
+مهمتك الأساسية والأكيدة:
+1. اقرأ وثيقة السياسة المرفقة كاملةً بكل دقة وأمانة (سواء كانت 5 صفحات أو 11 صفحة أو 50 صفحة) أياً كان موضوعها ومجالها.
+2. قم بتلخيص وتنظيم السياسة بالكامل في وثيقة ملخصة شاملة وواضحة ومنسقة بنظام (Organized & Comprehensive Policy Summary) يعكس محتوى الوثيقة الحقيقي 100% دون أي اختلاق لبيانات وهمية ودون فرض قوالب خارج نص الوثيقة.
+3. التلخيص في حقل (markdownSummary):
+   - يجب أن يكون وافياً، مفصلاً، ومستوعباً لكافة أقسام السياسة كما وردت في الوثيقة الأصلية (العنوان والكود، الغرض والمبررات، النطاق والتطبيق، التعريفات والمصطلحات، خطوات العمل القياسية المفصلة SOPs، مصفوفة المسؤوليات وتوزيع الأدوار، المحظورات ونقاط التحكم الحرجة، الجداول والمواصفات، النماذج ومؤشرات المتابعة والتدقيق).
+   - استخدم تنسيق Markdown الغني: جداول منظمة، نقاط متسلسلة، خطوط بارزة، واقتباسات تنبيهية واضحة.
+4. املأ باقي الحقول الهيكلية المستخرجة بدقة من صلب الوثيقة لخدمة البحث والتصدير.`;
 
     const parts: any[] = [];
 
@@ -131,331 +128,272 @@ app.post("/api/analyze-policy", async (req, res) => {
       });
     }
 
-    let userPromptText = `يرجى إجراء تحليل وتلخيص تنفيذي علمي شامل ومفصل ودقيق للسياسة والإجراءات الطبية المرفقة وفق معايير جهار (GAHAR 2025) والدليل القومي:`;
+    let userPromptText = `يرجى تلخيص وتنظيم وثيقة السياسة المرفقة بأمانة وشمولية تامة وفق محتواها الحقيقي بدقة متناهية:`;
 
     if (standardFocus) {
       userPromptText += `\n- معايير التركيز الأساسية: ${standardFocus}`;
     }
 
     if (customInstructions) {
-      userPromptText += `\n- توجيهات إضافية من المستخدم: ${customInstructions}`;
+      userPromptText += `\n- توجيهات خاصة: ${customInstructions}`;
     }
 
     if (content) {
-      userPromptText += `\n\n=== نص الوثيقة / السياسة الكاملة ===\n${content}\n======================================`;
+      userPromptText += `\n\n=== نص الوثيقة المرفقة بالكامل ===\n${content}\n======================================`;
     }
 
     parts.push({
       text: userPromptText,
     });
 
-    const response = await client.models.generateContent({
-      model: "gemini-3.7-flash",
-      contents: { parts },
-      config: {
-        systemInstruction: systemPrompt,
-        responseMimeType: "application/json",
-        responseSchema: {
+    const responseSchema = {
+      type: Type.OBJECT,
+      properties: {
+        markdownSummary: {
+          type: Type.STRING,
+          description: "ملخص شامل ومنظم ومفصل لكامل وثيقة السياسة بصيغة Markdown متكاملة مع الجداول والنقاط والعناوين دون أي بتر.",
+        },
+        policyCard: {
           type: Type.OBJECT,
           properties: {
-            markdownSummary: {
-              type: Type.STRING,
-              description: "A rich, exhaustive, well-formatted Markdown summary in the style of ChatGPT/Gemini including tables, bullet points, headers, step-by-step instructions, definitions, and institutional metadata.",
+            titleArabic: { type: Type.STRING },
+            titleEnglish: { type: Type.STRING },
+            policyCode: { type: Type.STRING },
+            domain: { type: Type.STRING },
+            departments: {
+              type: Type.ARRAY,
+              items: { type: Type.STRING },
             },
-            policyCard: {
-              type: Type.OBJECT,
-              properties: {
-                titleArabic: { type: Type.STRING },
-                titleEnglish: { type: Type.STRING },
-                policyCode: { type: Type.STRING },
-                domain: { type: Type.STRING },
-                departments: {
-                  type: Type.ARRAY,
-                  items: { type: Type.STRING },
-                },
-                effectiveDate: { type: Type.STRING },
-                reviewCycle: { type: Type.STRING },
-                alignedStandards: {
-                  type: Type.ARRAY,
-                  items: {
-                    type: Type.OBJECT,
-                    properties: {
-                      standardBody: { type: Type.STRING },
-                      clauseNumber: { type: Type.STRING },
-                      description: { type: Type.STRING },
-                    },
-                    required: ["standardBody", "description"],
-                  },
-                },
-              },
-              required: ["titleArabic", "titleEnglish", "policyCode", "domain", "departments", "alignedStandards"],
-            },
-            purposeAndScope: {
-              type: Type.OBJECT,
-              properties: {
-                mainObjective: { type: Type.STRING },
-                clinicalRationale: { type: Type.STRING },
-                scope: {
-                  type: Type.ARRAY,
-                  items: { type: Type.STRING },
-                },
-                exclusions: {
-                  type: Type.ARRAY,
-                  items: { type: Type.STRING },
-                },
-              },
-              required: ["mainObjective", "clinicalRationale", "scope"],
-            },
-            scientificDefinitions: {
+            effectiveDate: { type: Type.STRING },
+            reviewCycle: { type: Type.STRING },
+            alignedStandards: {
               type: Type.ARRAY,
               items: {
                 type: Type.OBJECT,
                 properties: {
-                  term: { type: Type.STRING },
-                  definition: { type: Type.STRING },
-                  clinicalSignificance: { type: Type.STRING },
-                },
-                required: ["term", "definition"],
-              },
-            },
-            technicalSpecifications: {
-              type: Type.ARRAY,
-              items: {
-                type: Type.OBJECT,
-                properties: {
-                  techniqueName: { type: Type.STRING },
-                  agentAndConcentration: { type: Type.STRING },
-                  requiredVolume: { type: Type.STRING },
-                  contactTime: { type: Type.STRING },
-                  indications: {
-                    type: Type.ARRAY,
-                    items: { type: Type.STRING },
-                  },
-                  contraindicationsOrLimitations: {
-                    type: Type.ARRAY,
-                    items: { type: Type.STRING },
-                  },
-                },
-                required: ["techniqueName", "agentAndConcentration", "contactTime", "indications"],
-              },
-            },
-            fiveMomentsDetail: {
-              type: Type.ARRAY,
-              items: {
-                type: Type.OBJECT,
-                properties: {
-                  momentNumber: { type: Type.INTEGER },
-                  momentName: { type: Type.STRING },
-                  timing: { type: Type.STRING },
-                  clinicalExamples: {
-                    type: Type.ARRAY,
-                    items: { type: Type.STRING },
-                  },
-                },
-                required: ["momentNumber", "momentName", "timing", "clinicalExamples"],
-              },
-            },
-            skinAndGloveCare: {
-              type: Type.OBJECT,
-              properties: {
-                gloveProtocols: {
-                  type: Type.ARRAY,
-                  items: { type: Type.STRING },
-                },
-                skinProtectionAndDermatitis: {
-                  type: Type.ARRAY,
-                  items: { type: Type.STRING },
-                },
-                jewelryAndNailRegulations: {
-                  type: Type.ARRAY,
-                  items: { type: Type.STRING },
+                  standardBody: { type: Type.STRING },
+                  clauseNumber: { type: Type.STRING },
+                  description: { type: Type.STRING },
                 },
               },
-            },
-            infrastructureRequirements: {
-              type: Type.OBJECT,
-              properties: {
-                sinkSpecifications: {
-                  type: Type.ARRAY,
-                  items: { type: Type.STRING },
-                },
-                dispenserAndConsumables: {
-                  type: Type.ARRAY,
-                  items: { type: Type.STRING },
-                },
-                maintenanceAndRefillRules: {
-                  type: Type.ARRAY,
-                  items: { type: Type.STRING },
-                },
-              },
-            },
-            rolesAndResponsibilities: {
-              type: Type.ARRAY,
-              items: {
-                type: Type.OBJECT,
-                properties: {
-                  role: { type: Type.STRING },
-                  responsibilities: {
-                    type: Type.ARRAY,
-                    items: { type: Type.STRING },
-                  },
-                },
-                required: ["role", "responsibilities"],
-              },
-            },
-            sopPhases: {
-              type: Type.OBJECT,
-              properties: {
-                preProcedure: {
-                  type: Type.ARRAY,
-                  items: {
-                    type: Type.OBJECT,
-                    properties: {
-                      stepNumber: { type: Type.INTEGER },
-                      title: { type: Type.STRING },
-                      details: { type: Type.STRING },
-                      assignedTo: { type: Type.STRING },
-                      keySafetyPoint: { type: Type.STRING },
-                    },
-                    required: ["stepNumber", "title", "details", "assignedTo"],
-                  },
-                },
-                execution: {
-                  type: Type.ARRAY,
-                  items: {
-                    type: Type.OBJECT,
-                    properties: {
-                      stepNumber: { type: Type.INTEGER },
-                      title: { type: Type.STRING },
-                      details: { type: Type.STRING },
-                      assignedTo: { type: Type.STRING },
-                      keySafetyPoint: { type: Type.STRING },
-                    },
-                    required: ["stepNumber", "title", "details", "assignedTo"],
-                  },
-                },
-                postProcedure: {
-                  type: Type.ARRAY,
-                  items: {
-                    type: Type.OBJECT,
-                    properties: {
-                      stepNumber: { type: Type.INTEGER },
-                      title: { type: Type.STRING },
-                      details: { type: Type.STRING },
-                      assignedTo: { type: Type.STRING },
-                      keySafetyPoint: { type: Type.STRING },
-                    },
-                    required: ["stepNumber", "title", "details", "assignedTo"],
-                  },
-                },
-              },
-              required: ["preProcedure", "execution", "postProcedure"],
-            },
-            safetyWarningsAndCriticalSteps: {
-              type: Type.OBJECT,
-              properties: {
-                criticalControlPoints: {
-                  type: Type.ARRAY,
-                  items: { type: Type.STRING },
-                },
-                dos: {
-                  type: Type.ARRAY,
-                  items: { type: Type.STRING },
-                },
-                donts: {
-                  type: Type.ARRAY,
-                  items: { type: Type.STRING },
-                },
-                emergencyIncidentProtocol: { type: Type.STRING },
-              },
-              required: ["criticalControlPoints", "dos", "donts"],
-            },
-            mermaidFlowchart: {
-              type: Type.OBJECT,
-              properties: {
-                code: { type: Type.STRING },
-                description: { type: Type.STRING },
-              },
-              required: ["code"],
-            },
-            complianceAndKPIs: {
-              type: Type.OBJECT,
-              properties: {
-                auditChecklist: {
-                  type: Type.ARRAY,
-                  items: {
-                    type: Type.OBJECT,
-                    properties: {
-                      id: { type: Type.STRING },
-                      checkpoint: { type: Type.STRING },
-                      standardReference: { type: Type.STRING },
-                      evidenceRequired: { type: Type.STRING },
-                      frequency: { type: Type.STRING },
-                    },
-                    required: ["checkpoint", "standardReference", "evidenceRequired"],
-                  },
-                },
-                kpis: {
-                  type: Type.ARRAY,
-                  items: {
-                    type: Type.OBJECT,
-                    properties: {
-                      name: { type: Type.STRING },
-                      formula: { type: Type.STRING },
-                      target: { type: Type.STRING },
-                      frequency: { type: Type.STRING },
-                      responsiblePerson: { type: Type.STRING },
-                    },
-                    required: ["name", "formula", "target"],
-                  },
-                },
-                gapAnalysisAndRecommendations: {
-                  type: Type.ARRAY,
-                  items: { type: Type.STRING },
-                },
-              },
-              required: ["auditChecklist", "kpis", "gapAnalysisAndRecommendations"],
-            },
-            executiveSummarySnippet: {
-              type: Type.STRING,
-              description: "A comprehensive multi-paragraph scientific executive summary in formal medical Arabic",
             },
           },
-          required: [
-            "policyCard",
-            "purposeAndScope",
-            "rolesAndResponsibilities",
-            "sopPhases",
-            "safetyWarningsAndCriticalSteps",
-            "mermaidFlowchart",
-            "complianceAndKPIs",
-            "executiveSummarySnippet",
-          ],
+          required: ["titleArabic"],
+        },
+        executiveSummarySnippet: {
+          type: Type.STRING,
+          description: "ملخص تنفيذي مركز لجوهر السياسة وأهم ما يجب معرفته.",
+        },
+        purposeAndScope: {
+          type: Type.OBJECT,
+          properties: {
+            mainObjective: { type: Type.STRING },
+            clinicalRationale: { type: Type.STRING },
+            scope: {
+              type: Type.ARRAY,
+              items: { type: Type.STRING },
+            },
+            exclusions: {
+              type: Type.ARRAY,
+              items: { type: Type.STRING },
+            },
+          },
+        },
+        scientificDefinitions: {
+          type: Type.ARRAY,
+          items: {
+            type: Type.OBJECT,
+            properties: {
+              term: { type: Type.STRING },
+              definition: { type: Type.STRING },
+              clinicalSignificance: { type: Type.STRING },
+            },
+            required: ["term", "definition"],
+          },
+        },
+        rolesAndResponsibilities: {
+          type: Type.ARRAY,
+          items: {
+            type: Type.OBJECT,
+            properties: {
+              role: { type: Type.STRING },
+              responsibilities: {
+                type: Type.ARRAY,
+                items: { type: Type.STRING },
+              },
+            },
+            required: ["role"],
+          },
+        },
+        sopPhases: {
+          type: Type.OBJECT,
+          properties: {
+            preProcedure: {
+              type: Type.ARRAY,
+              items: {
+                type: Type.OBJECT,
+                properties: {
+                  stepNumber: { type: Type.INTEGER },
+                  title: { type: Type.STRING },
+                  details: { type: Type.STRING },
+                  assignedTo: { type: Type.STRING },
+                  keySafetyPoint: { type: Type.STRING },
+                },
+              },
+            },
+            execution: {
+              type: Type.ARRAY,
+              items: {
+                type: Type.OBJECT,
+                properties: {
+                  stepNumber: { type: Type.INTEGER },
+                  title: { type: Type.STRING },
+                  details: { type: Type.STRING },
+                  assignedTo: { type: Type.STRING },
+                  keySafetyPoint: { type: Type.STRING },
+                },
+              },
+            },
+            postProcedure: {
+              type: Type.ARRAY,
+              items: {
+                type: Type.OBJECT,
+                properties: {
+                  stepNumber: { type: Type.INTEGER },
+                  title: { type: Type.STRING },
+                  details: { type: Type.STRING },
+                  assignedTo: { type: Type.STRING },
+                  keySafetyPoint: { type: Type.STRING },
+                },
+              },
+            },
+          },
+        },
+        safetyWarningsAndCriticalSteps: {
+          type: Type.OBJECT,
+          properties: {
+            criticalControlPoints: {
+              type: Type.ARRAY,
+              items: { type: Type.STRING },
+            },
+            dos: {
+              type: Type.ARRAY,
+              items: { type: Type.STRING },
+            },
+            donts: {
+              type: Type.ARRAY,
+              items: { type: Type.STRING },
+            },
+            emergencyIncidentProtocol: { type: Type.STRING },
+          },
+        },
+        complianceAndKPIs: {
+          type: Type.OBJECT,
+          properties: {
+            auditChecklist: {
+              type: Type.ARRAY,
+              items: {
+                type: Type.OBJECT,
+                properties: {
+                  checkpoint: { type: Type.STRING },
+                  standardReference: { type: Type.STRING },
+                  evidenceRequired: { type: Type.STRING },
+                },
+              },
+            },
+            kpis: {
+              type: Type.ARRAY,
+              items: {
+                type: Type.OBJECT,
+                properties: {
+                  name: { type: Type.STRING },
+                  formula: { type: Type.STRING },
+                  target: { type: Type.STRING },
+                  frequency: { type: Type.STRING },
+                },
+              },
+            },
+          },
         },
       },
-    });
+      required: ["markdownSummary", "policyCard", "executiveSummarySnippet"],
+    };
 
-    const rawOutput = response.text || "";
+    // Candidate model strategy with automatic failover for high-demand spikes (503 / 429)
+    const candidateModels = ["gemini-2.5-flash", "gemini-3.7-flash", "gemini-flash-latest"];
+    let lastError: any = null;
+    let rawOutput = "";
+
+    for (const modelName of candidateModels) {
+      try {
+        console.log(`Analyzing policy with model: ${modelName}...`);
+        const response = await client.models.generateContent({
+          model: modelName,
+          contents: { parts },
+          config: {
+            systemInstruction: systemPrompt,
+            responseMimeType: "application/json",
+            responseSchema: responseSchema,
+          },
+        });
+
+        rawOutput = response.text || "";
+        if (rawOutput && rawOutput.trim().length > 0) {
+          console.log(`Successfully generated summary using ${modelName}`);
+          break;
+        }
+      } catch (err: any) {
+        console.warn(`Model ${modelName} failed or busy:`, err.message || err);
+        lastError = err;
+        // Small delay before trying fallback model
+        await new Promise((r) => setTimeout(r, 800));
+      }
+    }
+
+    if (!rawOutput && lastError) {
+      throw lastError;
+    }
+
     const parsed = parseJsonSafely(rawOutput);
     res.json({ success: true, data: parsed });
   } catch (error: any) {
     console.error("Error analyzing policy with Gemini:", error);
     
-    try {
-      console.warn("Generating rich scientific fallback analysis due to API issue...");
-      const fallbackData = generateFallbackAnalysis(content || "", standardFocus);
-      return res.json({ 
-        success: true, 
-        data: fallbackData, 
-        isFallback: true,
-        notice: "تم استخراج الملخص العلمي والمنهجي المعتمد للسياسة بنجاح." 
-      });
-    } catch {
-      res.status(500).json({
-        error: "حدث خطأ أثناء معالجة السياسة عبر الذكاء الاصطناعي.",
-        details: error.message || String(error),
-      });
+    // If text content was provided, build a clean extractive representation from real user text rather than fake mock data
+    if (content && content.trim().length > 50) {
+      try {
+        console.warn("Building extractive summary from user text after API failure...");
+        const lines = content.split("\n").filter((l: string) => l.trim().length > 0);
+        const titleLine = lines[0] || "ملخص وثيقة السياسة";
+        
+        const fallbackExtracted = {
+          policyCard: {
+            titleArabic: titleLine.replace(/^#+\s*/, "").slice(0, 80),
+            domain: "السياسات والإجراءات الطبية المعتمدة",
+            departments: ["الأقسام ذات الصلة"],
+            effectiveDate: "2025/2026",
+            reviewCycle: "سنوي",
+            alignedStandards: [{ standardBody: "معايير الاعتماد والجودة", description: "التطبيق الإكلينيكي المعتمد" }]
+          },
+          executiveSummarySnippet: lines.slice(0, 5).join(" ").slice(0, 350) + "...",
+          markdownSummary: `# ${titleLine}\n\n## 📄 محتوى السياسة المنظم المستخرج\n\n` + content.slice(0, 4000)
+        };
+
+        return res.json({ 
+          success: true, 
+          data: fallbackExtracted, 
+          isFallback: true,
+          notice: "تم استخراج محتوى السياسة من النص المرفق."
+        });
+      } catch (extErr) {
+        console.error("Extractive fallback failed:", extErr);
+      }
     }
+
+    res.status(500).json({
+      error: "حدث ضغط مؤقت على خوادم الذكاء الاصطناعي أثناء معالجة الوثيقة. يرجى المحاولة مرة أخرى بالضغط على زر 'تحليل وتلخيص السياسة'.",
+      details: error.message || String(error),
+    });
   }
 });
 

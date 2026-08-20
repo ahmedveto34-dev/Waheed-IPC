@@ -88,7 +88,12 @@ export function GeminiStyleSummary({ data, onSwitchToA4, onReset }: GeminiStyleS
     if (data.complianceAndKPIs?.kpis?.length) {
       md += `## 6. مؤشرات الأداء والامتثال (KPIs)\n\n`;
       data.complianceAndKPIs.kpis.forEach(kpi => {
-        md += `- **${kpi.name}:** المستهدف: ${kpi.target} (دورية القياس: ${kpi.frequency})\n`;
+        const details = [
+          kpi.target ? `المستهدف: ${kpi.target}` : '',
+          kpi.frequency ? `دورية القياس: ${kpi.frequency}` : '',
+          kpi.formula ? `المعادلة: ${kpi.formula}` : ''
+        ].filter(Boolean).join(' | ');
+        md += `- **${kpi.name}**${details ? ` (${details})` : ''}\n`;
       });
       md += `\n`;
     }

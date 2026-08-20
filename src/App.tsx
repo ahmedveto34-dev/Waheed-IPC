@@ -163,28 +163,22 @@ export default function App() {
       }
 
       // Resilient data normalization
-      const raw = result.data;
+      const raw = result.data || {};
       const normalizedResult: PolicyAnalysisResult = {
         policyCard: {
-          titleArabic: raw.policyCard?.titleArabic || 'سياسة وإجراءات مكافحة العدوى والسلامة',
-          titleEnglish: raw.policyCard?.titleEnglish || 'Infection Prevention and Clinical Safety Policy',
-          policyCode: raw.policyCard?.policyCode || 'GAHAR-IPC-01',
-          domain: raw.policyCard?.domain || 'مكافحة العدوى والوقاية منها (Infection Prevention & Control)',
-          departments: Array.isArray(raw.policyCard?.departments) ? raw.policyCard.departments : ['كافة الأقسام الإكلينيكية والتمريض'],
-          effectiveDate: raw.policyCard?.effectiveDate || new Date().toISOString().split('T')[0],
-          reviewCycle: raw.policyCard?.reviewCycle || 'سنوياً',
-          alignedStandards: Array.isArray(raw.policyCard?.alignedStandards) ? raw.policyCard.alignedStandards : [
-            {
-              standardBody: 'معايير جهار (GAHAR 2025)',
-              clauseNumber: 'IPC.1',
-              description: 'تطبيق الاحتياطات القياسية لمكافحة العدوى وسلامة البيئة'
-            }
-          ]
+          titleArabic: raw.policyCard?.titleArabic || 'ملخص وثيقة السياسة والإجراءات',
+          titleEnglish: raw.policyCard?.titleEnglish || '',
+          policyCode: raw.policyCard?.policyCode || '',
+          domain: raw.policyCard?.domain || 'السياسات والإجراءات الطبية المعتمدة',
+          departments: Array.isArray(raw.policyCard?.departments) ? raw.policyCard.departments : [],
+          effectiveDate: raw.policyCard?.effectiveDate || '',
+          reviewCycle: raw.policyCard?.reviewCycle || '',
+          alignedStandards: Array.isArray(raw.policyCard?.alignedStandards) ? raw.policyCard.alignedStandards : []
         },
         purposeAndScope: {
-          mainObjective: raw.purposeAndScope?.mainObjective || 'الحد من انتقال العدوى المكتسبة وضمان سلامة المرضى والممارسين الصحيين.',
-          clinicalRationale: raw.purposeAndScope?.clinicalRationale || 'خفض معدلات العدوى بالمستشفيات والامتثال لمتطلبات الجودة والاعتماد.',
-          scope: Array.isArray(raw.purposeAndScope?.scope) ? raw.purposeAndScope.scope : ['جميع الكوادر الطبية والتمريضية والخدمات المساندة'],
+          mainObjective: raw.purposeAndScope?.mainObjective || '',
+          clinicalRationale: raw.purposeAndScope?.clinicalRationale || '',
+          scope: Array.isArray(raw.purposeAndScope?.scope) ? raw.purposeAndScope.scope : [],
           exclusions: Array.isArray(raw.purposeAndScope?.exclusions) ? raw.purposeAndScope.exclusions : []
         },
         scientificDefinitions: Array.isArray(raw.scientificDefinitions) ? raw.scientificDefinitions : [],
@@ -201,25 +195,26 @@ export default function App() {
         safetyWarningsAndCriticalSteps: {
           criticalControlPoints: Array.isArray(raw.safetyWarningsAndCriticalSteps?.criticalControlPoints)
             ? raw.safetyWarningsAndCriticalSteps.criticalControlPoints
-            : ['الالتزام بالحركات الخمس لنظافة الأيدي وقواعد الحقن الآمن'],
+            : [],
           dos: Array.isArray(raw.safetyWarningsAndCriticalSteps?.dos)
             ? raw.safetyWarningsAndCriticalSteps.dos
-            : ['الالتزام بالواقيات الشخصية وتطهير الأيدي'],
+            : [],
           donts: Array.isArray(raw.safetyWarningsAndCriticalSteps?.donts)
             ? raw.safetyWarningsAndCriticalSteps.donts
-            : ['يحظر إعادة تغطية الإبر باليدين أو مخالفة إجراءات العزل'],
-          emergencyIncidentProtocol: raw.safetyWarningsAndCriticalSteps?.emergencyIncidentProtocol || 'غسل الموضع فوراً بالماء والصابون وإبلاغ مشرف السلامة ومكافحة العدوى فوراً.'
+            : [],
+          emergencyIncidentProtocol: raw.safetyWarningsAndCriticalSteps?.emergencyIncidentProtocol || ''
         },
         mermaidFlowchart: {
-          code: raw.mermaidFlowchart?.code || `flowchart TD\nStart([بدء الإجراء]) --> Prep[1. نظافة الأيدي وارتداء الواقيات]\nPrep --> Exec[2. التنفيذ بالأسلوب المانع للتلوث]\nExec --> Waste[3. التخلص الآمن من النفايات]\nWaste --> Doc([4. التوثيق والمتابعة])`,
-          description: raw.mermaidFlowchart?.description || 'مخطط سير الإجراءات القياسي'
+          code: raw.mermaidFlowchart?.code || '',
+          description: raw.mermaidFlowchart?.description || ''
         },
         complianceAndKPIs: {
           auditChecklist: Array.isArray(raw.complianceAndKPIs?.auditChecklist) ? raw.complianceAndKPIs.auditChecklist : [],
           kpis: Array.isArray(raw.complianceAndKPIs?.kpis) ? raw.complianceAndKPIs.kpis : [],
           gapAnalysisAndRecommendations: Array.isArray(raw.complianceAndKPIs?.gapAnalysisAndRecommendations) ? raw.complianceAndKPIs.gapAnalysisAndRecommendations : []
         },
-        executiveSummarySnippet: raw.executiveSummarySnippet || 'تم تلخيص وتدقيق محاور هذه السياسة لتتوافق مع معايير جهار 2025 والدليل القومي المصري لمكافحة العدوى.'
+        executiveSummarySnippet: raw.executiveSummarySnippet || '',
+        markdownSummary: raw.markdownSummary || raw.executiveSummarySnippet || ''
       };
 
       setAnalysisResult(normalizedResult);
